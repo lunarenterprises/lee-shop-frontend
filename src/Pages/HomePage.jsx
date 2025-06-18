@@ -5,6 +5,8 @@ import ShopCard from "./ShopCard";
 import FreshProductList from "./FreshProductList";
 import Footer from "./Footer";
 import Header from "./Header";
+import DeliveryAgents from "./DeliveryAgents";
+import JoinLeeShop from "./JoinLeeShop";
 
 const HomePage = () => {
   return (
@@ -32,6 +34,12 @@ const HomePage = () => {
       <div className="shop-list-section">
         <FreshProductList />
       </div>
+      <div className="shop-list-section">
+        <DeliveryAgents />
+      </div>
+      {/* <div className="shop-list-section"> */}
+      <JoinLeeShop />
+      {/* </div> */}
       <Footer />
     </div>
   );

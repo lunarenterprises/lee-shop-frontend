@@ -9,25 +9,13 @@ const Header = () => {
         <div className="homepage-logo">LOGO</div>
         <nav className="homepage-nav">
           <div className="homepage-menu-item">
-            Groceries <span>&#9662;</span>
+            Find your Local shop <span>&#9662;</span>
           </div>
           <div className="homepage-menu-item">
-            Food & Beverages <span>&#9662;</span>
+            Find Nearby services <span>&#9662;</span>
           </div>
           <div className="homepage-menu-item">
-            Home <span>&#9662;</span>
-          </div>
-          <div className="homepage-menu-item">
-            Fashion <span>&#9662;</span>
-          </div>
-          <div className="homepage-menu-item">
-            Electronics <span>&#9662;</span>
-          </div>
-          <div className="homepage-menu-item">
-            Beauty <span>&#9662;</span>
-          </div>
-          <div className="homepage-menu-item">
-            Health <span>&#9662;</span>
+            Assign your Delivery Agent <span>&#9662;</span>
           </div>
         </nav>
         <div className="homepage-icons">

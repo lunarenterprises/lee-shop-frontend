@@ -13,6 +13,7 @@ const ShopList = [
     logoText: "CakeZone",
     whatsapp: true,
     icon: null,
+    image: "/shop.png",
   },
   {
     name: "FreshMart",
@@ -46,25 +47,42 @@ const ShopList = [
     logoText: "Freshmeat",
     whatsapp: true,
     icon: "🍗",
+    image: "/shop.png",
   },
 ];
 
 const ShopCard = () => {
   return (
     <div className="product-container">
-      <h2 className="product-heading">Find your local fresh product</h2>
+      <h2 className="product-heading">Discover Local Shops & Services</h2>
       <div className="product-grid">
         {ShopList.map((product, index) => (
           <div className="product-card" key={index}>
-            <div
-              className="product-logo"
-              style={{ backgroundColor: product.color }}
-            >
-              {product.icon && (
-                <div className="product-icon">{product.icon}</div>
-              )}
-              <div className="product-logo-text">{product.logoText}</div>
-            </div>
+            {product.image ? (
+              <img
+                src={product.image}
+                className="product-logo"
+                style={{
+                  // backgroundColor: product.color,
+                  // margin: "10px",
+                  borderRadius: "20px",
+                }}
+              />
+            ) : (
+              <div
+                className="product-logo"
+                style={{
+                  backgroundColor: product.color,
+                  margin: "10px",
+                  borderRadius: "20px",
+                }}
+              >
+                {product.icon && (
+                  <div className="product-icon">{product.icon}</div>
+                )}
+                <div className="product-logo-text">{product.logoText}</div>
+              </div>
+            )}
             <div className="product-details">
               <div className="product-top">
                 <span>{product.distance}</span>

@@ -1,0 +1,108 @@
+.delivery-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.delivery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.delivery-header h2 {
+  font-size: 24px;
+  margin: 0;
+}
+
+.view-all {
+  color: green;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.delivery-cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.delivery-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 300px;
+}
+
+.delivery-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.delivery-avatar img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.delivery-info {
+  flex-grow: 1;
+  margin-left: 15px;
+}
+
+.delivery-info h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.delivery-info p {
+  margin: 5px 0 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.star {
+  color: gold;
+  font-size: 16px;
+  margin-right: 4px;
+}
+
+.delivery-distance {
+  font-size: 14px;
+  color: #555;
+}
+
+.delivery-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.contact-btn {
+  flex: 1;
+  background: #006400;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.whatsapp-btn {
+  flex: 1;
+  background: transparent;
+  color: #006400;
+  border: 2px solid #006400;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+}
