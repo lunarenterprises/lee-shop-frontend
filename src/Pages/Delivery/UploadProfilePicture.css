@@ -1,0 +1,169 @@
+.upload-profile-container {
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.upload-left-panel {
+  flex: 1;
+  min-width: 300px;
+  background-color: #f5f5f5;
+  position: relative;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-left-panel img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.quote {
+  margin-top: 1rem;
+  font-size: 14px;
+  text-align: center;
+  color: #333;
+  padding: 0 10px;
+}
+
+.upload-right-panel {
+  flex: 1.2;
+  min-width: 300px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.progress-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.circle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #d0eecf;
+}
+
+.circle.current {
+  background-color: #1b611d;
+}
+
+.line {
+  height: 2px;
+  width: 40px;
+  background-color: #d0eecf;
+  margin: 0 5px;
+}
+
+.line.completed {
+  background-color: #1b611d;
+}
+
+.circle.completed {
+  background-color: #1b611d;
+}
+
+.upload-heading {
+  font-size: 20px;
+  color: #1b611d;
+  margin-bottom: 1rem;
+}
+
+.arrow-symbol {
+  color: #1b611d;
+  margin-right: 5px;
+}
+
+.upload-box {
+  border: 2px dashed #1b611d;
+  border-radius: 10px;
+  padding: 2rem;
+  text-align: center;
+  color: #444;
+  margin-bottom: 2rem;
+}
+
+.upload-box svg {
+  color: #1b611d;
+  margin-bottom: 10px;
+}
+
+.choose-file-btn {
+  background-color: #1b611d;
+  color: white;
+  padding: 8px 16px;
+  margin-top: 10px;
+  display: inline-block;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.back-btn,
+.skip-btn,
+.next-btn {
+  padding: 10px 20px;
+  border: none;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.back-btn,
+.skip-btn {
+  border: 1px solid #1b611d;
+  background-color: white;
+  color: #1b611d;
+}
+
+.back-btn:hover,
+.skip-btn:hover {
+  background-color: #e4f7e4;
+}
+
+.next-btn {
+  background-color: #1b611d;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.next-btn:hover {
+  background-color: #155317;
+}
+
+@media (max-width: 768px) {
+  .upload-profile-container {
+    flex-direction: column;
+  }
+
+  .upload-left-panel,
+  .upload-right-panel {
+    width: 100%;
+  }
+
+  .upload-box {
+    padding: 1.5rem;
+  }
+
+  .upload-heading {
+    font-size: 18px;
+  }
+}

@@ -1,10 +1,14 @@
+import Route from "./Pages/Route/Path"
 import "./App.css";
-import HomePage from "./Pages/HomePage";
+// import RegistrationJoin from "./Pages/Registration/RegistrationJoin/RegistrationJoin";
+
+
 
 function App() {
   return (
     <>
-      <HomePage />
+      <Route />
+
     </>
   );
 }

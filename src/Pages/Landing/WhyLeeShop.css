@@ -1,0 +1,158 @@
+.leeshop-why {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.why-lee-shop {
+  padding: 2rem 1rem;
+  text-align: center;
+  background-color: white;
+  max-width: 1200px;
+  margin: auto;
+  position: relative;
+}
+
+.why-lee-shop h2 {
+  color: #167c30;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.why-lee-shop p {
+  color: #555;
+  font-size: 1rem;
+  max-width: 700px;
+  margin: 0 auto 2rem;
+  line-height: 1.6;
+  padding: 0 1rem;
+}
+
+.steps-container {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem;
+  padding: 2rem 1rem;
+  margin-top: -3rem;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+.step-card {
+  background-color: #d7f9a1;
+  border-radius: 2rem;
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  width: 100%;
+  max-width: 300px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  text-align: left;
+  z-index: 2;
+}
+
+.step-card .icon-wrapper {
+  background-color: #a7df42;
+  border-radius: 50%;
+  padding: 0.5rem;
+  margin-right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-card span {
+  font-weight: 500;
+  color: #000;
+  font-size: 1rem;
+}
+
+/* Middle card slightly lower */
+.step-card.center {
+  position: relative;
+  top: 1.5rem;
+}
+
+/* Dashed line image */
+.dashed-line-image {
+  position: absolute;
+  top: 98%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+ max-width: 139%;
+  height: auto;
+  height: auto;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Tablet */
+@media screen and (max-width: 1024px) {
+  .why-lee-shop h2 {
+    font-size: 1.8rem;
+  }
+
+  .why-lee-shop p {
+    font-size: 0.95rem;
+  }
+
+  .step-card.center {
+    top: 1rem;
+  }
+
+  .dashed-line-image {
+    width: 100%;
+    max-width: 1000px;
+  }
+}
+
+/* Mobile */
+@media screen and (max-width: 768px) {
+  .steps-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .step-card {
+    flex-direction: row;
+    justify-content: flex-start;
+    width: 100%;
+    max-width: 90%;
+  }
+
+  .step-card.center {
+    top: 0;
+  }
+
+  .dashed-line-image {
+    display: none;
+  }
+
+  .why-lee-shop h2 {
+    font-size: 1.5rem;
+  }
+
+  .why-lee-shop p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Small phones */
+@media screen and (max-width: 480px) {
+  .step-card {
+    padding: 0.8rem 1rem;
+  }
+
+  .step-card span {
+    font-size: 0.95rem;
+  }
+
+  .why-lee-shop p {
+    font-size: 0.85rem;
+  }
+}

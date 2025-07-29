@@ -1,0 +1,344 @@
+/* ---------- Container ---------- */
+.listing-card {
+  max-width: 900px;
+  margin: 24px auto;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  font-family: "Inter", sans-serif;
+}
+.badge-distance{
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #A5E830;
+    color: #0A5C15;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* ---------- Banner ---------- */
+.banner {
+  position: relative;
+  width: 100%;
+  padding-top: 30%; /* 3 : 1 aspect ratio */
+}
+
+.banner-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.badge.distance {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #19c37d;
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.icon-heart {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #fff;
+  color: #19c37d;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  padding: 6px;
+  cursor: pointer;
+}
+
+/* ---------- Details ---------- */
+.details {
+  padding: 20px 18px 28px;
+}
+
+/* Header block */
+.header-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  align-items: center;
+}
+
+.title {
+  flex: 1 1 100%;
+  margin: 0 0 4px;
+  font-size: 1.4rem;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.star {
+  color: #fbc02d;
+}
+
+.review-count {
+  font-weight: 400;
+  color: #64748b;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.status::before {
+  content: "•";
+  margin: 0 5px 0 2px;
+}
+
+.delivery {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Action buttons */
+.actions {
+  margin: 18px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  padding: 6px 18px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+.btn.primary {
+  background: #19c37d;
+  color: #fff;
+}
+
+.btn.whatsapp {
+  background: #fff;
+  border: 1px solid #d1d5db;
+  color: #000;
+}
+
+.btn.edit {
+  background: #f4f4f5;
+  color: #000;
+}
+
+/* ---------- Gallery ---------- */
+.gallery {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.main-photo img,
+.small-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.side-photos {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+}
+
+.more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #d1d5db;
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 1.1rem;
+}
+
+/* ---------- Tabs ---------- */
+.tabs {
+  display: flex;
+  gap: 24px;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 14px;
+}
+
+.tab {
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 8px 0;
+  color: #475569;
+  position: relative;
+  cursor: pointer;
+}
+
+.tab.active {
+  color: #000;
+}
+
+.tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #19c37d;
+}
+
+/* ---------- Content ---------- */
+.content h4 {
+  margin: 16px 0 8px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.content ul {
+  margin: 0 0 16px;
+  padding-left: 18px;
+}
+
+.content p {
+  line-height: 1.55;
+  margin: 0 0 12px;
+}
+
+/* ---------- Responsiveness ---------- */
+@media (max-width: 768px) {
+  .gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .side-photos {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+
+/* -------- Overall wrapper -------- */
+.gallery-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  max-width: 900px;      /* tweak as you like */
+  margin: auto;
+}
+
+/* -------- Left side (hero) -------- */
+.gallery-left {
+  flex: 2;
+}
+
+.gallery-left img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* -------- Right side -------- */
+.gallery-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Top row */
+.top-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* Bottom row → two equal columns */
+.bottom-images {
+  display: flex;
+  gap: 12px;
+}
+
+.thumb,
+.overlay-container {
+  flex: 1;
+  border-radius: 10px;
+  overflow: hidden;          /* keep the radius on img */
+}
+
+.thumb img,
+.overlay-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* -------- Overlay for +6 -------- */
+.overlay-container {
+  position: relative;
+}
+
+.overlay-text {
+  position: absolute;
+  inset: 0;                      /* full‑size overlay */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.35rem;
+  color: #1f2937;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(1px);
+}
+
+/* -------- Responsiveness -------- */
+@media (max-width: 768px) {
+  .gallery-wrapper {
+    flex-direction: column;
+  }
+}

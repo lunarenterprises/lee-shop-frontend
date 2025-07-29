@@ -1,0 +1,155 @@
+.form-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.left-panel {
+  flex: 1;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  justify-content: center;
+}
+
+.form-image {
+  max-width: 100%;
+  border-radius: 1rem;
+  height: auto;
+}
+
+.quote {
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  text-align: center;
+  color: #444;
+  font-style: italic;
+  max-width: 90%;
+}
+
+.right-panel {
+  flex: 1;
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.step-title {
+  text-align: right;
+  font-size: 0.9rem;
+  color: #2e7d32;
+  margin-bottom: 1rem;
+}
+
+.progress-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.step {
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  background-color: #ccc;
+}
+
+.step.active {
+  background-color: #2e7d32;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  color: #2e7d32;
+  margin-bottom: 1.5rem;
+}
+
+.form-fields label {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.form-fields input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.25rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.country-code {
+  padding: 0.5rem 0.75rem;
+  background: #f1f1f1;
+  border: 1px solid #ccc;
+  border-radius: 6px 0 0 6px;
+  font-size: 0.95rem;
+}
+
+.input-group input {
+  flex: 1;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.form-buttons button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.back-btn {
+  background: white;
+  border: 1px solid #2e7d32;
+  color: #2e7d32;
+}
+
+.skip-btn {
+  background: white;
+  border: 1px solid #ccc;
+  color: #555;
+}
+
+.next-btn {
+  background: #2e7d32;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .form-container {
+    flex-direction: column;
+  }
+
+  .right-panel,
+  .left-panel {
+    width: 100%;
+    padding: 2rem;
+  }
+
+  .form-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
