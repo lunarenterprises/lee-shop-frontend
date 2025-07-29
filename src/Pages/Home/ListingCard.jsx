@@ -1,242 +1,132 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React from "react";
+import "./ListingCard.css";
 import {
   FaStar,
   FaHeart,
   FaPhoneAlt,
   FaWhatsapp,
-  FaTruck,
-  FaSpinner
+  FaTruck
 } from "react-icons/fa";
 import { FiMapPin, FiEdit3 } from "react-icons/fi";
-import "./ListingCard.css";
 
-const API_BASE_URL = "https://lunarsenterprises.com:6031/leeshop";
-
-const transformApiData = (apiShop) => ({
-  id: apiShop.sh_id,
-  name: apiShop.sh_name,
-  ownerName: apiShop.sh_owner_name,
-  category: apiShop.sh_category_name,
-  shopType: apiShop.sh_shop_or_service,
-  bannerImage: 'https://lunarsenterprises.com:6031' + apiShop.shopimages[0].si_image,
-  distance: "2km away", // Replace with your actual distance logic if needed
-  rating: apiShop.sh_ratings || 0,
-  reviewCount: 0,
-  location: `${apiShop.sh_location}, ${apiShop.sh_city}, ${apiShop.sh_state}`,
-  address: apiShop.sh_address,
-  status: apiShop.sh_status === "active" ? `Open ${apiShop.sh_opening_hours}` : "Closed",
-  isOpen: apiShop.sh_status === "active",
-  deliveryAvailable: apiShop.sh_delivery_option === "Available",
-  phone: `+${apiShop.sh_primary_phone}`,
-  secondaryPhone: apiShop.sh_secondary_phone ? `+${apiShop.sh_secondary_phone}` : null,
-  whatsapp: `+${apiShop.sh_whatsapp_number}`,
-  email: apiShop.sh_email,
-  gallery: {
-    mainImage: apiShop.shopimages?.[0]
-      ? `${'https://lunarsenterprises.com:6031'}${apiShop.shopimages[0].si_image}`
-      : "",
-    topImage: apiShop.shopimages?.[1]
-      ? `${'https://lunarsenterprises.com:6031'}${apiShop.shopimages[1].si_image}`
-      : apiShop.shopimages?.[0]
-        ? `${'https://lunarsenterprises.com:6031'}${apiShop.shopimages[0].si_image}`
-        : "",
-    thumbnails:
-      apiShop.shopimages?.slice(0, 2).map((img) => `${'https://lunarsenterprises.com:6031'}${img.si_image}`) || [],
-    additionalImagesCount: Math.max(0, (apiShop.shopimages?.length || 0) - 2)
-  },
-  about: {
-    description: apiShop.sh_description,
-    productsAndServices: apiShop.sh_product_and_service
-      .replace(/[\[\]]/g, "")
-      .split(" ")
-      .filter(Boolean),
-    openingHours: `Open: ${apiShop.sh_opening_hours}`,
-    workingDays: apiShop.sh_working_days.replace(/[\[\]]/g, "").split(" ").filter(Boolean)
-  },
-  reviews: [], // Add reviews if available from API
-});
-
-const ListingCard = ({ shop }) => {
-  const data = transformApiData(shop);
-
-  const handleCall = () => {
-    window.location.href = `tel:${data.phone}`;
-  };
-
-  const handleWhatsApp = () => {
-    const num = data.whatsapp.replace(/\D/g, "");
-    window.open(`https://wa.me/${num}`, "_blank");
-  };
-
-  const handleEdit = () => {
-    console.log("Edit listing:", data.id);
-  };
-
-  const renderStars = (rating) =>
-    Array.from({ length: 5 }, (_, i) => (
-      <FaStar
-        key={i}
-        className={`star ${i < Math.floor(rating) ? "filled" : "empty"}`}
-      />
-    ));
-
+const ListingCard = () => {
   return (
     <div className="listing-card">
+      {/* ---------- Hero / Banner ---------- */}
       <div className="banner">
-        <img src={data.bannerImage} alt={`${data.name} banner`} className="banner-img" />
-        <span className="badge-distance">{data.distance}</span>
+        <img
+          src="/imageone.png"
+          alt="CakeZone banner"
+          className="banner-img"
+        />
+
+        <span className="badge-distance">1.5km away</span>
         <FaHeart className="icon-heart" />
       </div>
+
+      {/* ---------- Details ---------- */}
       <div className="details">
+        {/* Top row: name, rating, meta */}
         <div className="header-info">
-          <div className="title-section">
-            <h2 className="title">{data.name}</h2>
-            {data.category && <span className="category-badge">{data.category}</span>}
-            {data.shopType && <span className="shop-type-badge">{data.shopType}</span>}
-          </div>
+          <h2 className="title">Cakezone</h2>
+
           <div className="rating">
-            {renderStars(data.rating)}
-            {data.rating} <span className="review-count">({data.reviewCount} Reviews)</span>
+            <FaStar className="star" />
+            4.5 <span className="review-count">(120 Reviews)</span>
           </div>
+
           <div className="meta">
-            <FiMapPin /> {data.location}
-            <span className={`status ${data.isOpen ? "open" : "closed"}`}> • {data.status}</span>
-            {data.deliveryAvailable && (
-              <span className="delivery">
-                <FaTruck /> Delivery Available
-              </span>
-            )}
+            <FiMapPin /> Panampilly Nagar, Kochi
+            <span className="status">• Open 7 am to 9 pm</span>
+            <span className="delivery">
+              <FaTruck /> Delivery Available
+            </span>
           </div>
         </div>
+
+        {/* Action buttons */}
         <div className="actions">
-          <button className="btn primary" onClick={handleCall}>
-            <FaPhoneAlt /> Contact Now
+          <button className="btn primary">
+            <FaPhoneAlt /> Contact Now
           </button>
-          <button className="btn whatsapp" onClick={handleWhatsApp}>
+          <button className="btn whatsapp">
             <FaWhatsapp /> WhatsApp
           </button>
-          <button className="btn edit" onClick={handleEdit}>
+          <button className="btn edit">
             <FiEdit3 /> Edit
           </button>
         </div>
+
+        {/* ---------- Photo gallery ---------- */}
         <div className="gallery-wrapper">
+          {/* ---------- Left: large hero ---------- */}
           <div className="gallery-left">
-            <img src={data.gallery.mainImage} alt={`${data.name} main gallery image`} />
+            <img
+              src="/imagetwo.png"
+              alt="Assorted pastries on table"
+            />
           </div>
+
+          {/* ---------- Right column ---------- */}
           <div className="gallery-right">
+            {/* Row 1 — one wide image */}
             <div className="top-image">
-              <img src={data.gallery.topImage} alt={`${data.name} featured image`} />
+              <img
+                src="/imagethree.png"
+                alt="Pink pastries"
+              />
             </div>
+
+            {/* Row 2 — TWO square thumbnails */}
             <div className="bottom-images">
-              {data.gallery.thumbnails[0] && (
+              {/* Left thumbnail */}
+              <img
+                src="/imagefour.png"
+                alt="Chocolate cake slice"
+                className="thumb"
+              />
+
+              {/* Right thumbnail with +6 overlay */}
+              <div className="thumb overlay-container">
                 <img
-                  src={data.gallery.thumbnails[0]}
-                  alt={`${data.name} thumbnail 1`}
-                  className="thumb"
+                  src="/imagefive.png"
+                  alt="Macarons"
                 />
-              )}
-              {data.gallery.thumbnails[1] && (
-                <div className="thumb overlay-container">
-                  <img
-                    src={data.gallery.thumbnails[1]}
-                    alt={`${data.name} thumbnail 2`}
-                  />
-                  {data.gallery.additionalImagesCount > 0 && (
-                    <span className="overlay-text">+{data.gallery.additionalImagesCount}</span>
-                  )}
-                </div>
-              )}
+                <span className="overlay-text">+6</span>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* ---------- Tabs ---------- */}
         <div className="tabs">
-          <button className="tab active">About Us</button>
+          <button className="tab active">About Us</button>
+          <button className="tab">Reviews</button>
         </div>
+
+        {/* ---------- Tab content ---------- */}
         <div className="content">
-          <p>{data.about.description}</p>
-          <h4>Products and Services</h4>
+          <p>
+            CakeZone is your go‑to neighborhood bakery known for fresh,
+            handcrafted cakes and a cozy, personalized service experience.
+            Whether it’s a birthday, celebration, or casual indulgence we bake
+            it with care.
+          </p>
+
+          <h4>Products and services</h4>
           <ul>
-            {data.about.productsAndServices.map((item, i) => (
-              <li key={i}>{item}</li>
-            ))}
+            <li>Customized Birthday Cakes</li>
+            <li>Chocolate Truffle, Red Velvet, and Photo Cakes</li>
+            <li>Eggless and Sugar‑free Options</li>
+            <li>Pre‑orders for Events</li>
           </ul>
-          <h4>Opening Hours</h4>
-          <p>{data.about.openingHours}</p>
-          <h4>Working Days</h4>
-          <p>{data.about.workingDays.join(", ")}</p>
-          <h4>Owner</h4>
-          <p>{data.ownerName}</p>
-          <h4>Address</h4>
-          <p>{data.address}</p>
-          <h4>Email</h4>
-          <p>{data.email}</p>
+
+          <h4>Opening Hours</h4>
+          <p>Open Daily: 7 : 00 AM – 9 : 00 PM</p>
         </div>
       </div>
     </div>
   );
 };
 
-export default function AllListings() {
-  const [shops, setShops] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  // Fetch all shops from API (POST)
-  useEffect(() => {
-    const fetchShops = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        // If your API requires any filtering params in POST body, add here
-        const postData = {};
-
-        const response = await axios.post(`${API_BASE_URL}/shop/list/shop`, postData, {
-          headers: { "Content-Type": "application/json" },
-          timeout: 10000
-        });
-
-        if (response.data?.result && response.data.list?.length > 0) {
-          setShops(response.data.list);
-        } else {
-          setError("No shops found");
-        }
-      } catch (e) {
-        setError(`Failed to load shops: ${e.message}`);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchShops();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="loading-state">
-        <FaSpinner className="spinner" />
-        <span>Loading shops...</span>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="error-state">
-        <p>{error}</p>
-      </div>
-    );
-  }
-
-  if (!shops.length) {
-    return <p>No shops to display.</p>;
-  }
-
-  return (
-    <div className="all-listings">
-      {shops.map((shop) => (
-        <ListingCard key={shop.sh_id} shop={shop} />
-      ))}
-    </div>
-  );
-}
+export default ListingCard;
