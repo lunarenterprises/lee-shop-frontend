@@ -35,7 +35,7 @@ const FreshProductList = () => {
       try {
         const res = await axios.post(
           `${API_BASE_URL}/shop/list/shop`,
-          { search: "shop" },
+          { sh_shop_or_service: "shop" },
           {
             headers: { "Content-Type": "application/json" }
           }
