@@ -17,6 +17,9 @@ import DeliveryAgentForm from "../Delivery/DeliveryAgentForm";
 import DeliveryDetails from "../Delivery/DeliveryDetails";
 import UploadProfilePicture from "../Delivery/UploadProfilePicture";
 import DeliveryContactInformation from "../Delivery/DeliveryContactInformation";
+import FreshProductList from "../FreshProductList";
+import ShopCard from "../ShopCard";
+import DeliveryAgents from "../DeliveryAgents";
 import HomePage from "../Home/HomePage";
 
 function Path() {
@@ -49,13 +52,13 @@ function Path() {
           <Route path="/DeliveryAgentForm" element={<DeliveryAgentForm />} />
           <Route
             path="/DeliveryDetails"
-            element={<DeliveryDetails/>}
+            element={<DeliveryDetails />}
 
           />
 
           <Route
             path="/uploadProfilePicture"
-            element={<UploadProfilePicture/>}
+            element={<UploadProfilePicture />}
 
           />
 
