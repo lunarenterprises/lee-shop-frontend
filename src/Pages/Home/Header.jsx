@@ -8,15 +8,15 @@ const Header = () => {
       <header className="homepage-header">
         <div className="homepage-logo">LOGO</div>
         <nav className="homepage-nav">
-          <div className="homepage-menu-item">
+          <a href="NearbyShop" className="homepage-menu-item">
             Find your Local shop <span>&#9662;</span>
-          </div>
-          <div className="homepage-menu-item">
+          </a>
+          <a href="/NearbyService" className="homepage-menu-item">
             Find Nearby services <span>&#9662;</span>
-          </div>
-          <div className="homepage-menu-item">
+          </a>
+          <a href="/AssignDelivery" className="homepage-menu-item">
             Assign your Delivery Agent <span>&#9662;</span>
-          </div>
+          </a>
         </nav>
         <div className="homepage-icons">
           <div className="homepage-icon-wrapper">

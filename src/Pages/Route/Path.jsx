@@ -21,7 +21,9 @@ import FreshProductList from "../FreshProductList";
 import ShopCard from "../ShopCard";
 import DeliveryAgents from "../DeliveryAgents";
 import HomePage from "../Home/HomePage";
-
+import AssignDeliveryAgent from "../Delivery/AssignDeliveryAgent";
+import NearbyService from "../Service/NearbyService";
+import NearbyShop from "../Service/NearbyShop";
 function Path() {
   return (
     <div>
@@ -53,6 +55,21 @@ function Path() {
           <Route
             path="/DeliveryDetails"
             element={<DeliveryDetails />}
+
+          />
+          <Route
+            path="/NearbyService"
+            element={<NearbyService />}
+
+          />
+          <Route
+            path="/NearbyShop"
+            element={<NearbyShop />}
+
+          />
+          <Route
+            path="/AssignDelivery"
+            element={<AssignDeliveryAgent />}
 
           />
 
