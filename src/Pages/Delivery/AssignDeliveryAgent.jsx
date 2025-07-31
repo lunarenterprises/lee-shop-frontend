@@ -251,7 +251,6 @@ function AssignDeliveryAgent() {
                     </div>
                 </div>
             </div>
-            <JoinLeeShop />
             <Footer />
         </div>
     );
