@@ -173,6 +173,13 @@
   gap: 20px;
   justify-content: center;
 }
+.homepage-menu-item.active {
+  background-color: #bcee66;
+  font-weight: 600;
+  border-radius: 20px;
+  padding: 5px;
+  /* Or any indicator you want */
+}
 
 /* RESPONSIVE */
 @media (max-width: 1024px) {

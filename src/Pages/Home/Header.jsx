@@ -1,22 +1,31 @@
 import React from "react";
+import { useLocation, Link } from "react-router-dom";
 import "./HomePage.css";
 import { FaBell, FaHeart, FaShoppingCart, FaUser } from "react-icons/fa";
 
+const navItems = [
+  { href: "/NearbyShop", label: "Find your Local shop" },
+  { href: "/NearbyService", label: "Find Nearby services" },
+  { href: "/AssignDelivery", label: "Assign your Delivery Agent" },
+];
+
 const Header = () => {
+  const location = useLocation();
+
   return (
     <div>
       <header className="homepage-header">
         <div className="homepage-logo">LOGO</div>
         <nav className="homepage-nav">
-          <a href="NearbyShop" className="homepage-menu-item">
-            Find your Local shop <span>&#9662;</span>
-          </a>
-          <a href="/NearbyService" className="homepage-menu-item">
-            Find Nearby services <span>&#9662;</span>
-          </a>
-          <a href="/AssignDelivery" className="homepage-menu-item">
-            Assign your Delivery Agent <span>&#9662;</span>
-          </a>
+          {navItems.map((item) => (
+            <Link
+              to={item.href}
+              className={`homepage-menu-item${location.pathname === item.href ? " active" : ""}`}
+              key={item.href}
+            >
+              {item.label} <span>&#9662;</span>
+            </Link>
+          ))}
         </nav>
         <div className="homepage-icons">
           <div className="homepage-icon-wrapper">
