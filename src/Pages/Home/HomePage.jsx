@@ -1,5 +1,14 @@
 import React, { useState } from "react";
 import "./HomePage.css";
+import { FaMapMarkerAlt, FaSearch } from "react-icons/fa";
+
+
+import LoginModal from "./LoginModal";
+import ConfirmIdentityModal from "./ConfirmIdentityModal";
+import EmailVerificationModal from "./EmailVerificationModal";
+import ResetPasswordModal from "./ResetPasswordModal";
+import SuccessModal from "./SuccessModal";
+
 import Header from "./Header";
 import Footer from "../Footer";
 import JoinLeeShop from "../JoinLeeShop";
@@ -59,8 +68,86 @@ const HomePage = () => {
     setSearching(false);
   };
 
+  //----------------------------
+
+    const [showLoginModal, setShowLoginModal] = useState(true);
+  const [showIdentityModal, setShowIdentityModal] = useState(false);
+  const [showEmailVerificationModal, setShowEmailVerificationModal] =
+    useState(false);
+
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  const closeAllModals = () => {
+    setShowLoginModal(false);
+    setShowIdentityModal(false);
+    setShowEmailVerificationModal(false); // <-- Add this
+    setShowResetModal(false); // <-- Add this
+    setShowSuccessModal(false); // <-- Add this
+  };
+
+  const handleForgotPassword = () => {
+    setShowLoginModal(false);
+    setShowIdentityModal(true);
+  };
+ const [userEmail, setUserEmail] = useState("");
+
+
+// ✅ Called from ConfirmIdentityModal on success
+const handleConfirmEmail = (email) => {
+  setUserEmail(email); // Store email for next modal
+  setShowIdentityModal(false); // Hide this modal
+  setShowEmailVerificationModal(true); // Show next modal
+};
+
+
+  const handleVerify = () => {
+    setShowEmailVerificationModal(false); // Close email modal
+    setShowResetModal(true); // Open reset password modal
+  };
+
+
   return (
     <div className="homepage-container">
+
+
+{showLoginModal && (
+        <LoginModal
+          onClose={closeAllModals}
+          onForgotPassword={handleForgotPassword}
+        />
+      )}
+
+      {showIdentityModal && (
+         <ConfirmIdentityModal
+    onClose={() => setShowIdentityModal(false)}
+    onConfirmEmail={handleConfirmEmail}
+  />
+      )}
+
+      {showEmailVerificationModal && (
+      <EmailVerificationModal
+  email={userEmail}
+  onClose={() => setShowEmailVerificationModal(false)}
+  onVerify={handleVerify}
+/>
+
+      )}
+      {showResetModal && (
+     <ResetPasswordModal
+  email={userEmail} // dynamically passed
+  onClose={() => setShowResetModal(false)}
+  onSuccess={() => {
+    setShowResetModal(false);
+    setShowSuccessModal(true);
+  }}
+/>
+      )}
+
+      {showSuccessModal && (
+        <SuccessModal onClose={() => setShowSuccessModal(false)} />
+      )}
+
       <Header />
       <div className="homepage-hero">
         <LocationSearchBar onSearch={handleShopSearch} />

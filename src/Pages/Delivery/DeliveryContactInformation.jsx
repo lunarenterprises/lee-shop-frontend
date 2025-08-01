@@ -3,7 +3,7 @@ import "./DeliveryContactInformation.css";
 import { useNavigate } from "react-router-dom";
 
 const DeliveryContactInformation = () => {
-     const navigate = useNavigate();
+  const navigate = useNavigate();
   return (
     <div className="form-container">
       <div className="left-panel">
@@ -58,13 +58,22 @@ const DeliveryContactInformation = () => {
           <input type="password" placeholder="Enter a password" />
 
           <div className="button-group">
-            <button type="button" className="btn back">Back</button>
-            <button type="button" className="btn skip">Skip</button>
-            <button type="submit" className="btn next"  onClick={() => navigate("/ShopProfileLayout")}>Next ➜</button>
+            <button type="button" className="btn back">
+              Back
+            </button>
+            <button type="button" className="btn skip">
+              Skip
+            </button>
+            <button
+              type="submit"
+              className="btn next"
+              onClick={() => navigate("/ShopProfileLayout")}
+            >
+              Submit ➜
+            </button>
           </div>
         </form>
       </div>
-
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ChevronRight, ArrowLeft } from "lucide-react";
-import { useNavigate, useNavigation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const BusinessRegistrationForm = ({
   onNext = () => {},
@@ -9,7 +9,7 @@ const BusinessRegistrationForm = ({
   defaultSelection = null,
   showSkip = true,
   showBack = true,
-  customImage = "../../reg_1.png",
+  customImage = "/reg_1.png",
   customQuote = null,
   customTitle = null,
   customOptions = null,
@@ -39,6 +39,7 @@ const BusinessRegistrationForm = ({
 
   const handleNext = () => {
     if (selectedOption) {
+      localStorage.setItem("businessType", selectedOption); // Optional: persist
       onNext(selectedOption);
     }
   };
@@ -53,6 +54,7 @@ const BusinessRegistrationForm = ({
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row overflow-hidden">
+      {/* Left Panel */}
       <div className="w-full md:w-1/2 relative">
         {customImage ? (
           <div className="hidden md:block w-full h-full relative">
@@ -72,14 +74,6 @@ const BusinessRegistrationForm = ({
         ) : (
           <div className="w-full h-[300px] sm:h-[400px] flex items-center justify-center bg-gradient-to-br from-green-400 to-green-600">
             <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 sm:p-6 max-w-md mx-4 text-center">
-              <div className="flex items-center justify-center space-x-4 mb-6">
-                <div className="w-16 h-16 bg-white/30 rounded-full flex items-center justify-center">
-                  <div className="w-8 h-8 bg-orange-400 rounded-full"></div>
-                </div>
-                <div className="w-16 h-16 bg-white/30 rounded-full flex items-center justify-center">
-                  <div className="w-8 h-8 bg-blue-400 rounded-full"></div>
-                </div>
-              </div>
               <div className="text-white text-lg font-medium leading-relaxed">
                 "{quote}"
               </div>
@@ -88,8 +82,8 @@ const BusinessRegistrationForm = ({
         )}
       </div>
 
-      {/* Right Side - Form */}
-      <div className="w-full  md:w-1/2 flex flex-col ">
+      {/* Right Panel */}
+      <div className="w-full md:w-1/2 flex flex-col">
         <div className="p-4 sm:p-6 md:p-8">
           <div className="flex items-end justify-end mb-2">
             <p className="text-[16px] text-[#0A5C15] font-semibold">
@@ -101,15 +95,13 @@ const BusinessRegistrationForm = ({
               <React.Fragment key={step.id}>
                 <div
                   className={`w-4 h-4 rounded-full flex items-center justify-center ${
-                    step.completed
-                      ? "bg-green-500"
-                      : step.active
+                    step.completed || step.active
                       ? "bg-green-500"
                       : "bg-green-200"
                   }`}
                 >
                   {(step.completed || step.active) && (
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                    <div className="w-2 h-2 bg-white rounded-full" />
                   )}
                 </div>
                 {index < progressSteps.length - 1 && (
@@ -117,19 +109,19 @@ const BusinessRegistrationForm = ({
                     className={`h-1 w-50 ${
                       step.completed ? "bg-green-500" : "bg-green-200"
                     }`}
-                  ></div>
+                  />
                 )}
               </React.Fragment>
             ))}
           </div>
         </div>
 
-        <div className="flex-1 align-middle  justify-center px-4 sm:px-6 md:px-8 py-8 md:py-12 ">
+        {/* Business Type Form */}
+        <div className="flex-1 justify-center px-4 sm:px-6 md:px-8 py-8 md:py-12">
           <div className="max-w-md mx-auto w-full">
             <h2 className="text-2xl sm:text-3xl font-semibold text-[#0A5C15] mb-8 sm:mb-12 text-center">
               {title}
             </h2>
-
             <div className="space-y-4">
               {options.map((option) => (
                 <label
@@ -137,7 +129,7 @@ const BusinessRegistrationForm = ({
                   className={`flex items-center p-4 sm:p-6 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
                     selectedOption === option.value
                       ? "border-green-500 bg-[#D4F49C]"
-                      : "border-gray-200 bg-[#D4F49C] hover:border-green-300 hover:bg-green-25"
+                      : "border-gray-200 bg-[#D4F49C] hover:border-green-300"
                   }`}
                   onClick={() => handleOptionSelect(option.value)}
                 >
@@ -149,7 +141,7 @@ const BusinessRegistrationForm = ({
                     }`}
                   >
                     {selectedOption === option.value && (
-                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                      <div className="w-3 h-3 bg-white rounded-full" />
                     )}
                   </div>
                   <span className="text-lg font-medium text-[#0A5C15]">
@@ -161,7 +153,8 @@ const BusinessRegistrationForm = ({
           </div>
         </div>
 
-        <div className="px-4 sm:px-6 md:px-4 pb-8 ">
+        {/* Navigation Buttons */}
+        <div className="px-4 sm:px-6 md:px-4 pb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             {showBack ? (
               <button
@@ -172,9 +165,8 @@ const BusinessRegistrationForm = ({
                 Back
               </button>
             ) : (
-              <div></div>
+              <div />
             )}
-
             <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 w-full sm:w-auto gap-4">
               {showSkip && (
                 <button
@@ -184,13 +176,12 @@ const BusinessRegistrationForm = ({
                   Skip
                 </button>
               )}
-
               <button
                 onClick={handleNext}
                 disabled={!selectedOption}
                 className={`flex items-center justify-center px-8 py-3 rounded-lg font-medium transition-all duration-200 w-full sm:w-auto ${
                   selectedOption
-                    ? "bg-[#0A5C15] text-white hover:bg-green-700 shadow-lg hover:shadow-xl"
+                    ? "bg-[#0A5C15] text-white hover:bg-green-700"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
               >
@@ -205,46 +196,23 @@ const BusinessRegistrationForm = ({
   );
 };
 
-// Example usage component
+// Parent Wrapper
 const RegistrationJoin = () => {
+  const navigate = useNavigate();
+
   const pathMap = {
-    "product-seller": "/BusinessRegistrationForm ",
+    "product-seller": "/BusinessRegistrationForm",
     "service-provider": "/ServiceRegistration",
     both: "/BothRegistrationForm",
   };
 
-  const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({});
-
   const handleNext = (selectedValue) => {
-    setFormData((prev) => ({ ...prev, businessType: selectedValue }));
-    navigate(pathMap[selectedValue], {
-      state: { businessType: selectedValue },
-    });
+    localStorage.setItem("businessType", selectedValue); // Optional
+    navigate(pathMap[selectedValue]);
   };
 
   const handleBack = () => navigate(-1);
   const handleSkip = () => navigate("/");
-
-  if (currentStep > 1) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <div className="bg-white p-6 sm:p-8 rounded-lg shadow-lg max-w-md w-full">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Next Step</h2>
-          <p className="text-gray-600 mb-4">
-            Business Type Selected: {formData.businessType}
-          </p>
-          <button
-            onClick={() => setCurrentStep(1)}
-            className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 w-full"
-          >
-            Go Back to Form
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <BusinessRegistrationForm

@@ -6,12 +6,11 @@ import { useNavigate } from "react-router-dom";
 const DeliveryDetails = () => {
   const navigate = useNavigate();
 
-
   return (
     <div className="delivery-details-container">
       <div className="left-panel">
         <img
-          src="/delivery-guy.png"
+          src="/Deliveryimage2.png"
           alt="Delivery"
           className="delivery-image"
         />

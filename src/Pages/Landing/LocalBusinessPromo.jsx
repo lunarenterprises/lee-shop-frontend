@@ -5,12 +5,12 @@ const LocalBusinessPromo = () => {
   return (
     <div className="promo-container">
       <div className="promo-images">
-        <img src="/img1.jpg" alt="Shop 1" className="promo-img top-left" />
-        <img src="/img2.jpg" alt="Shop 2" className="promo-img top-right" />
-        <img src="/img3.jpg" alt="Shop 3" className="promo-img middle-left" />
-        <img src="/img4.jpg" alt="Shop 4" className="promo-img middle-right" />
-        <img src="/img5.jpg" alt="Shop 5" className="promo-img bottom-left" />
-        <img src="/img6.jpg" alt="Shop 6" className="promo-img bottom-right" />
+        <img src="/right1.png" alt="Shop 1" className="promo-img top-left" />
+        <img src="/right2.png" alt="Shop 2" className="promo-img top-right" />
+        <img src="right3.png" alt="Shop 3" className="promo-img middle-left" />
+        <img src="/left1.png" alt="Shop 4" className="promo-img middle-right" />
+        <img src="/left2.png" alt="Shop 5" className="promo-img bottom-left" />
+        <img src="/left3.png" alt="Shop 6" className="promo-img bottom-right" />
       </div>
 
       <div className="promo-content">

@@ -9,8 +9,7 @@ const UploadProfilePicture = () => {
   return (
     <div className="upload-profile-container">
       <div className="upload-left-panel">
-        <img src="/profile-img.png" alt="Profile" />
-       
+        <img src="/Deliveryimage21.png" alt="Profile" />
       </div>
 
       <div className="upload-right-panel">
@@ -41,7 +40,10 @@ const UploadProfilePicture = () => {
         <div className="action-buttons">
           <button className="back-btn">Back</button>
           <button className="skip-btn">Skip</button>
-          <button className="next-btn" onClick={() => navigate("/DeliveryContactInformation")}>
+          <button
+            className="next-btn"
+            onClick={() => navigate("/DeliveryContactInformation")}
+          >
             Next <ArrowRight size={18} />
           </button>
         </div>

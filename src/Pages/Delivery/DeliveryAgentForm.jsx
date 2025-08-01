@@ -1,18 +1,18 @@
 import React from "react";
 import "./DeliveryAgentForm.css";
 import { ChevronRight, MapPin } from "lucide-react";
-import {useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const DeliveryAgentForm = () => {
-    const Navigate = useNavigate();
-    const handleclicknext = () => {
-        Navigate("/DeliveryDetails");
-    }
+  const Navigate = useNavigate();
+  const handleclicknext = () => {
+    Navigate("/DeliveryDetails");
+  };
   return (
     <div className="form-container">
       <div className="left-panel">
         <img
-          src="/delivery-guy.png" // replace with actual image path
+          src="/DeliveryImage.png" // replace with actual image path
           alt="Delivery Guy"
           className="form-image"
         />
@@ -70,7 +70,7 @@ const DeliveryAgentForm = () => {
         <div className="form-buttons">
           <button className="back-btn">Back</button>
           <button className="skip-btn">Skip</button>
-          <button  onClick={handleclicknext()} className="next-btn">
+          <button onClick={() => handleclicknext()} className="next-btn">
             Next <ChevronRight size={16} />
           </button>
         </div>
