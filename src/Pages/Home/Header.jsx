@@ -174,15 +174,7 @@ const Header = ({ activeKey, onNavClick, navItems }) => {
           className="homepage-hamburger"
           onClick={() => setMenuOpen((open) => !open)}
           aria-label={menuOpen ? "Close menu" : "Open menu"}
-          style={{
-            background: "none",
-            border: "none",
-            color: "#bcee66",
-            marginLeft: 10,
-            fontSize: "1.6rem",
-            display: "inline-flex",
-            alignItems: "center"
-          }}
+
         >
           {menuOpen ? <FaTimes size={26} /> : <FaBars size={26} />}
         </button>

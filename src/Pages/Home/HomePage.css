@@ -133,6 +133,9 @@ body,
 
 /* Show in nav drawer on mobile, hide outside */
 @media (max-width: 800px) {
+  .homepage-header {
+    flex-direction: row;
+  }
   .homepage-login-register-mobile {
     display: block;
     padding: 13px 0 0 18px;
@@ -164,9 +167,9 @@ body,
 /* RESPONSIVE: MOBILE */
 @media (max-width: 640px) {
   .homepage-header {
+    flex-direction: row;
     padding: 0 4px;
     font-size: 0.92rem;
-    flex-direction: column;
     height: auto;
     min-height: unset;
     gap: 0;
@@ -203,7 +206,6 @@ body,
     order: 3;
   }
 }
-
 /* Extra small screens */
 @media (max-width: 370px) {
   .homepage-logo,
@@ -216,6 +218,10 @@ body,
   }
 }
 @media (max-width: 800px) {
+  .homepage-hamburger {
+    display: inline-flex; /* Only on mobile/tablet */
+    align-items: center;
+  }
   .homepage-nav {
     display: none;
     flex-direction: column;
