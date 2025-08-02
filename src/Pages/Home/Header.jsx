@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import "./HomePage.css";
-import { FaBell, FaHeart, FaShoppingCart, FaUser } from "react-icons/fa";
+import { FaBell, FaHeart, FaShoppingCart, FaUser, FaBars, FaTimes } from "react-icons/fa";
 import axiosInstance from "../../constant/axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -9,9 +9,9 @@ import ProfileEditModal from "../Profiles/ProfileEditModal";
 const navItems = [
   { href: "/", label: "Home" },
   { href: "/Why", label: "Why Lee Shop" },
-  { href: "/NearbyService", label: "Our Goal" },
+  { href: "/ourGoal", label: "Our Goal" },
 ];
-const Header = ({ onNavClick }) => {
+const Header = ({ activeKey, onNavClick, navItems }) => {
   const location = useLocation();
   const [profileModal, setProfileModal] = useState(false);
   const [childModal, setChildModal] = useState(false);
@@ -146,63 +146,72 @@ const Header = ({ onNavClick }) => {
       }
     });
   };
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // Handles nav button click (and closes menu on mobile)
+  const handleMenuItemClick = (href) => {
+    if (onNavClick) onNavClick(href);
+    setMenuOpen(false);
+  };
   return (
     <div>
       <header className="homepage-header">
-        <div className="homepage-logo">
+        <div
+          className="homepage-logo"
+          onClick={() => onNavClick && onNavClick("/")}
+          style={{ cursor: "pointer" }}
+        >
           <img
             src="/logo.png"
-            alt=""
+            alt="Logo"
             className="h-14 cursor-pointer animate-pulse"
-            onClick={() => navigate("/")}
+            style={{ height: "42px" }}
           />
         </div>
-        <nav className="homepage-nav">
+
+        {/* Hamburger icon for mobile */}
+        <button
+          className="homepage-hamburger"
+          onClick={() => setMenuOpen((open) => !open)}
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          style={{
+            background: "none",
+            border: "none",
+            color: "#bcee66",
+            marginLeft: 10,
+            fontSize: "1.6rem",
+            display: "inline-flex",
+            alignItems: "center"
+          }}
+        >
+          {menuOpen ? <FaTimes size={26} /> : <FaBars size={26} />}
+        </button>
+
+        {/* NAV: on mobile, .open shows menu as overlay */}
+        <nav className={`homepage-nav${menuOpen ? " open" : ""}`}>
           {navItems.map((item) => (
             <button
               type="button"
               key={item.href}
-              className={`homepage-menu-item`}
-              onClick={() => {
-                if (onNavClick) onNavClick(item.href);
-              }}
-              style={{
-                background: "none",
-                border: "none",
-                padding: 0,
-                margin: 0,
-                color: "inherit",
-                font: "inherit",
-                cursor: "pointer"
-              }}
+              className={`homepage-menu-item${activeKey === item.href ? " active" : ""}`}
+              onClick={() => handleMenuItemClick(item.href)}
             >
-              {item.label} <span>&#9662;</span>
+              {item.label}
             </button>
           ))}
+          {/* Login/Register only in mobile nav */}
+          <div className="homepage-login-register-mobile">
+            Login / Register
+          </div>
         </nav>
 
-
-        {/* {userId ? (
-          <div className="homepage-icons">
-            <div className="homepage-icon-wrapper">
-              <FaBell />
-              <span className="badge">1</span>
-            </div>
-            <div className="homepage-icon-wrapper">
-              <FaHeart />
-              <span className="badge">3</span>
-            </div>
-            <div className="homepage-icon-wrapper">
-              <FaShoppingCart />
-            </div>
-            <div className="homepage-icon-wrapper">
-              <FaUser onClick={() => setProfileModal(true)} />
-            </div>
-          </div>
-        ) : ( */}
-        <div>Login / Register</div>
-        {/* )} */}
+        {/* Desktop only: hide this on mobile */}
+        <div className="homepage-login-register-desktop">
+          Login / Register
+        </div>
       </header>
+
+
       {profileModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 flex justify-end items-start pt-16">
           {/* Modal */}
