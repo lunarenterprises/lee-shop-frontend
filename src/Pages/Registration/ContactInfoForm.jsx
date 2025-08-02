@@ -20,6 +20,7 @@ const ContactInfoForm = () => {
     whatsapp_number: "",
     email: "",
     password: "",
+    confirm_password: "",     // <-- IMPORTANT
     product_and_service: [],
     opening_hours: "",
     location: "",
@@ -45,8 +46,8 @@ const ContactInfoForm = () => {
     const brandingDetails = JSON.parse(
       localStorage.getItem("brandingDetails") || "{}"
     );
-
-    setFormData({
+    setFormData(prev => ({
+      ...prev,
       service_or_shop: businessType,
       shop_name: businessInfo.shop_name,
       owner_name: businessInfo.owner_name,
@@ -60,6 +61,7 @@ const ContactInfoForm = () => {
       whatsapp_number: "",
       email: "",
       password: "",
+      confirm_password: "",         // <-- RESET
       product_and_service: ["egg", "milk"],
       opening_hours: operatingDetails.opening_hours,
       location: "kerala",
@@ -69,25 +71,10 @@ const ContactInfoForm = () => {
       longitude: 2.22222,
       category_name: businessInfo.category,
       image: brandingImageMeta,
-    });
-
-    // const serviceDetails =
-    //   JSON.parse(localStorage.getItem("serviceDetails")) || {};
-    // const brandingDetails =
-    //   JSON.parse(localStorage.getItem("brandingDetails")) || {};
-    // const operatingDetails =
-    //   JSON.parse(localStorage.getItem("bothOperatingDetails")) ||
-    //   JSON.parse(localStorage.getItem("operatingDetails")) ||
-    //   {};
-
-    // setFormData((prev) => ({
-    //   ...prev,
-    //   ...serviceDetails,
-    //   ...brandingDetails,
-    //   ...operatingDetails,
-    // }));
+    }));
   }, []);
 
+  // One change handler for all
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -99,6 +86,7 @@ const ContactInfoForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Add this check: password/confirm_password
     if (formData.password !== formData.confirm_password) {
       alert("Passwords do not match");
       return;
@@ -108,25 +96,24 @@ const ContactInfoForm = () => {
       const submitData = new FormData();
 
       for (const key in formData) {
-        if (Array.isArray(formData[key])) {
-          formData[key].forEach((item) => {
-            submitData.append(`${key}`, item);
-          });
-        } else if (key === "image") {
+        if (key === "image") {
+          // Images from file input
           const imageInput = document.getElementById("realImageUploadInput");
           if (imageInput && imageInput.files.length > 0) {
             Array.from(imageInput.files).forEach((file) => {
               submitData.append("image", file);
             });
+          } else if (Array.isArray(formData.image)) {
+            formData.image.forEach(item => {
+              // support for any meta/image URLs if you want (rarely needed)
+              if (typeof item === "string") submitData.append("image", item);
+            })
           }
-        } else if (key === "working_days") {
-          submitData.append("working_days", formData.working_days);
-        } else if (key === "product_and_service") {
-          submitData.append(
-            "product_and_service",
-            formData.product_and_service
-          );
-        } else {
+        } else if (Array.isArray(formData[key])) {
+          // working_days, product_and_service, etc.
+          submitData.append(key, formData[key].join(","));
+        } else if (key !== "confirm_password") {
+          // Do NOT send confirm_password to backend
           submitData.append(key, formData[key]);
         }
       }
@@ -136,9 +123,12 @@ const ContactInfoForm = () => {
         submitData
       );
 
-      console.log("Success:", response.data);
-      alert("Registration successful!");
-      navigate("/ShopProfileLayout");
+      if (response.data && response.data.result) {
+        alert("Registration successful!");
+        navigate("/ShopProfileLayout");
+      } else {
+        alert(response.data?.message || "Registration failed. Please try again.");
+      }
     } catch (error) {
       console.error("Submission error:", error);
       alert("Registration failed. Please try again.");
@@ -180,7 +170,6 @@ const ContactInfoForm = () => {
               required
             />
           </div>
-
           <label>Alternate Contact Number</label>
           <div className="phone-input">
             <span className="country-code">🇮🇳 +91</span>
@@ -192,7 +181,6 @@ const ContactInfoForm = () => {
               placeholder="Enter number"
             />
           </div>
-
           <label>WhatsApp Number</label>
           <div className="phone-input">
             <span className="country-code">🇮🇳 +91</span>
@@ -204,7 +192,6 @@ const ContactInfoForm = () => {
               placeholder="Enter number"
             />
           </div>
-
           <label>Email Address</label>
           <input
             type="email"
@@ -213,7 +200,6 @@ const ContactInfoForm = () => {
             onChange={handleChange}
             placeholder="Enter your email"
           />
-
           <label>Enter Password</label>
           <input
             type="password"
@@ -222,16 +208,14 @@ const ContactInfoForm = () => {
             onChange={handleChange}
             placeholder="Enter a password"
           />
-
           <label>Confirm Password</label>
           <input
             type="password"
             name="confirm_password"
-            value={formData.confirm_password || ""}
+            value={formData.confirm_password}
             onChange={handleChange}
-            placeholder="Enter a password"
+            placeholder="Confirm your password"
           />
-
           <label>Upload Images</label>
           <input
             type="file"
@@ -239,7 +223,6 @@ const ContactInfoForm = () => {
             multiple
             accept="image/*"
           />
-
           <div className="button-group">
             <button
               type="button"
