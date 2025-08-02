@@ -7,13 +7,12 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import ProfileEditModal from "../Profiles/ProfileEditModal";
 const navItems = [
-  { href: "/NearbyShop", label: "Find your Local shop" },
-  { href: "/NearbyService", label: "Find Nearby services" },
-  { href: "/AssignDelivery", label: "Assign your Delivery Agent" },
+  { href: "/", label: "Home" },
+  { href: "/Why", label: "Why Lee Shop" },
+  { href: "/NearbyService", label: "Our Goal" },
 ];
-const Header = () => {
+const Header = ({ onNavClick }) => {
   const location = useLocation();
-
   const [profileModal, setProfileModal] = useState(false);
   const [childModal, setChildModal] = useState(false);
   const [settingsModal, setSettingsModal] = useState(false);
@@ -22,11 +21,8 @@ const Header = () => {
   const [userData, setUserData] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
-
   const navigate = useNavigate();
-
   const formData = useRef(new FormData());
-
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("userData"));
     const getUser = async () => {
@@ -59,7 +55,6 @@ const Header = () => {
       setUserId(userData.u_id);
     }
   }, [userId]); // only depends on userId
-
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -107,13 +102,11 @@ const Header = () => {
       // });
     }
   };
-
   const handleLogout = () => {
     localStorage.removeItem("userData");
     setProfileModal(false);
     setUserId(null);
   };
-
   const handleChangePassword = () => {
     Swal.fire({
       title: "Successfully!",
@@ -123,7 +116,6 @@ const Header = () => {
       footer: '<a href="/login" class="text-[#0A5C15] text-xl">Go to Login</a>',
     });
   };
-
   const handleDeleteButton = () => {
     Swal.fire({
       title: "Are you sure?",
@@ -154,7 +146,6 @@ const Header = () => {
       }
     });
   };
-
   return (
     <div>
       <header className="homepage-header">
@@ -168,19 +159,30 @@ const Header = () => {
         </div>
         <nav className="homepage-nav">
           {navItems.map((item) => (
-            <Link
-              to={item.href}
-              className={`homepage-menu-item${
-                location.pathname === item.href ? " active" : ""
-              }`}
+            <button
+              type="button"
               key={item.href}
+              className={`homepage-menu-item`}
+              onClick={() => {
+                if (onNavClick) onNavClick(item.href);
+              }}
+              style={{
+                background: "none",
+                border: "none",
+                padding: 0,
+                margin: 0,
+                color: "inherit",
+                font: "inherit",
+                cursor: "pointer"
+              }}
             >
               {item.label} <span>&#9662;</span>
-            </Link>
+            </button>
           ))}
         </nav>
 
-        {userId ? (
+
+        {/* {userId ? (
           <div className="homepage-icons">
             <div className="homepage-icon-wrapper">
               <FaBell />
@@ -197,9 +199,9 @@ const Header = () => {
               <FaUser onClick={() => setProfileModal(true)} />
             </div>
           </div>
-        ) : (
-          <div>Login / Register</div>
-        )}
+        ) : ( */}
+        <div>Login / Register</div>
+        {/* )} */}
       </header>
       {profileModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 flex justify-end items-start pt-16">
