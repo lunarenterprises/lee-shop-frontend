@@ -1,12 +1,40 @@
-// ServiceRegistrationForm.jsx
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ServiceRegistrationForm.css";
 
 const ServiceRegistrationForm = () => {
   const navigate = useNavigate();
+  const [images, setImages] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]);
+  const [description, setDescription] = useState("");
+  const [services, setServices] = useState([]);
+  const [newService, setNewService] = useState("");
+
+  // Handle image upload
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    setImages((prev) => [...prev, ...files.map(file => URL.createObjectURL(file))]);
+    setImageFiles((prev) => [...prev, ...files]);
+  };
+
+  const handleAddService = () => {
+    if (newService.trim()) {
+      setServices((prev) => [...prev, newService]);
+      setNewService("");
+    }
+  };
+
+  // Are all fields filled?
+  const allFilled = description && services.length > 0 && imageFiles.length > 0;
 
   const handleNext = () => {
+    // Save image files to window (cannot store Files in localStorage)
+    window.serviceImageFiles = imageFiles;
+    // Store other details in localStorage
+    localStorage.setItem(
+      "serviceRegistration",
+      JSON.stringify({ description, services })
+    );
     navigate("/ServiceContactPage");
   };
 
@@ -34,14 +62,24 @@ const ServiceRegistrationForm = () => {
           <div className="image-upload-box">
             <div className="upload-box">
               <p>Drag and drop your service images here or</p>
-              <button className="upload-btn">Upload an Image</button>
+              <label className="upload-btn">
+                Upload an Image
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={handleImageUpload}
+                />
+              </label>
             </div>
             <div className="image-gallery">
-              {[...Array(8)].map((_, i) => (
+              {images.map((img, i) => (
                 <img
                   key={i}
-                  src="/UploadImage-one.png"
+                  src={img}
                   alt={`Preview ${i + 1}`}
+                  style={{ width: 60, height: 60, objectFit: "cover", marginRight: 8 }}
                 />
               ))}
             </div>
@@ -52,22 +90,37 @@ const ServiceRegistrationForm = () => {
           <textarea
             className="shop-description"
             placeholder="Describe your service offerings, mission, and story."
+            value={description}
+            onChange={e => setDescription(e.target.value)}
           />
 
           <div className="product-service-input">
             <input
               type="text"
               placeholder="Mention types of services provided"
+              value={newService}
+              onChange={e => setNewService(e.target.value)}
+              onKeyDown={e => (e.key === "Enter" ? (e.preventDefault(), handleAddService()) : undefined)}
             />
-            <button className="add-btn">+</button>
+            <button className="add-btn" type="button" onClick={handleAddService}>+</button>
           </div>
 
-          <div className="product-tag">Home Visits & Weekend Services Available</div>
+          <div style={{ marginBottom: 10 }}>
+            {services.map((service, i) => (
+              <span key={i} className="product-tag">{service}</span>
+            ))}
+          </div>
 
           <div className="buttons">
-            <button className="back-btn">Back</button>
-            <button className="skip-btn">Skip</button>
-            <button className="next-btn" onClick={handleNext}>
+            <button className="back-btn" type="button" onClick={() => navigate(-1)}>Back</button>
+            <button className="skip-btn" type="button" onClick={handleNext}>Skip</button>
+            <button
+              className="next-btn"
+              type="button"
+              disabled={!allFilled}
+              style={{ opacity: allFilled ? 1 : 0.5, cursor: allFilled ? "pointer" : "not-allowed" }}
+              onClick={handleNext}
+            >
               Next
             </button>
           </div>

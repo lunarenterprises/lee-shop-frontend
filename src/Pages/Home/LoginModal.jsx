@@ -2,17 +2,17 @@ import React, { useState } from "react";
 import "./LoginModal.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const LoginModal = ({ onClose, onForgotPassword }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // 👈 loader state
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const togglePassword = () => {
-    setShowPassword((prev) => !prev);
-  };
+  const togglePassword = () => setShowPassword((prev) => !prev);
 
   const handleLogin = async () => {
     setIsLoading(true);
@@ -21,14 +21,26 @@ const LoginModal = ({ onClose, onForgotPassword }) => {
       const response = await axios.post("https://lunarsenterprises.com:6031/leeshop/user/login", {
         email,
         password,
-        role: "user"
       });
 
       if (response.data.result === false) {
         setErrorMessage(response.data.message || "Login failed");
+      } else if (response.data.user) {
+        // Save to localStorage if you want:
+        localStorage.setItem("userData", JSON.stringify(response.data.user));
+        let role = response.data.user.role  // or use 'role', inspect your payload!
+        if (role === "user") {
+          navigate("/UserProfile"); // User
+        } else if (role === "deliverystaff") {
+          navigate("/deliveryProfile"); // Delivery Agent
+        } else if (role === "shop") {
+          navigate("/shopProfile"); // Shop Owner
+        } else {
+          navigate("/"); // Default fallback
+        }
+        onClose && onClose();
       } else {
-        console.log("Login Success:", response.data);
-        // onClose(); // close modal if needed
+        setErrorMessage("Login failed: No user info in response.");
       }
     } catch (error) {
       setErrorMessage(
@@ -72,7 +84,6 @@ const LoginModal = ({ onClose, onForgotPassword }) => {
           </span>
         </div>
 
-        {/* ✅ Error message */}
         {errorMessage && <p className="error-message">{errorMessage}</p>}
 
         <div className="remember-forgot">
@@ -88,7 +99,6 @@ const LoginModal = ({ onClose, onForgotPassword }) => {
           </span>
         </div>
 
-        {/* ✅ Sign in button with loader */}
         <button className="sign-in-btn" onClick={handleLogin} disabled={isLoading}>
           {isLoading ? "Signing in..." : "Sign in"}
         </button>

@@ -63,6 +63,7 @@ p {
   font-size: 15px;
   border-radius: 6px;
   border: 1px solid #1e3811;
+  color: black;
 }
 
 .password-wrapper {

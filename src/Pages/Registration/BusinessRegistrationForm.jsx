@@ -14,6 +14,9 @@ const BusinessRegistrationForm = () => {
     category: "",
   });
 
+  // All required fields check
+  const allFilled = Object.values(formData).every(v => v && v.toString().trim() !== "");
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -32,25 +35,19 @@ const BusinessRegistrationForm = () => {
   const handleNext = () => {
     // Save to localStorage
     localStorage.setItem("businessInfo", JSON.stringify(formData));
-
-    // Navigate to next step
     navigate("/BusinessOperatingDetails");
   };
 
   const handleBack = () => navigate(-1);
-  const handleSkip = () => navigate("/BusinessOperatingDetails");
+  const handleSkip = () => {
+    // Optionally: set what you have, or leave last data
+    localStorage.setItem("businessInfo", JSON.stringify(formData));
+    navigate("/BusinessOperatingDetails");
+  };
 
   const categories = [
-    "Grocery",
-    "Bakery",
-    "Gifts & Custom Products",
-    "Pet Care",
-    "Hardware & Utilities",
-    "Fashion Accessories",
-    "Stationery & Printing",
-    "Beauty",
-    "Furniture & Decor",
-    "Kitchen",
+    "Grocery", "Bakery", "Gifts & Custom Products", "Pet Care", "Hardware & Utilities",
+    "Fashion Accessories", "Stationery & Printing", "Beauty", "Furniture & Decor", "Kitchen"
   ];
 
   return (
@@ -62,10 +59,8 @@ const BusinessRegistrationForm = () => {
           className="left-image"
         />
       </div>
-
       <div className="right-panel">
         <div className="registration-step">Business Registration.</div>
-
         <h2 className="section-title">Basic Business & Shop Location Info</h2>
 
         <div className="form-row">
@@ -92,10 +87,9 @@ const BusinessRegistrationForm = () => {
           <div className="categories">
             {categories.map((category, index) => (
               <button
+                type="button"
                 key={index}
-                className={`category-btn ${
-                  formData.category === category ? "selected" : ""
-                }`}
+                className={`category-btn ${formData.category === category ? "selected" : ""}`}
                 onClick={() => handleCategorySelect(category)}
               >
                 {category}
@@ -133,13 +127,22 @@ const BusinessRegistrationForm = () => {
         </div>
 
         <div className="button-row">
-          <button className="back-btn" onClick={handleBack}>
+          <button className="back-btn" type="button" onClick={handleBack}>
             Back
           </button>
-          <button className="skip-btn" onClick={handleSkip}>
+          <button className="skip-btn" type="button" onClick={handleSkip}>
             Skip
           </button>
-          <button className="next-btn" onClick={handleNext}>
+          <button
+            className="next-btn"
+            type="button"
+            onClick={handleNext}
+            disabled={!allFilled}
+            style={{
+              opacity: allFilled ? 1 : 0.5,
+              cursor: allFilled ? "pointer" : "not-allowed"
+            }}
+          >
             Next →
           </button>
         </div>

@@ -1,25 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./BrandingRegistrationForm.css";
 
 const BrandingRegistrationForm = () => {
   const navigate = useNavigate();
 
+  // Initialize as empty or pre-populate if user navigates back
   const [images, setImages] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]);
   const [description, setDescription] = useState("");
   const [services, setServices] = useState([]);
   const [newService, setNewService] = useState("");
+
+  // Optional: Display or merge previous data for review/UX
+  useEffect(() => {
+    // You could load previous step data here for review/preview (see previous answers)
+    // const businessInfo = JSON.parse(localStorage.getItem("businessInfo") || "{}");
+    // const operatingDetails = JSON.parse(localStorage.getItem("operatingDetails") || "{}");
+    // ...
+  }, []);
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     const imageURLs = files.map((file) => URL.createObjectURL(file));
     setImages((prev) => [...prev, ...imageURLs]);
-
-    const fileData = files.map((file) => ({
-      name: file.name,
-      type: file.type,
-    }));
-    localStorage.setItem("brandingImageMeta", JSON.stringify(fileData));
+    setImageFiles((prev) => [...prev, ...files]);
   };
 
   const handleAddService = () => {
@@ -30,12 +35,12 @@ const BrandingRegistrationForm = () => {
   };
 
   const handleNext = () => {
-    const formData = {
-      images,
-      description,
-      services,
-    };
-    localStorage.setItem("brandingDetails", JSON.stringify(formData));
+    // Save images files to a temp global var (cannot use localStorage for File objects)
+    window.brandingImageFiles = imageFiles;
+    // Save rest (description, services) to localStorage for next component
+    localStorage.setItem("brandingDetails", JSON.stringify({ description, services }));
+    // (Optional: if you want image meta in localStorage, also do this)
+    // localStorage.setItem("brandingImageMeta", JSON.stringify(imageFiles.map(f => ({ name: f.name, type: f.type }))));
     navigate("/ContactInfoform");
   };
 
@@ -48,7 +53,6 @@ const BrandingRegistrationForm = () => {
           className="main-image"
         />
       </div>
-
       <div className="right-panel">
         <p className="small-heading">Business Registration.</p>
         <div className="progress-bar">
@@ -76,7 +80,6 @@ const BrandingRegistrationForm = () => {
                 />
               </label>
             </div>
-
             <div className="image-gallery">
               {images.map((img, i) => (
                 <img key={i} src={img} alt={`Preview ${i + 1}`} />
@@ -100,7 +103,7 @@ const BrandingRegistrationForm = () => {
               value={newService}
               onChange={(e) => setNewService(e.target.value)}
             />
-            <button className="add-btn" onClick={handleAddService}>
+            <button type="button" className="add-btn" onClick={handleAddService}>
               +
             </button>
           </div>
@@ -114,13 +117,13 @@ const BrandingRegistrationForm = () => {
           </div>
 
           <div className="buttons">
-            <button className="back-btn" onClick={() => navigate(-1)}>
+            <button className="back-btn" type="button" onClick={() => navigate(-1)}>
               Back
             </button>
-            <button className="skip-btn" onClick={handleNext}>
+            <button className="skip-btn" type="button" onClick={handleNext}>
               Skip
             </button>
-            <button className="next-btn" onClick={handleNext}>
+            <button className="next-btn" type="button" onClick={handleNext}>
               Next
             </button>
           </div>

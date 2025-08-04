@@ -36,6 +36,7 @@
 
 .confirm-identity-modal input[type="email"] {
   width: 100%;
+  color: black;
   padding: 12px;
   margin-bottom: 1.5rem;
   border-radius: 8px;

@@ -31,7 +31,7 @@ function Path() {
         <Routes>
           {/* Landingpagelayout */}
           <Route path="/" element={<Landingpagelayout />} />
-          <Route path="/HomePage" element={<HomePage />} />
+          <Route path="/UserProfile" element={<HomePage />} />
           <Route path="/RegistrationJoin" element={<RegistrationJoin />} />
           <Route
             path="/BusinessRegistrationForm"
