@@ -1,0 +1,692 @@
+.shop-profile {
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
+}
+
+/* Cover Section */
+.cover-section {
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+}
+
+.cover-image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cover-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1rem;
+}
+
+.distance-badge {
+  background-color: #8bc34a;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.favorite-btn {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #666;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.favorite-btn:hover {
+  background-color: white;
+  color: #e91e63;
+}
+
+/* Shop Info Section */
+.shop-info {
+  padding: 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.shop-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.shop-name {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.shop-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.action-btn {
+  background: none;
+  border: 1px solid #ddd;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #666;
+}
+
+.action-btn:hover {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+  transform: scale(1.05);
+}
+
+/* Edit Button Styling */
+.edit-btn {
+  background-color: #2196f3;
+  color: white;
+  border: 1px solid #2196f3;
+}
+
+.edit-btn:hover {
+  background-color: #1976d2;
+  border-color: #1976d2;
+}
+
+.shop-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rating-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stars {
+  display: flex;
+  gap: 0.125rem;
+}
+
+.star {
+  color: #ddd;
+  font-size: 0.875rem;
+}
+
+.star.filled {
+  color: #ffc107;
+}
+
+.star.half {
+  color: #ffc107;
+}
+
+.rating-text {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.location-info,
+.availability,
+.delivery-availablity {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.icon {
+  color: #666;
+  font-size: 0.75rem;
+}
+
+.status-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.status.open {
+  color: #4caf50;
+  font-weight: 500;
+}
+
+.delivery-availablity {
+  color: #2196f3;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.contact-btn,
+.directions-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.contact-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.contact-btn:hover {
+  background-color: #45a049;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+}
+
+.directions-btn {
+  background-color: #f8f9fa;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.directions-btn:hover {
+  background-color: #e9ecef;
+  border-color: #ccc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-icon {
+  font-size: 0.875rem;
+}
+
+/* Images Gallery */
+.images-gallery {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: #fafafa;
+}
+
+.main-image {
+  flex: 2;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.main-image img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.side-images {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.side-image {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 95px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.side-image:hover {
+  transform: scale(1.02);
+}
+
+.side-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.more-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+/* Content Section */
+.content-section {
+  padding: 1.5rem;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 1.5rem;
+}
+
+.tab {
+  background: none;
+  border: none;
+  padding: 1rem 0;
+  margin-right: 2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.tab.active {
+  color: #4caf50;
+  border-bottom-color: #4caf50;
+}
+
+.tab:hover:not(.active) {
+  color: #333;
+}
+
+.tab-content {
+  min-height: 200px;
+}
+
+.about-content {
+  animation: fadeIn 0.3s ease-in;
+}
+
+.reviews-content {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.description {
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.products-section,
+.hours-section {
+  margin-bottom: 2rem;
+}
+
+.products-section h3,
+.hours-section h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #4caf50;
+  margin-bottom: 1rem;
+}
+
+.products-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.products-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+  color: #666;
+  position: relative;
+  padding-left: 1rem;
+  transition: color 0.2s ease;
+}
+
+.products-list li:before {
+  content: "•";
+  color: #4caf50;
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+.products-list li:last-child {
+  border-bottom: none;
+}
+
+.products-list li:hover {
+  color: #333;
+}
+
+/* Hours Section */
+.hours-section p {
+  color: #666;
+  font-size: 1rem;
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
+/* Responsive Design */
+
+/* Small screens (mobile) */
+@media (max-width: 576px) {
+  .cover-section {
+    height: 200px;
+  }
+
+  .cover-overlay {
+    padding: 0.75rem;
+  }
+
+  .distance-badge {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .favorite-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .shop-info {
+    padding: 1rem;
+  }
+
+  .shop-name {
+    font-size: 1.5rem;
+  }
+
+  .shop-details {
+    gap: 0.5rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .contact-btn,
+  .directions-btn {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+
+  .shop-actions {
+    gap: 0.375rem;
+  }
+
+  .action-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .images-gallery {
+    flex-direction: column;
+    padding: 0.75rem;
+  }
+
+  .main-image {
+    margin-bottom: 0.5rem;
+  }
+
+  .main-image img {
+    height: 150px;
+  }
+
+  .side-images {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .side-image {
+    height: 70px;
+  }
+
+  .content-section {
+    padding: 1rem;
+  }
+
+  .tab {
+    margin-right: 1rem;
+    font-size: 0.875rem;
+    padding: 0.75rem 0;
+  }
+
+  .description {
+    font-size: 0.875rem;
+  }
+
+  .products-section h3,
+  .hours-section h3 {
+    font-size: 1.125rem;
+  }
+}
+
+/* Medium screens (tablet) */
+@media (min-width: 577px) and (max-width: 768px) {
+  .cover-section {
+    height: 220px;
+  }
+
+  .shop-info {
+    padding: 1.25rem;
+  }
+
+  .action-buttons {
+    gap: 1.25rem;
+  }
+
+  .images-gallery {
+    padding: 1.25rem;
+  }
+
+  .side-image {
+    height: 85px;
+  }
+
+  .content-section {
+    padding: 1.25rem;
+  }
+}
+
+/* Large screens (desktop) */
+@media (min-width: 769px) {
+  .shop-profile {
+    margin: 2rem auto;
+  }
+
+  .cover-section {
+    height: 300px;
+  }
+
+  .shop-info {
+    padding: 2rem;
+  }
+
+  .shop-details {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+
+  .action-buttons {
+    max-width: 400px;
+    gap: 1.5rem;
+  }
+
+  .contact-btn,
+  .directions-btn {
+    padding: 1rem 1.5rem;
+  }
+
+  .images-gallery {
+    padding: 1.5rem;
+  }
+
+  .main-image img {
+    height: 250px;
+  }
+
+  .side-image {
+    height: 120px;
+  }
+
+  .content-section {
+    padding: 2rem;
+  }
+}
+
+/* Extra large screens */
+@media (min-width: 1200px) {
+  .shop-details {
+    gap: 3rem;
+  }
+
+  .images-gallery {
+    padding: 2rem;
+  }
+
+  .content-section {
+    padding: 2.5rem;
+  }
+}
+
+/* Focus and accessibility improvements */
+.favorite-btn:focus,
+.action-btn:focus,
+.tab:focus,
+.contact-btn:focus,
+.directions-btn:focus {
+  outline: 2px solid #4caf50;
+  outline-offset: 2px;
+}
+
+.side-image:focus {
+  outline: 2px solid #4caf50;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .tab.active {
+    border-bottom-width: 3px;
+  }
+
+  .cover-overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.5) 0%,
+      rgba(0, 0, 0, 0.3) 100%
+    );
+  }
+
+  .contact-btn,
+  .directions-btn {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .action-btn,
+  .contact-btn,
+  .directions-btn,
+  .side-image,
+  .favorite-btn {
+    transition: none;
+  }
+
+  .action-btn:hover,
+  .contact-btn:hover,
+  .directions-btn:hover {
+    transform: none;
+  }
+
+  .about-content,
+  .reviews-content {
+    animation: none;
+  }
+}
+
+/* Loading states */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Print styles */
+@media print {
+  .shop-profile {
+    box-shadow: none;
+    margin: 0;
+  }
+
+  .action-buttons,
+  .shop-actions,
+  .favorite-btn {
+    display: none;
+  }
+
+  .cover-overlay {
+    background: rgba(0, 0, 0, 0.2);
+  }
+}

@@ -376,14 +376,20 @@ const Header = ({ activeKey, onNavClick }) => {
         />
 
         {/* Avatar Modal - NEW */}
+
         <AvatarModal
           isOpen={showAvatarModal}
           onClose={() => setShowAvatarModal(false)}
-          userData={userData}
+          userData={{
+            id: userData?.u_id, // depending on role
+            role: userData?.role || 'user', // make sure role is set
+
+          }}
           onProfileClick={handleProfileModalClick}
           onSettingsClick={handleSettingsClick}
           onLogout={handleLogout}
         />
+
 
         {/* Profile Edit Modal */}
         {profileModal && (

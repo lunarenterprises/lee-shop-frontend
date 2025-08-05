@@ -111,8 +111,13 @@
 }
 
 .call-btn {
+  display: flex;
   background-color: #0a6d0a;
   color: white;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
 .whatsapp-btn {
