@@ -67,7 +67,7 @@ const HomePage = () => {
 
   //----------------------------
 
-  const [showLoginModal, setShowLoginModal] = useState(true);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [showIdentityModal, setShowIdentityModal] = useState(false);
   const [showEmailVerificationModal, setShowEmailVerificationModal] =
     useState(false);

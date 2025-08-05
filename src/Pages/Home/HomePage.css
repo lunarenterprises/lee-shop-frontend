@@ -1,3 +1,6 @@
+/* ───────────────────────────
+   GLOBAL HEADER LAYOUT
+   ─────────────────────────── */
 .homepage-header {
   position: fixed;
   top: 0;
@@ -8,13 +11,14 @@
   align-items: center;
   justify-content: space-between;
   background-color: #0b6b07;
-  color: white;
+  color: #fff;
   padding: 0 22px;
   height: 56px;
   min-height: 56px;
   box-shadow: 0 2px 10px rgba(30, 52, 4, 0.07);
 }
 
+/* logo  */
 .homepage-logo {
   font-size: 1.42rem;
   font-weight: bold;
@@ -28,7 +32,9 @@
   gap: 9px;
 }
 
-/* Nav links */
+/* ───────────────────────────
+   NAV LINKS
+   ─────────────────────────── */
 .homepage-nav {
   display: flex;
   gap: 18px;
@@ -63,12 +69,14 @@
   background: #196c0a;
   color: #bcee66;
 }
-
 .homepage-menu-item span {
   font-size: 12px;
   margin-left: 5px;
 }
 
+/* ───────────────────────────
+   DESKTOP-ONLY ICONS (right side)
+   ─────────────────────────── */
 .homepage-icons {
   display: flex;
   gap: 16px;
@@ -76,12 +84,28 @@
   margin-left: 24px;
 }
 
-.homepage-icon-wrapper {
-  position: relative;
-  font-size: 18px;
+.desktop-icon-btn {
+  background: #226910;
+  border: none;
+  border-radius: 50%;
+  padding: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.desktop-icon-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
+}
+.desktop-icon-btn:focus {
+  outline: 2px solid #bcee66;
+  outline-offset: 2px;
 }
 
+/* badge on any icon */
 .badge {
   position: absolute;
   top: -5px;
@@ -97,11 +121,27 @@
   justify-content: center;
 }
 
-/* Give page content a top-padding for the fixed header */
-body,
-.homepage-container {
-  padding-top: 56px;
+/* ───────────────────────────
+   AUTH LINKS
+   ─────────────────────────── */
+.desktop-login-btn {
+  background: none;
+  border: none;
+  color: #ffff;
+  padding: 6px 18px;
+  border-radius: 4px;
+  font-size: 1.08rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
+.desktop-login-btn:hover {
+  background: #bcee66;
+  color: #185d09;
+}
+
+/* ───────────────────────────
+   HAMBURGER
+   ─────────────────────────── */
 .homepage-hamburger {
   display: none;
   background: none;
@@ -113,112 +153,74 @@ body,
   cursor: pointer;
   z-index: 1201;
 }
-/* Login/Register placement for responsive nav */
+.homepage-hamburger:focus {
+  outline: 2px solid #bcee66;
+  outline-offset: 2px;
+}
+
+/* ───────────────────────────
+   MOBILE EXTRA SECTIONS
+   ─────────────────────────── */
+.mobile-user-icons {
+  display: none; /* overridden in media query */
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  width: 100%;
+}
+.mobile-icon-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.18s;
+}
+.mobile-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.mobile-auth-section,
 .homepage-login-register-mobile {
   display: none;
-  margin: 13px 0 0 0;
-  font-size: 1.08rem;
-  text-align: left;
+  margin: 1.25rem 0 0 0;
+  width: 100%;
+}
+.mobile-login-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: #bcee66;
+  border: none;
+  color: #185d09;
+  font-weight: 600;
+  border-radius: 8px;
   cursor: pointer;
 }
 
-.homepage-login-register-desktop {
-  font-size: 1.08rem;
-  margin-left: 34px;
-  display: block;
-  cursor: pointer;
+/* ───────────────────────────
+   FIXED HEADER OFFSET
+   ─────────────────────────── */
+body,
+.homepage-container {
+  padding-top: 56px;
 }
 
-/* Show in nav drawer on mobile, hide outside */
-@media (max-width: 800px) {
-  .homepage-header {
-    flex-direction: row;
-  }
-  .homepage-login-register-mobile {
-    display: block;
-    padding: 13px 0 0 18px;
-  }
-  .homepage-login-register-desktop {
-    display: none;
-  }
-}
+/* ───────────────────────────
+   RESPONSIVE BREAKPOINTS
+   ─────────────────────────── */
 
-/* RESPONSIVE: TABLET */
-@media (max-width: 900px) {
-  .homepage-header {
-    flex-direction: row;
-    align-items: stretch;
-    height: auto;
-    min-height: 48px;
-    padding: 0 10px;
-  }
-  .homepage-nav {
-    margin-left: 0;
-    gap: 12px;
-    justify-content: flex-start;
-  }
-  .homepage-icons {
-    margin-left: 0;
-  }
-}
-
-/* RESPONSIVE: MOBILE */
-@media (max-width: 640px) {
-  .homepage-header {
-    flex-direction: row;
-    padding: 0 4px;
-    font-size: 0.92rem;
-    height: auto;
-    min-height: unset;
-    gap: 0;
-  }
-  .homepage-logo {
-    padding: 0;
-    font-size: 1.08rem;
-    min-width: unset;
-    gap: 7px;
-    margin: 6px 0 0 0;
-  }
-  .homepage-nav {
-    width: 100vw;
-    flex-wrap: wrap;
-    order: 2;
-    justify-content: flex-start;
-    gap: 0;
-    padding: 0 0 8px 4px;
-    font-size: 0.95rem;
-  }
-  .homepage-menu-item,
-  .homepage-menu-item.active {
-    padding: 4px 8px;
-    font-size: 0.97rem;
-    margin: 3px 7px 0 0;
-    border-radius: 14px;
-  }
-  .homepage-icons {
-    margin-left: 0;
-    margin-bottom: 5px;
-    gap: 12px;
-    font-size: 1em;
-    justify-content: flex-end;
-    order: 3;
-  }
-}
-/* Extra small screens */
-@media (max-width: 370px) {
-  .homepage-logo,
-  .homepage-menu-item,
-  .homepage-nav {
-    font-size: 0.82rem;
-  }
-  .homepage-header {
-    padding: 0 2px;
-  }
-}
+/* tablets / mobiles: show hamburger, hide desktop icons */
 @media (max-width: 800px) {
   .homepage-hamburger {
-    display: inline-flex; /* Only on mobile/tablet */
-    align-items: center;
+    display: inline-flex;
   }
   .homepage-nav {
     display: none;
@@ -227,37 +229,59 @@ body,
     top: 56px;
     left: 0;
     width: 100vw;
-    background: #207c20;
+    background: #0d5909;
     z-index: 1200;
-    padding: 24px 0 20px 0;
+    padding: 24px 0 20px;
     box-shadow: 0 8px 20px rgba(30, 65, 35, 0.17);
-    transition: all 0.18s;
+    transition: all 0.25s ease;
   }
   .homepage-nav.open {
     display: flex;
   }
-  .homepage-hamburger {
-    display: inline-flex;
+  .homepage-icons {
+    display: none; /* hide right-side icons */
   }
-  .homepage-login-register {
-    display: none;
-  }
-  .homepage-header {
-    min-height: 54px;
-    height: auto;
-    padding-left: 11px;
-    padding-right: 11px;
-    position: fixed;
-    width: 100vw;
+  .mobile-user-icons,
+  .mobile-auth-section {
+    display: flex; /* now visible inside menu */
   }
 }
+
+/* ≤640 px: tighten spacing */
+@media (max-width: 640px) {
+  .homepage-header {
+    padding: 0 6px;
+  }
+  .homepage-logo {
+    font-size: 1.08rem;
+    min-width: unset;
+    gap: 7px;
+  }
+  .homepage-menu-item,
+  .homepage-menu-item.active {
+    padding: 4px 10px;
+    font-size: 0.94rem;
+    margin-right: 6px;
+  }
+}
+
+/* ≤500 px: lower the slide-out top & header padding */
 @media (max-width: 500px) {
   .homepage-nav {
     top: 48px;
-    padding: 19px 0 16px 0;
+    padding: 19px 0 16px;
   }
   .homepage-header {
     padding-left: 3px;
     padding-right: 3px;
+  }
+}
+
+/* ≤370 px: shrink fonts further */
+@media (max-width: 370px) {
+  .homepage-logo,
+  .homepage-menu-item,
+  .homepage-nav {
+    font-size: 0.82rem;
   }
 }
