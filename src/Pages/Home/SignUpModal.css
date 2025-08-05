@@ -1,0 +1,197 @@
+/* ---------- overlay ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto; /* entire overlay scrolls if 90vh is still too small */
+  z-index: 999;
+}
+
+/* ---------- modal shell ---------- */
+.signup-modal {
+  background: #fff;
+  width: 100%;
+  max-width: 540px;
+  max-height: 90vh;
+  border-radius: 10px;
+  position: relative;
+  padding: 2rem 2.25rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+/* header bits */
+.close-button {
+  position: absolute;
+  top: 12px;
+  right: 18px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.modal-logo {
+  width: 75px;
+  margin: 0 auto 1rem auto;
+  display: block;
+}
+
+.signup-title {
+  text-align: center;
+  color: #065e13;
+  margin: 0 0 0.25rem 0;
+}
+.signup-subtitle {
+  text-align: center;
+  font-size: 15px;
+  color: #4d4d4d;
+  margin-bottom: 1.25rem;
+}
+
+/* ---------- form area ---------- */
+.modal-body {
+  display: flex;
+  overflow-y: auto;
+  padding-right: 4px;
+  flex-direction: column;
+  align-items: baseline;
+}
+.signup-modal label {
+  display: block;
+  font-weight: 600;
+  color: #065e13;
+  margin-top: 14px;
+  font-size: 14px;
+}
+
+.signup-modal input {
+  width: 100%;
+  padding: 11px 12px;
+  margin-top: 5px;
+  border: 1.8px solid #065e13;
+  border-radius: 6px;
+  font-size: 15px;
+  color: #000;
+}
+
+/* password eye icon */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+.eye-icon {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #333;
+  font-size: 18px;
+}
+
+/* terms row */
+.terms-box {
+  display: flex;
+  margin-top: 1rem;
+  font-size: 14px;
+  flex-direction: row;
+  justify-content: center;
+}
+.terms-box input {
+  accent-color: #065e13;
+}
+.terms-container {
+  display: flex;
+  flex-direction: row;
+  font-weight: 600;
+  color: #065e13;
+  font-size: 14px;
+}
+/* error message */
+.error-message {
+  color: #d93025;
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+/* CTA button */
+.sign-btn {
+  background: #065e13;
+  color: #fff;
+  border: none;
+  width: 100%;
+  padding: 13px 0;
+  border-radius: 6px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 14px;
+}
+.sign-btn:disabled {
+  background: #a6a6a6;
+  cursor: not-allowed;
+}
+
+/* footer switch */
+.footer-switch {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 14px;
+}
+.footer-switch span {
+  color: #065e13;
+  cursor: pointer;
+  font-weight: 600;
+}
+/* Add to SignUpModal.css */
+
+/* Success message styling */
+.success-message {
+  color: #065e13;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin: 10px 0;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Error message styling */
+.error-message {
+  color: #d93025;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin: 10px 0;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Disabled state for inputs */
+.signup-modal input:disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Loading state for button */
+.sign-btn:disabled {
+  background-color: #a6a6a6;
+  cursor: not-allowed;
+}
+
+/* ---------- responsive width ---------- */
+@media (max-width: 480px) {
+  .signup-modal {
+    max-width: 92%;
+    padding: 1.5rem;
+  }
+}
