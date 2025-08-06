@@ -117,7 +117,7 @@ const BrandingRegistrationForm = () => {
           </div>
 
           <div className="buttons">
-            <button className="back-btn" type="button" onClick={() => navigate(-1)}>
+            <button className="back-button" type="button" onClick={() => navigate(-1)}>
               Back
             </button>
             <button className="skip-btn" type="button" onClick={handleNext}>

@@ -150,7 +150,7 @@
   flex-wrap: wrap;
 }
 
-.back-btn,
+.back-button,
 .skip-btn,
 .next-btn {
   padding: 10px 20px;
@@ -160,7 +160,7 @@
   cursor: pointer;
 }
 
-.back-btn {
+.back-button {
   background: #f0f0f0;
   color: #2e7d32;
 }

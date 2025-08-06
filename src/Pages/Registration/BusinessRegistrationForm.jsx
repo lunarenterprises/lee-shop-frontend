@@ -127,7 +127,7 @@ const BusinessRegistrationForm = () => {
         </div>
 
         <div className="button-row">
-          <button className="back-btn" type="button" onClick={handleBack}>
+          <button className="back-button" type="button" onClick={handleBack}>
             Back
           </button>
           <button className="skip-btn" type="button" onClick={handleSkip}>
