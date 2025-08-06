@@ -35,6 +35,7 @@ const BusinessRegistrationForm = () => {
   const handleNext = () => {
     // Save to localStorage
     localStorage.setItem("businessInfo", JSON.stringify(formData));
+    console.log("Storing businessInfo:", formData);
     navigate("/BusinessOperatingDetails");
   };
 

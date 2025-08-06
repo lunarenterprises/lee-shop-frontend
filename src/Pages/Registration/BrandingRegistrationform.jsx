@@ -39,6 +39,7 @@ const BrandingRegistrationForm = () => {
     window.brandingImageFiles = imageFiles;
     // Save rest (description, services) to localStorage for next component
     localStorage.setItem("brandingDetails", JSON.stringify({ description, services }));
+    console.log("brandingDetails", JSON.stringify({ description, services }));
     // (Optional: if you want image meta in localStorage, also do this)
     // localStorage.setItem("brandingImageMeta", JSON.stringify(imageFiles.map(f => ({ name: f.name, type: f.type }))));
     navigate("/ContactInfoform");

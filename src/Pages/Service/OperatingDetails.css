@@ -1,113 +1,153 @@
-/* NEW STYLES & OVERRIDES */
-.section.two-columns {
+.business-container {
   display: flex;
-  justify-content: space-between;
   flex-wrap: wrap;
   gap: 20px;
-}
-
-.pill {
-  background-color: #226d1b;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: bold;
-}
-
-.left-panel p {
   padding: 20px;
-  font-size: 16px;
-  color: white;
-  background: #000000aa;
-  font-weight: 500;
-  text-align: center;
+}
+
+.left-panel {
+  flex: 1 1 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgb(0 0 0 / 0.1);
+}
+
+.left-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  object-fit: cover;
+}
+
+.right-panel {
+  flex: 2 1 500px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgb(0 0 0 / 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0;
 }
 
 .days button {
-  background: white;
-  border: 2px solid #226d1b;
-  color: #226d1b;
-  font-weight: 500;
-  padding: 10px 14px;
-  margin: 5px;
-  border-radius: 6px;
+  padding: 8px 16px;
+  border: 1px solid #3a6b35;
+  background-color: transparent;
+  color: #3a6b35;
+  border-radius: 5px;
   cursor: pointer;
-  min-width: 55px;
-  transition: 0.2s;
+  transition: background-color 0.3s ease;
 }
 
+.days button.day-selected,
 .days button:hover {
-  background: #226d1b;
-  color: white;
+  background-color: #3a6b35;
+  color: #fff;
+}
+
+.delivery-options {
+  list-style: none;
+  padding: 0;
+  margin-top: 8px;
 }
 
 .delivery-options li {
-  margin: 10px 0;
   cursor: pointer;
+  padding: 6px 10px;
+  border: 1px solid #3a6b35;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  user-select: none;
   display: flex;
   align-items: center;
-  color: #226d1b;
-  font-weight: 500;
+  gap: 8px;
+}
+.delivery-options li.selected {
+  background-color: #3a6b35;
+  color: white;
+}
+.delivery-options li:hover {
+  background-color: #a3d39c;
 }
 
-.delivery-options li .dot {
+.dot {
   height: 14px;
   width: 14px;
-  background-color: #c9e4c5;
   border-radius: 50%;
-  margin-right: 10px;
+  background-color: #3a6b35;
   display: inline-block;
-  border: 1px solid #226d1b;
 }
 
-.delivery-options li.selected .dot {
-  background-color: #226d1b;
-}
-
-.time-box select {
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 15px;
-}
-
-/* Responsive for smaller screens */
-@media (max-width: 768px) {
-  .section.two-columns {
-    flex-direction: column;
-  }
-
-  .left-panel img {
-    width: 100%;
-    height: auto !important;
-  }
-
-  .buttons {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .buttons button {
-    width: 100%;
-  }
-}
-
+/* Time box styles */
 .time-label-box {
-  background-color: #226d1b;
-  color: white;
   display: flex;
   justify-content: space-between;
-  padding: 10px 16px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  font-weight: bold;
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #355230;
+}
+.time-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.time-box select {
+  padding: 6px;
+  border-radius: 5px;
+  border: 1px solid #3a6b35;
+  background-color: white;
+  color: #3a6b35;
 }
 
-.time-label-box .left {
-  text-align: left;
+.buttons {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.buttons button {
+  padding: 8px 18px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+.buttons .back {
+  background-color: transparent;
+  border: 1px solid #3a6b35;
+  color: #3a6b35;
+}
+.buttons .skip {
+  background-color: #b9ccaf;
+  color: #3a6b35;
+}
+.buttons .next {
+  background-color: #3a6b35;
+  color: white;
 }
 
-.time-label-box .right {
-  text-align: right;
+/* Responsive Design */
+@media (max-width: 900px) {
+  .business-container {
+    flex-direction: column;
+    padding: 10px;
+  }
+  .left-panel,
+  .right-panel {
+    flex: 1 1 100%;
+  }
 }
-

@@ -5,6 +5,13 @@ import "./OperatingDetails.css";
 const OperatingDetails = () => {
   const [selectedDelivery, setSelectedDelivery] = useState(0);
   const [selectedServiceArea, setSelectedServiceArea] = useState(0);
+
+  // State for selected working days (get/set from localStorage)
+  const [selectedDays, setSelectedDays] = useState(() => {
+    const storedDays = localStorage.getItem("workingDays");
+    return storedDays ? JSON.parse(storedDays) : [];
+  });
+
   const navigate = useNavigate();
 
   const deliveryOptions = [
@@ -14,12 +21,27 @@ const OperatingDetails = () => {
   ];
 
   const serviceAreaOptions = ["In-shop Only", "Home Service", "Both"];
+  const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+  // Toggle day button, save to storage
+  const toggleDay = (day) => {
+    setSelectedDays((prevDays) => {
+      let updatedDays;
+      if (prevDays.includes(day)) {
+        updatedDays = prevDays.filter((d) => d !== day);
+      } else {
+        updatedDays = [...prevDays, day];
+      }
+      localStorage.setItem("workingDays", JSON.stringify(updatedDays));
+      return updatedDays;
+    });
+  };
 
   return (
     <div className="business-container">
       <div className="left-panel">
-        <img src="/operationdetails.png" alt="Shop owner" />
-        {/* <p>“Make it easier for traditional shop owners to go online with simple registration, basic marketing, and delivery support.”</p> */}
+        <img src="/operationdetails.png" alt="Shop owner" className="left-image" />
+        <p>“Make it easier for traditional shop owners to go online with simple registration, basic marketing, and delivery support.”</p>
       </div>
 
       <div className="right-panel">
@@ -39,20 +61,25 @@ const OperatingDetails = () => {
         <div className="section">
           <label>Working Days</label>
           <div className="days">
-            {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-              <button key={day}>{day}</button>
+            {daysOfWeek.map((day) => (
+              <button
+                key={day}
+                className={selectedDays.includes(day) ? "day-selected" : ""}
+                onClick={() => toggleDay(day)}
+                type="button"
+              >
+                {day}
+              </button>
             ))}
           </div>
         </div>
 
         <div className="section">
           <label>Start Time & End Time</label>
-
           <div className="time-label-box">
             <span className="left">Opening</span>
             <span className="right">Closing</span>
           </div>
-
           <div className="time-box">
             <select>
               <option>08:00</option>
@@ -72,21 +99,6 @@ const OperatingDetails = () => {
 
         <div className="section two-columns">
           <div>
-            <label>Service Area Coverage</label>
-            <ul className="delivery-options">
-              {serviceAreaOptions.map((opt, index) => (
-                <li
-                  key={opt}
-                  className={selectedServiceArea === index ? "selected" : ""}
-                  onClick={() => setSelectedServiceArea(index)}
-                >
-                  <span className="dot"></span> {opt}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
             <label>Do you provide delivery services?</label>
             <ul className="delivery-options">
               {deliveryOptions.map((opt, index) => (
@@ -103,12 +115,9 @@ const OperatingDetails = () => {
         </div>
 
         <div className="buttons">
-          <button className="back">Back</button>
-          <button className="skip">Skip</button>
-          <button
-            className="next"
-            onClick={() => navigate("/ServiceRegistrationForm")}
-          >
+          <button className="back" type="button">Back</button>
+          <button className="skip" type="button">Skip</button>
+          <button className="next" onClick={() => navigate("/ServiceRegistrationForm")}>
             Next <span>&rarr;</span>
           </button>
         </div>

@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import "./ContactInfoForm.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ContactInfoForm = () => {
   const navigate = useNavigate();
 
-  // Final contact input step
   const [contact, setContact] = useState({
     primary_phone: "",
     secondary_phone: "",
@@ -19,16 +20,19 @@ const ContactInfoForm = () => {
   const [merged, setMerged] = useState(null);
 
   useEffect(() => {
-    // Retrieve all prior data:
     const businessType = localStorage.getItem("businessType");
     const businessInfo = JSON.parse(localStorage.getItem("businessInfo") || "{}");
     const operatingDetails = JSON.parse(localStorage.getItem("operatingDetails") || "{}");
     const brandingDetails = JSON.parse(localStorage.getItem("brandingDetails") || "{}");
-    const brandingImageFiles = window.brandingImageFiles || []; // Array of File objects
+    const brandingImageFiles = window.brandingImageFiles || [];
 
     setMerged({
-      service_or_shop: businessType === "product-seller" ? "shop" :
-        businessType === "service-provider" ? "service" : "both",
+      service_or_shop:
+        businessType === "product-seller"
+          ? "shop"
+          : businessType === "service-provider"
+            ? "service"
+            : "both",
       shop_name: businessInfo.shop_name,
       owner_name: businessInfo.owner_name,
       shop_address: businessInfo.address,
@@ -36,44 +40,53 @@ const ContactInfoForm = () => {
       city: businessInfo.city,
       working_days: operatingDetails.working_days || [],
       description: brandingDetails.description,
-      product_and_service: brandingDetails.services || [],
+      product_and_service: Array.isArray(brandingDetails.services)
+        ? brandingDetails.services
+        : [],
       opening_hours: operatingDetails.opening_hours,
-      location: businessInfo.location || "",
+      location: businessInfo.location || businessInfo.state,
       delivery_option: operatingDetails.delivery_option,
       category_id: businessInfo.category_id || 4,
       latitude: businessInfo.latitude || 12.9352,
       longitude: businessInfo.longitude || 77.6245,
       category_name: businessInfo.category || "grocery",
-      image: brandingImageFiles, // Array of File objects
+      image: brandingImageFiles,
     });
   }, []);
 
-  // Handle UI input
   const handleChange = (e) =>
-    setContact((f) => ({ ...f, [e.target.name]: e.target.value }));
+    setContact((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  // Form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!merged) { alert("Loading previous data..."); return; }
 
-    // Validate user fields
+    if (!merged) {
+      toast.warn("Loading previous data...");
+      return;
+    }
+
+    // Validate required fields
     for (const key of [
-      "primary_phone", "secondary_phone", "whatsapp_number", "email", "password", "confirm_password"
+      "primary_phone",
+      "secondary_phone",
+      "whatsapp_number",
+      "email",
+      "password",
+      "confirm_password",
     ]) {
       if (!contact[key]) {
-        alert(`Please fill in ${key.replace("_", " ")}!`);
+        toast.error(`Please fill in ${key.replace("_", " ")}!`);
         return;
       }
     }
+
     if (contact.password !== contact.confirm_password) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
     setLoading(true);
 
-    // Compose all API fields
     const data = {
       ...merged,
       primary_phone: contact.primary_phone,
@@ -83,27 +96,21 @@ const ContactInfoForm = () => {
       password: contact.password,
     };
 
+    // Log data object before sending
+    console.log("Data to submit:", data);
+
     const formData = new FormData();
+
     Object.keys(data).forEach((key) => {
       if (key === "image" && Array.isArray(data.image)) {
-        // send all images as 'image' fields
-        data.image.forEach(file => formData.append("image", file));
+        data.image.forEach((file) => formData.append("image", file));
       } else if (Array.isArray(data[key])) {
-        // Join array fields as expected by API
-        formData.append(key, data[key].join(","));
+        // Send arrays as JSON strings (backend expects actual array)
+        formData.append(key, JSON.stringify(data[key]));
       } else {
         formData.append(key, data[key]);
       }
     });
-
-    // DEBUG: Show all form data entries (text and image)
-    for (let [key, value] of formData.entries()) {
-      if (value instanceof File) {
-        console.log(`FormData: ${key}: FILE ${value.name} (type: ${value.type}, size: ${value.size})`);
-      } else {
-        console.log(`FormData: ${key}:`, value);
-      }
-    }
 
     try {
       const response = await axios.post(
@@ -111,24 +118,33 @@ const ContactInfoForm = () => {
         formData
       );
       setLoading(false);
-      if (response.data && response.data.result) {
-        alert("Registration successful!");
+
+      if (response.data?.result) {
+        toast.success("Registration successful!");
         localStorage.clear();
         window.brandingImageFiles = null;
-        navigate("/ShopProfileLayout");
+
+        // Navigate to home page after success
+        navigate("/");
       } else {
-        alert(response.data?.message || "Registration failed.");
+        toast.error(response.data?.message || "Registration failed.");
       }
     } catch (error) {
       setLoading(false);
-      alert("Registration failed. Please try again.");
+      toast.error("Registration failed. Please try again.");
+      console.error("Registration error:", error);
     }
   };
 
   return (
     <div className="form-container">
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="left-panel">
-        <img src="/Rectangle-three.png" alt="Shop Owner" className="form-image" />
+        <img
+          src="/Rectangle-three.png"
+          alt="Shop Owner"
+          className="form-image"
+        />
       </div>
       <div className="right-panel">
         <div className="progress-indicator">
@@ -160,6 +176,7 @@ const ContactInfoForm = () => {
               type="tel"
               name="secondary_phone"
               value={contact.secondary_phone}
+              maxLength={10}
               onChange={handleChange}
               required
               placeholder="Enter number"
@@ -171,6 +188,7 @@ const ContactInfoForm = () => {
             <input
               type="tel"
               name="whatsapp_number"
+              maxLength={10}
               value={contact.whatsapp_number}
               onChange={handleChange}
               required
@@ -204,14 +222,11 @@ const ContactInfoForm = () => {
             required
             placeholder="Confirm password"
           />
-          {/* Images already collected in previous step */}
           <div className="button-group">
-            <button type="button" className="btn back" onClick={() => navigate(-1)}>Back</button>
-            <button
-              type="submit"
-              className="btn next"
-              disabled={loading}
-            >
+            <button type="button" className="btn back" onClick={() => navigate(-1)}>
+              Back
+            </button>
+            <button type="submit" className="btn next" disabled={loading}>
               {loading ? "Submitting..." : <>Submit ➜</>}
             </button>
           </div>
