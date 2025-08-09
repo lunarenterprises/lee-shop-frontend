@@ -6,20 +6,22 @@
   gap: 20px;
 }
 
-.left-panel {
-  flex: 1 1 40%;
-  background: #f4f4f4;
-  border-radius: 15px;
-  overflow: hidden;
+.left-panel2 {
+  flex: 1;
+  background-color: #ffffff;
+  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  max-width: 650px;
+  box-shadow: none;
+  padding: 30px;
 }
 
 .left-panel img {
-  width: 800px;
+  width: 750px;
   height: 750px !important;
-  border-bottom: 1px solid #ccc;
+  border-bottom: none !important;
 }
 
 .left-panel p {
@@ -30,9 +32,14 @@
   font-weight: 500;
 }
 
-.right-panel {
-  flex: 1 1 55%;
-  padding: 20px;
+.right-panel_2 {
+  flex: 1;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 300px;
+  width: 100%;
 }
 
 .progress {
@@ -136,34 +143,71 @@ h2 {
   background-color: #226d1b;
 }
 
-.buttons {
+.button-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   flex-wrap: wrap;
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
-.buttons button {
+.left-buttons {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.right-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+}
+
+.back-btn2,
+.skip-btn2,
+.next-btn2 {
   padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: bold;
+  border-radius: 5px;
   border: none;
+  font-weight: bold;
   cursor: pointer;
 }
 
-.back {
-  background: white;
-  border: 1px solid #226d1b;
-  color: #226d1b;
+.back-btn2 {
+  background: #f0f0f0;
+  color: #0a5c15;
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px; /* 150% */
+  border-radius: 10px;
+  border: 1px solid #0a5c15;
+  background: #fff;
 }
 
-.skip {
+.skip-btn2 {
   background: white;
-  border: 1px solid #ccc;
-  color: #444;
+  border: 1px solid #0a5c15;
+  color: #0a5c15;
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px; /* 150% */
+  border-radius: 10px;
+  border: 1px solid #0a5c15;
+  background: #fff;
 }
 
-.next {
-  background: #226d1b;
-  color: white;
+.next-btn2 {
+  color: #d4f49c;
+  font-family: Inter;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 24px; /* 120% */
+  border-radius: 10px;
+  background: #0a5c15;
 }

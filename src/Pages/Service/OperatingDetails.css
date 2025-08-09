@@ -5,24 +5,23 @@
   padding: 20px;
 }
 
-.left-panel {
-  flex: 1 1 300px;
+.left-panel2 {
+  flex: 1;
+  background-color: #ffffff;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  background-color: #fff;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgb(0 0 0 / 0.1);
+  max-width: 700px;
+  box-shadow: none;
+  padding: 30px;
 }
 
-.left-image {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  object-fit: cover;
+.left-panel2 img {
+  width: 850px;
+  height: 750px !important;
+  border-bottom: none !important;
+  border-radius: 20px !important;
 }
 
 .right-panel {

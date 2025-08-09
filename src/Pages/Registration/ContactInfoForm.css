@@ -100,33 +100,65 @@
   border: 1px solid #ccc;
 }
 
-.button-group {
+.left-buttons {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
-  flex-wrap: wrap;
+  align-items: center;
+  padding: 10px;
 }
 
-.btn {
-  padding: 8px 16px;
-  border-radius: 4px;
+.right-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+}
+
+.back-btn2,
+.skip-btn2,
+.next-btn2 {
+  padding: 10px 20px;
+  border-radius: 5px;
   border: none;
+  font-weight: bold;
   cursor: pointer;
 }
 
-.btn.back {
-  background-color: #eee;
+.back-btn2 {
+  background: #f0f0f0;
+  color: #0a5c15;
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px; /* 150% */
+  border-radius: 10px;
+  border: 1px solid #0a5c15;
+  background: #fff;
 }
 
-.btn.skip {
-  background-color: #fdd835;
-  color: #000;
+.skip-btn2 {
+  background: white;
+  border: 1px solid #0a5c15;
+  color: #0a5c15;
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px; /* 150% */
+  border-radius: 10px;
+  border: 1px solid #0a5c15;
+  background: #fff;
 }
 
-.btn.next {
-  background-color: #2e7d32;
-  color: white;
+.next-btn2 {
+  color: #d4f49c;
+  font-family: Inter;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 24px; /* 120% */
+  border-radius: 10px;
+  background: #0a5c15;
 }
 
 /* Responsive Design */
