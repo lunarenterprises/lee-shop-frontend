@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { ArrowRight, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import "./RegistrationJoin.css";
+import "./RegistrationJoin.css"; // renamed CSS file
+import ProgressSteps from "../../ProgressSteps";
 
 const BusinessRegistrationForm = ({
-  onNext = () => { },
-  onBack = () => { },
-  onSkip = () => { },
+  onNext = () => {},
+  onBack = () => {},
+  onSkip = () => {},
   defaultSelection = null,
   showSkip = true,
   showBack = true,
@@ -17,7 +17,11 @@ const BusinessRegistrationForm = ({
 
   const defaultOptionsData = [
     { id: "product-seller", label: "Product Seller", value: "product-seller" },
-    { id: "service-provider", label: "Service Provider", value: "service-provider" },
+    {
+      id: "service-provider",
+      label: "Service Provider",
+      value: "service-provider",
+    },
     { id: "both", label: "Both", value: "both" },
   ];
 
@@ -36,8 +40,8 @@ const BusinessRegistrationForm = ({
   };
 
   const progressSteps = [
-    { id: 1, completed: true, active: false },
-    { id: 2, completed: false, active: true },
+    { id: 1, completed: false, active: true },
+    { id: 2, completed: false, active: false },
     { id: 3, completed: false, active: false },
     { id: 4, completed: false, active: false },
     { id: 5, completed: false, active: false },
@@ -52,76 +56,69 @@ const BusinessRegistrationForm = ({
             <img src="/logo.png" alt="LeeShop" className="hero-logo" />
           </div>
           <div className="hero-quote">
-            <p>"Help small businesses and professionals grow by giving them an easy, affordable way to sell online and reach local customers."</p>
+            <p>
+              "Help small businesses and professionals grow by giving them an
+              easy, affordable way to sell online and reach local customers."
+            </p>
           </div>
         </div>
       </div>
-
-      {/* Right Panel - Form */}
-      <div className="registration-form-panel">
+      <div className="right-panel_2">
         {/* Progress Header */}
-        <div className="progress-header">
-          <div className="progress-label">
-            <span>Business Registration.</span>
-          </div>
-          <div className="progress-steps">
-            {progressSteps.map((step, index) => (
-              <React.Fragment key={step.id}>
-                <div className={`progress-dot ${step.completed ? 'completed' : ''} ${step.active ? 'active' : ''}`}>
-                  <div className="progress-dot-inner"></div>
-                </div>
-                {index < progressSteps.length - 1 && (
-                  <div className={`progress-line ${step.completed ? 'completed' : ''}`}></div>
-                )}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
+        <ProgressSteps
+          title={"Business Registration."}
+          progressSteps={progressSteps}
+        />
 
         {/* Form Content */}
         <div className="form-content">
-          <h1 className="form-title">{title}</h1>
+          <h2 className="section-title">▶ {title}</h2>
 
-          <div className="options-container">
-            {options.map((option) => (
-              <label
-                key={option.id}
-                className={`option-card ${selectedOption === option.value ? 'selected' : ''}`}
-                onClick={() => handleOptionSelect(option.value)}
-              >
-                <div className="radio-button">
-                  <div className="radio-inner"></div>
-                </div>
-                <span className="option-label">{option.label}</span>
-              </label>
-            ))}
+          <div className="section">
+            <div className="options-container">
+              {options.map((option) => (
+                <label
+                  key={option.id}
+                  className={`option-card ${
+                    selectedOption === option.value ? "selected" : ""
+                  }`}
+                  onClick={() => handleOptionSelect(option.value)}
+                >
+                  <div className="radio-button">
+                    <div className="radio-inner"></div>
+                  </div>
+                  <span className="option-label">{option.label}</span>
+                </label>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Navigation Footer */}
-        <div className="navigation-footer">
-          <div className="nav-left">
+        <div className="button-row">
+          <div className="left-buttons">
             {showBack && (
-              <button onClick={onBack} className="btn-secondary">
-                <ArrowLeft size={18} />
+              <button onClick={onBack} className="back-btn2">
                 Back
               </button>
             )}
           </div>
-
-          <div className="nav-right">
+          <div className="right-buttons">
             {showSkip && (
-              <button onClick={onSkip} className="btn-skip">
+              <button onClick={onSkip} className="skip-btn2">
                 Skip
               </button>
             )}
             <button
               onClick={handleNext}
               disabled={!selectedOption}
-              className={`btn-primary ${!selectedOption ? 'disabled' : ''}`}
+              className={`next-btn2 ${!selectedOption ? "disabled" : ""}`}
+              style={{
+                opacity: selectedOption ? 1 : 0.5,
+                cursor: selectedOption ? "pointer" : "not-allowed",
+              }}
             >
-              Next
-              <ArrowRight size={18} />
+              Next →
             </button>
           </div>
         </div>

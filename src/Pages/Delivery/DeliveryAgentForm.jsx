@@ -36,19 +36,13 @@ const DeliveryAgentForm = () => {
 
   return (
     <div className="form-container">
-      <div className="left-panel">
+      <div className="left-panel2">
         <img
           src="/DeliveryImage.png"
           alt="Delivery Agent Illustration"
-          className="form-image"
         />
-        <div className="image-text">
-          <q>
-            “Strengthen local commerce by connecting nearby sellers, services, and customers to promote sustainability.”
-          </q>
-        </div>
       </div>
-      <div className="right-panel">
+      <div className="right-panel_2">
         {/* ...progress, section-title... */}
         <form className="form-fields" onSubmit={e => e.preventDefault()}>
           <label>

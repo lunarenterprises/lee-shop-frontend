@@ -10,6 +10,7 @@ import ResetPasswordModal from "./ResetPasswordModal";
 import SuccessModal from "./SuccessModal";
 import FavoritesComponent from "./FavoritesComponent";
 import AvatarModal from "./AvatarModal";
+import SignUpModal from "./SignUpModal";
 
 const Header = ({ activeKey, onNavClick }) => {
   const location = useLocation();
@@ -17,6 +18,7 @@ const Header = ({ activeKey, onNavClick }) => {
 
   // ---------- user state ----------
   const [userData, setUserData] = useState(null);
+  const [showSignUp, setShowSignUp] = useState(false);
   useEffect(() => {
     try {
       const raw = localStorage.getItem("userData");
@@ -24,7 +26,9 @@ const Header = ({ activeKey, onNavClick }) => {
         const parsed = JSON.parse(raw);
         if (parsed?.id) setUserData(parsed);
       }
-    } catch { localStorage.removeItem("userData"); }
+    } catch {
+      localStorage.removeItem("userData");
+    }
   }, []);
   console.log("Header userData:", userData);
 
@@ -38,21 +42,29 @@ const Header = ({ activeKey, onNavClick }) => {
   const landingLinks = [
     { href: "/", label: "Home" },
     { href: "/Why", label: "Why Lee Shop" },
-    { href: "/ourGoal", label: "Our Goal" }
+    { href: "/ourGoal", label: "Our Goal" },
   ];
   const userLinks = [
     { path: "/NearbyShop", label: "Find Your Local Shop" },
     { path: "/NearbyService", label: "Find Nearby Services" },
-    { path: "/AssignDelivery", label: "Assign Your Delivery Agent" }
+    { path: "/AssignDelivery", label: "Assign Your Delivery Agent" },
   ];
   // Show only on landing for logged out
-  const navItems = isVisitor ? (onLanding ? landingLinks : []) : isUser ? userLinks : [];
+  const navItems = isVisitor
+    ? onLanding
+      ? landingLinks
+      : []
+    : isUser
+    ? userLinks
+    : [];
 
   // ---------- routes ----------
   const profileRoute =
-    role === "deliverystaff" ? "/DeliveryProfile"
-      : role === "shop" ? "/ShopProfile"
-        : "/UserProfile";
+    role === "deliverystaff"
+      ? "/DeliveryProfile"
+      : role === "shop"
+      ? "/ShopProfile"
+      : "/UserProfile";
 
   // ---------- ui state ----------
   const [menuOpen, setMenuOpen] = useState(false);
@@ -67,8 +79,14 @@ const Header = ({ activeKey, onNavClick }) => {
 
   // ---------- logo click ----------
   const handleLogo = () => {
-    if (onLanding) { window.location.reload(); return; }
-    if (userData) { navigate(profileRoute); return; }
+    if (onLanding) {
+      window.location.reload();
+      return;
+    }
+    if (userData) {
+      navigate(profileRoute);
+      return;
+    }
     navigate("/");
   };
 
@@ -77,13 +95,14 @@ const Header = ({ activeKey, onNavClick }) => {
     localStorage.setItem("userData", JSON.stringify(user));
     setUserData(user);
     navigate(
-      user.role?.toLowerCase() === "shop" ? "/ShopProfile"
-        : user.role?.toLowerCase() === "deliverystaff" ? "/DeliveryProfile"
-          : "/UserProfile"
+      user.role?.toLowerCase() === "shop"
+        ? "/ShopProfile"
+        : user.role?.toLowerCase() === "deliverystaff"
+        ? "/DeliveryProfile"
+        : "/UserProfile"
     );
     setShowLogin(false);
   };
-
 
   // ---------- logout handler ----------
   const handleLogout = () => {
@@ -96,7 +115,11 @@ const Header = ({ activeKey, onNavClick }) => {
     <>
       <header className="homepage-header">
         {/* LOGO */}
-        <div className="homepage-logo" onClick={handleLogo} style={{ cursor: "pointer" }}>
+        <div
+          className="homepage-logo"
+          onClick={handleLogo}
+          style={{ cursor: "pointer" }}
+        >
           <img src="/logo.png" alt="Logo" style={{ height: 42 }} />
         </div>
 
@@ -105,7 +128,7 @@ const Header = ({ activeKey, onNavClick }) => {
           <button
             className="homepage-hamburger"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
-            onClick={() => setMenuOpen(o => !o)}
+            onClick={() => setMenuOpen((o) => !o)}
           >
             {menuOpen ? <FaTimes size={26} /> : <FaBars size={26} />}
           </button>
@@ -134,14 +157,25 @@ const Header = ({ activeKey, onNavClick }) => {
             {/* Mobile icons for USER only */}
             {isUser && (
               <div className="mobile-user-icons">
-                <button className="mobile-icon-btn" onClick={() => { setShowFav(true); setMenuOpen(false); }}>
-                  <FaHeart size={18} /><span>Favorites</span>
+                <button
+                  className="mobile-icon-btn"
+                  onClick={() => {
+                    setShowFav(true);
+                    setMenuOpen(false);
+                  }}
+                >
+                  <FaHeart size={18} />
+                  <span>Favorites</span>
                 </button>
                 <button
                   className="mobile-icon-btn"
-                  onClick={() => { setShowAvatar(true); setMenuOpen(false); }}
+                  onClick={() => {
+                    setShowAvatar(true);
+                    setMenuOpen(false);
+                  }}
                 >
-                  <FaUser size={18} /><span>Profile</span>
+                  <FaUser size={18} />
+                  <span>Profile</span>
                 </button>
               </div>
             )}
@@ -149,7 +183,13 @@ const Header = ({ activeKey, onNavClick }) => {
             {/* Mobile login button */}
             {!userData && (
               <div className="mobile-auth-section">
-                <button className="mobile-login-btn" onClick={() => { setShowLogin(true); setMenuOpen(false); }}>
+                <button
+                  className="mobile-login-btn"
+                  onClick={() => {
+                    setShowLogin(true);
+                    setMenuOpen(false);
+                  }}
+                >
                   Login / Register
                 </button>
               </div>
@@ -160,13 +200,19 @@ const Header = ({ activeKey, onNavClick }) => {
         {/* RIGHT ICONS */}
         <div className="homepage-icons">
           {!userData ? (
-            <button className="desktop-login-btn" onClick={() => setShowLogin(true)}>
+            <button
+              className="desktop-login-btn"
+              onClick={() => setShowLogin(true)}
+            >
               Login / Register
             </button>
           ) : (
             <>
               {isUser && (
-                <button className="desktop-icon-btn" onClick={() => setShowFav(true)}>
+                <button
+                  className="desktop-icon-btn"
+                  onClick={() => setShowFav(true)}
+                >
                   <FaHeart color="#bcee66" size={18} />
                 </button>
               )}
@@ -183,14 +229,68 @@ const Header = ({ activeKey, onNavClick }) => {
       </header>
 
       {/* ---------- MODALS ---------- */}
-      {showLogin && <LoginModal onClose={() => setShowLogin(false)} onLoginSuccess={handleLoginSuccess} onForgotPassword={() => { setShowLogin(false); setShowIdentity(true); }} />}
-      {showIdentity && <ConfirmIdentityModal onClose={() => setShowIdentity(false)} onConfirmEmail={(e) => { setUserEmail(e); setShowIdentity(false); setShowEmail(true); }} />}
-      {showEmail && <EmailVerificationModal email={userEmail} onClose={() => setShowEmail(false)} onVerify={() => { setShowEmail(false); setShowReset(true); }} />}
-      {showReset && <ResetPasswordModal email={userEmail} onClose={() => setShowReset(false)} onSuccess={() => { setShowReset(false); setShowSuccess(true); }} />}
+      {showLogin && (
+        <LoginModal
+          onClose={() => setShowLogin(false)}
+          onLoginSuccess={handleLoginSuccess}
+          onSignUp={() => {
+            setShowLogin(false);
+            setShowSignUp(true);
+          }}
+          onForgotPassword={() => {
+            setShowLogin(false);
+            setShowIdentity(true);
+          }}
+        />
+      )}
+      {showIdentity && (
+        <ConfirmIdentityModal
+          onClose={() => setShowIdentity(false)}
+          onConfirmEmail={(e) => {
+            setUserEmail(e);
+            setShowIdentity(false);
+            setShowEmail(true);
+          }}
+        />
+      )}
+      {showEmail && (
+        <EmailVerificationModal
+          email={userEmail}
+          onClose={() => setShowEmail(false)}
+          onVerify={() => {
+            setShowEmail(false);
+            setShowReset(true);
+          }}
+        />
+      )}
+      {showReset && (
+        <ResetPasswordModal
+          email={userEmail}
+          onClose={() => setShowReset(false)}
+          onSuccess={() => {
+            setShowReset(false);
+            setShowSuccess(true);
+          }}
+        />
+      )}
       {showSuccess && <SuccessModal onClose={() => setShowSuccess(false)} />}
 
+      {/* ---------- Sign-up modal ---------- */}
+      {showSignUp && (
+        <SignUpModal
+          onClose={() => setShowSignUp(false)}
+          /* If you want to redirect after successful signup,
+           add onSuccess={() => navigate('/UserProfile')} inside the modal */
+        />
+      )}
+
       {/* Favorites only for USER */}
-      {isUser && <FavoritesComponent isOpen={showFav} onClose={() => setShowFav(false)} />}
+      {isUser && (
+        <FavoritesComponent
+          isOpen={showFav}
+          onClose={() => setShowFav(false)}
+        />
+      )}
 
       {/* Avatar modal always available */}
       <AvatarModal

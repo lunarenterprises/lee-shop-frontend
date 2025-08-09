@@ -1,7 +1,7 @@
 import React from "react";
 import "./LocalBusinessPromo.css";
 
-const LocalBusinessPromo = () => {
+const LocalBusinessPromo = ({ onLoginClick }) => {
   return (
     <div className="promo-container">
       <div className="promo-images">
@@ -22,7 +22,7 @@ const LocalBusinessPromo = () => {
           Lee Shop connects local shop owners and service providers with nearby
           customers with flexible delivery powered by freelance partners.
         </p>
-        <button className="get-started-btn">
+        <button className="get-started-btn" onClick={onLoginClick}>
           Get started now <span className="arrow">➜</span>
         </button>
       </div>

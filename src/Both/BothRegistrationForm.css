@@ -2,12 +2,12 @@
   display: flex;
   flex-wrap: wrap;
   min-height: 100vh;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Segoe UI", sans-serif;
 }
 
-.left-panel {
+.left-panel2 {
   flex: 1;
-  background-color: #f4f4f4;
+  background-color: #ffffff;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -38,14 +38,14 @@
   color: #333;
 }
 
-.right-panel {
-  flex: 2;
-  padding: 40px;
+.right-panel_2 {
+  flex: 1;
   background: #fff;
   display: flex;
   flex-direction: column;
   justify-content: center;
   min-width: 300px;
+  width: 100%;
 }
 
 .registration-step {
@@ -134,16 +134,31 @@
   margin-bottom: 20px;
 }
 
+/* Updated Button Layout */
 .button-row {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
   flex-wrap: wrap;
+  margin-top: 20px;
 }
 
-.back-btn,
-.skip-btn,
-.next-btn {
+.left-buttons {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.right-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+}
+
+.back-btn2,
+.skip-btn2,
+.next-btn2 {
   padding: 10px 20px;
   border-radius: 5px;
   border: none;
@@ -151,20 +166,42 @@
   cursor: pointer;
 }
 
-.back-btn {
+.back-btn2 {
   background: #f0f0f0;
-  color: #2e7d32;
+  color: #0a5c15;
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px; /* 150% */
+  border-radius: 10px;
+  border: 1px solid #0a5c15;
+  background: #fff;
 }
 
-.skip-btn {
+.skip-btn2 {
   background: white;
-  border: 1px solid #2e7d32;
-  color: #2e7d32;
+  border: 1px solid #0a5c15;
+  color: #0a5c15;
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px; /* 150% */
+  border-radius: 10px;
+  border: 1px solid #0a5c15;
+  background: #fff;
 }
 
-.next-btn {
-  background: #2e7d32;
-  color: white;
+.next-btn2 {
+  color: #d4f49c;
+  font-family: Inter;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 24px; /* 120% */
+  border-radius: 10px;
+  background: #0a5c15;
 }
 
 /* Responsive Design */
@@ -181,11 +218,29 @@
     max-width: 100%;
   }
 
-  .right-panel {
-    padding: 20px;
-  }
-
   .button-row {
     justify-content: center;
+    gap: 10px;
   }
+
+  .left-buttons,
+  .right-buttons {
+    gap: 10px;
+  }
+
+  /* Stack buttons vertically on very small screens */
+  @media (max-width: 480px) {
+    .button-row {
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .right-buttons {
+      order: -1; /* Move right buttons above left button on mobile */
+    }
+  }
+}
+
+.form-content {
+  padding: 10px;
 }

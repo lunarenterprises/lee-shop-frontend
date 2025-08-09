@@ -18,6 +18,8 @@
   background-position: center;
   background-repeat: no-repeat;
   overflow: hidden;
+  border-radius: 20px !important;
+  margin-left: 10px;
 }
 
 .hero-content {
@@ -25,9 +27,8 @@
   z-index: 2;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  width: 100%;
-  padding: 2rem;
+  width: 850px;
+  height: 750px !important;
 }
 
 .logo-container {
@@ -42,6 +43,11 @@
   height: 54px;
   object-fit: contain;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.right-panel_2 {
+  flex: 1;
+  background-color: #fff;
 }
 
 .hero-quote {
@@ -90,13 +96,14 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .progress-dot {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #e5e7eb;
+  background: #d4f49c;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -105,30 +112,30 @@
 
 .progress-dot.active,
 .progress-dot.completed {
-  background: #22c55e;
+  background: #0a5c15;
 }
 
 .progress-dot-inner {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: transparent;
 }
 
 .progress-dot.active .progress-dot-inner,
 .progress-dot.completed .progress-dot-inner {
-  background: white;
+  background: #d4f49c;
 }
 
 .progress-line {
-  width: 32px;
-  height: 4px;
-  background: #e5e7eb;
+  width: 120px;
+  height: 2px;
+  background: #0a5c15;
   transition: all 0.3s ease;
 }
 
 .progress-line.completed {
-  background: #22c55e;
+  background: #0a5c15;
 }
 
 /* Form Content */

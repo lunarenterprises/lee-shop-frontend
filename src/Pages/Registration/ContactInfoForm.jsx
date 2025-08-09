@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import "./ContactInfoForm.css";
+import "./ContactInfoForm.css"; // renamed CSS file
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ProgressSteps from "../ProgressSteps";
 
 const ContactInfoForm = () => {
   const navigate = useNavigate();
@@ -19,11 +20,25 @@ const ContactInfoForm = () => {
   const [loading, setLoading] = useState(false);
   const [merged, setMerged] = useState(null);
 
+  const progressSteps = [
+    { id: 1, completed: false, active: false },
+    { id: 2, completed: false, active: false },
+    { id: 3, completed: false, active: false },
+    { id: 4, completed: false, active: false },
+    { id: 5, completed: true, active: true },
+  ];
+
   useEffect(() => {
     const businessType = localStorage.getItem("businessType");
-    const businessInfo = JSON.parse(localStorage.getItem("businessInfo") || "{}");
-    const operatingDetails = JSON.parse(localStorage.getItem("operatingDetails") || "{}");
-    const brandingDetails = JSON.parse(localStorage.getItem("brandingDetails") || "{}");
+    const businessInfo = JSON.parse(
+      localStorage.getItem("businessInfo") || "{}"
+    );
+    const operatingDetails = JSON.parse(
+      localStorage.getItem("operatingDetails") || "{}"
+    );
+    const brandingDetails = JSON.parse(
+      localStorage.getItem("brandingDetails") || "{}"
+    );
     const brandingImageFiles = window.brandingImageFiles || [];
 
     setMerged({
@@ -31,8 +46,8 @@ const ContactInfoForm = () => {
         businessType === "product-seller"
           ? "shop"
           : businessType === "service-provider"
-            ? "service"
-            : "both",
+          ? "service"
+          : "both",
       shop_name: businessInfo.shop_name,
       owner_name: businessInfo.owner_name,
       shop_address: businessInfo.address,
@@ -136,99 +151,132 @@ const ContactInfoForm = () => {
     }
   };
 
+  const handleBack = () => navigate(-1);
+  const handleSkip = () => {
+    navigate("/");
+  };
+
   return (
-    <div className="form-container">
+    <div className="registration-container">
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="left-panel">
+
+      <div className="left-panel2">
         <img
           src="/Rectangle-three.png"
           alt="Shop Owner"
-          className="form-image"
         />
       </div>
-      <div className="right-panel">
-        <div className="progress-indicator">
-          <div className="dots">
-            {[...Array(5)].map((_, i) => (
-              <span key={i} className={`dot ${i <= 4 ? "active" : ""}`}></span>
-            ))}
+
+      <div className="right-panel_2">
+        {/* Progress Header */}
+        <ProgressSteps
+          title={"Business Registration."}
+          progressSteps={progressSteps}
+        />
+
+        {/* Form Content */}
+        <form onSubmit={handleSubmit}>
+          <div className="form-content2">
+            <h2 className="section-title">▶ Add Contact Information</h2>
+
+            <div className="section">
+              <label>Primary Contact Number*</label>
+              <div className="phone-input">
+                <span className="country-code">🇮🇳 +91</span>
+                <input
+                  type="tel"
+                  name="primary_phone"
+                  value={contact.primary_phone}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter number"
+                />
+              </div>
+            </div>
+
+            <div className="section">
+              <label>Alternate Contact Number</label>
+              <div className="phone-input">
+                <span className="country-code">🇮🇳 +91</span>
+                <input
+                  type="tel"
+                  name="secondary_phone"
+                  value={contact.secondary_phone}
+                  maxLength={10}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter number"
+                />
+              </div>
+            </div>
+
+            <div className="section">
+              <label>WhatsApp Number</label>
+              <div className="phone-input">
+                <span className="country-code">🇮🇳 +91</span>
+                <input
+                  type="tel"
+                  name="whatsapp_number"
+                  maxLength={10}
+                  value={contact.whatsapp_number}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter number"
+                />
+              </div>
+            </div>
+
+            <div className="section">
+              <label>Email Address</label>
+              <input
+                type="email"
+                name="email"
+                value={contact.email}
+                onChange={handleChange}
+                required
+                placeholder="Enter your email"
+              />
+            </div>
+
+            <div className="section">
+              <label>Enter Password</label>
+              <input
+                type="password"
+                name="password"
+                value={contact.password}
+                onChange={handleChange}
+                required
+                placeholder="Enter password"
+              />
+            </div>
+
+            <div className="section">
+              <label>Confirm Password</label>
+              <input
+                type="password"
+                name="confirm_password"
+                value={contact.confirm_password}
+                onChange={handleChange}
+                required
+                placeholder="Confirm password"
+              />
+            </div>
           </div>
-          <p className="step-title">Business Registration.</p>
-        </div>
-        <form className="contact-form" onSubmit={handleSubmit}>
-          <h2 className="form-title">Add Contact Information</h2>
-          <label>Primary Contact Number*</label>
-          <div className="phone-input">
-            <span className="country-code">🇮🇳 +91</span>
-            <input
-              type="tel"
-              name="primary_phone"
-              value={contact.primary_phone}
-              onChange={handleChange}
-              required
-              placeholder="Enter number"
-            />
-          </div>
-          <label>Alternate Contact Number</label>
-          <div className="phone-input">
-            <span className="country-code">🇮🇳 +91</span>
-            <input
-              type="tel"
-              name="secondary_phone"
-              value={contact.secondary_phone}
-              maxLength={10}
-              onChange={handleChange}
-              required
-              placeholder="Enter number"
-            />
-          </div>
-          <label>WhatsApp Number</label>
-          <div className="phone-input">
-            <span className="country-code">🇮🇳 +91</span>
-            <input
-              type="tel"
-              name="whatsapp_number"
-              maxLength={10}
-              value={contact.whatsapp_number}
-              onChange={handleChange}
-              required
-              placeholder="Enter number"
-            />
-          </div>
-          <label>Email Address</label>
-          <input
-            type="email"
-            name="email"
-            value={contact.email}
-            onChange={handleChange}
-            required
-            placeholder="Enter your email"
-          />
-          <label>Enter Password</label>
-          <input
-            type="password"
-            name="password"
-            value={contact.password}
-            onChange={handleChange}
-            required
-            placeholder="Enter password"
-          />
-          <label>Confirm Password</label>
-          <input
-            type="password"
-            name="confirm_password"
-            value={contact.confirm_password}
-            onChange={handleChange}
-            required
-            placeholder="Confirm password"
-          />
-          <div className="button-group">
-            <button type="button" className="btn back" onClick={() => navigate(-1)}>
-              Back
-            </button>
-            <button type="submit" className="btn next" disabled={loading}>
-              {loading ? "Submitting..." : <>Submit ➜</>}
-            </button>
+          {/* Navigation Footer */}
+          <div className="button-row">
+            <div className="left-buttons">
+              <button className="back-btn2" type="button" onClick={handleBack}>
+                Back
+              </button>
+            </div>
+            <div className="right-buttons">
+              <button className="skip-btn2" type="button" onClick={handleSkip}>
+                Skip
+              </button>
+              <button className="next-btn2" type="submit" disabled={loading}>
+                {loading ? "Submitting..." : "Submit →"}
+              </button>
+            </div>
           </div>
         </form>
       </div>
