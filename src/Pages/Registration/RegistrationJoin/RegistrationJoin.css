@@ -20,6 +20,7 @@
   overflow: hidden;
   border-radius: 20px !important;
   margin-left: 10px;
+  margin-bottom: 10px;
 }
 
 .hero-content {
@@ -28,7 +29,7 @@
   display: flex;
   flex-direction: column;
   width: 850px;
-  height: 750px !important;
+  height: 900px !important;
 }
 
 .logo-container {

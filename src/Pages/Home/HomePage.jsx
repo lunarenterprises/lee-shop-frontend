@@ -33,24 +33,26 @@ const HomePage = () => {
     }
     setSearching(true);
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/shop/list/shop`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ search: searchTerm })
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/shop/list/shop`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ search: searchTerm }),
+      });
       const resData = await response.json();
 
       let found = null;
-      if (resData.result && Array.isArray(resData.list) && resData.list.length) {
+      if (
+        resData.result &&
+        Array.isArray(resData.list) &&
+        resData.list.length
+      ) {
         // Try exact match first, fallback to first shop
-        found = resData.list.find(
-          (shop) =>
-            shop.sh_name &&
-            shop.sh_name.toLowerCase().includes(searchTerm.toLowerCase())
-        ) || resData.list[0];
+        found =
+          resData.list.find(
+            (shop) =>
+              shop.sh_name &&
+              shop.sh_name.toLowerCase().includes(searchTerm.toLowerCase())
+          ) || resData.list[0];
 
         setSearchedShopList(resData.list); // Save the sidebar shops data
       } else {
@@ -89,7 +91,6 @@ const HomePage = () => {
   };
   const [userEmail, setUserEmail] = useState("");
 
-
   // ✅ Called from ConfirmIdentityModal on success
   const handleConfirmEmail = (email) => {
     setUserEmail(email); // Store email for next modal
@@ -97,17 +98,13 @@ const HomePage = () => {
     setShowEmailVerificationModal(true); // Show next modal
   };
 
-
   const handleVerify = () => {
     setShowEmailVerificationModal(false); // Close email modal
     setShowResetModal(true); // Open reset password modal
   };
 
-
   return (
     <div className="homepage-container">
-
-
       {showLoginModal && (
         <LoginModal
           onClose={closeAllModals}
@@ -128,7 +125,6 @@ const HomePage = () => {
           onClose={() => setShowEmailVerificationModal(false)}
           onVerify={handleVerify}
         />
-
       )}
       {showResetModal && (
         <ResetPasswordModal
@@ -161,10 +157,7 @@ const HomePage = () => {
             </div>
           ) : (
             // <<< Pass the full list for the sidebar, main shop as prop
-            <ShopDetailCard
-              shop={searchedShop}
-              shopsList={searchedShopList}
-            />
+            <ShopDetailCard shop={searchedShop} shopsList={searchedShopList} />
           )}
         </div>
       ) : (

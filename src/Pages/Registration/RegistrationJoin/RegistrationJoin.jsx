@@ -50,20 +50,14 @@ const BusinessRegistrationForm = ({
   return (
     <div className="registration-container">
       {/* Left Panel - Hero Image */}
-      <div className="registration-hero">
+      <div className="registration-hero" >
         <div className="hero-content">
           <div className="logo-container">
             <img src="/logo.png" alt="LeeShop" className="hero-logo" />
           </div>
-          <div className="hero-quote">
-            <p>
-              "Help small businesses and professionals grow by giving them an
-              easy, affordable way to sell online and reach local customers."
-            </p>
-          </div>
         </div>
       </div>
-      <div className="right-panel_2">
+      <div className="right-panel2">
         {/* Progress Header */}
         <ProgressSteps
           title={"Business Registration."}
