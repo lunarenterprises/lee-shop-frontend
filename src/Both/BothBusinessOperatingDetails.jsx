@@ -35,7 +35,7 @@ const BothBusinessOperatingDetails = () => {
         />
       </div>
 
-      <div className="right-panel_2">
+      <div className="right-panel2">
         {/* Progress Header - Added to fix the gap */}
         <ProgressSteps
           title={"Business Registration."}
