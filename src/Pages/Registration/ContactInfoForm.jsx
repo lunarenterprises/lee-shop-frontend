@@ -167,7 +167,7 @@ const ContactInfoForm = () => {
         />
       </div>
 
-      <div className="right-panel_2">
+      <div className="right-panel2">
         {/* Progress Header */}
         <ProgressSteps
           title={"Business Registration."}

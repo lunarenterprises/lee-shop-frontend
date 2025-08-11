@@ -152,7 +152,7 @@ const OperatingDetails = () => {
         <img src="/operationdetails.png" alt="Shop owner" />
       </div>
 
-      <div className="right-panel_2">
+      <div className="right-panel2">
         {/* Progress Header */}
         <ProgressSteps
           title={"Business Registration."}

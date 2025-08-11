@@ -116,15 +116,15 @@ const BrandingRegistrationForm = () => {
         />
       </div>
 
-      <div className="right-panel_2">
+      <div className="right-panel2">
         {/* Progress Header */}
         <ProgressSteps
-          title={"Business Registration."}
+          title={"Delivery Agent Registration."}
           progressSteps={progressSteps}
         />
 
         {/* Form Content */}
-        <div className="form-content2">
+        <div className="form-content">
           <h2 className="section-title">▶ Branding & Details</h2>
 
           <div className="section">

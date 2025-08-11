@@ -104,7 +104,7 @@ const ServiceRegistrationForm = () => {
         <img src="/service-page.jpg" alt="Team working" />
       </div>
 
-      <div className="right-panel_2">
+      <div className="right-panel2">
         {/* Progress Header */}
         <ProgressSteps
           title={"Service Registration."}
@@ -112,7 +112,7 @@ const ServiceRegistrationForm = () => {
         />
 
         {/* Form Content */}
-        <div className="form-content2">
+        <div className="form-content">
           <h2 className="section-title">▶ Service Details & Description</h2>
 
           <div className="section">

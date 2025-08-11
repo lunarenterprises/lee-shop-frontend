@@ -29,7 +29,7 @@ const ServiceContactPage = () => {
         <img src="/Rectangle25.png" alt="Shop Owner" />
       </div>
 
-      <div className="right-panel_2">
+      <div className="right-panel2">
         {/* Progress Header */}
         <ProgressSteps
           title={"Service Registration."}
