@@ -18,19 +18,22 @@
 
 .product-card {
   display: flex;
-  border: 1px solid #ddd;
+  border: 1px solid #c1c1c1;
   border-radius: 10px;
   overflow: hidden;
   background: #fff;
 }
 
-.product-logo {
-  width: 120px;
+.product-logo2 {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 10px;
+  width: 240px;
+  opacity: 1;
+  gap: 10px;
+  border-radius: 20px;
+  padding: 15px;
 }
 
 .product-icon {
@@ -52,13 +55,18 @@
   justify-content: space-between;
 }
 
-.product-top {
+.product-top2 {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 14px;
-  color: #555;
+  color: #494949;
   position: relative;
+  font-family: Inter;
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0%;
 }
 
 .open-dot {
@@ -67,29 +75,59 @@
   background: green;
   border-radius: 50%;
   display: inline-block;
+  margin-left: 10px;
 }
 
 .open-time {
-  color: green;
+  color: #3dbb34;
+  font-family: Inter;
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0%;
 }
 
 .wishlist-icon {
-  margin-left: auto;
-  font-size: 20px;
-  cursor: pointer;
-  color: darkgreen;
+  display: inline-flex; /* keeps items in a row */
+  align-items: center; /* vertical alignment */
+  opacity: 1;
+  gap: 10px;
+  border-radius: 100%;
+  padding-top: 14px;
+  padding-right: 16px;
+  padding-bottom: 14px;
+  padding-left: 16px;
+  background: #0a5c15;
 }
 
-.product-name {
-  font-size: 18px;
-  font-weight: bold;
+.product-name2 {
   margin-top: 8px;
+  font-family: Inter;
+  font-weight: 600;
+  font-style: Semi Bold;
+  font-size: 24px;
+  line-height: 24px;
+  letter-spacing: 0%;
 }
-
-.product-rating {
-  font-size: 14px;
-  color: #555;
+.product_info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  vertical-align: middle;
+  padding: 2px;
+}
+.product-rating2 {
+  display: flex;
   margin: 5px 0;
+  font-family: Inter;
+  font-weight: 500;
+  font-style: Medium;
+  font-size: 14px;
+  line-height: 24px;
+  letter-spacing: 0%;
+  color: #494949;
+  align-items: center;
 }
 
 .product-actions {
