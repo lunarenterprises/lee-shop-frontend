@@ -84,7 +84,7 @@ function DeliveryAgents() {
   };
 
   return (
-    <div className="delivery-container">
+    <div className="delivery-container2">
       <div className="delivery-header">
         <h2>Find your delivery agent</h2>
         <a href="#" className="view-all">
