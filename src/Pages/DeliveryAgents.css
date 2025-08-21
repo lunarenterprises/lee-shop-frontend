@@ -1,4 +1,4 @@
-.delivery-container2 {
+.delivery-container {
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background-color: #fff;
@@ -6,17 +6,17 @@
   margin: 0 auto;
 }
 
-.delivery-header {
+.delivery-header2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
 }
 
-.delivery-header h2 {
+.delivery-header2 h2 {
   font-size: 24px;
   font-weight: 600;
-  margin: 0;
+  margin-left: 20px;
   color: #333;
 }
 
@@ -146,6 +146,10 @@
   gap: 6px;
 }
 
+.location-section2{
+  display: block;
+}
+
 .location-icon {
   display: flex;
   align-items: center;
@@ -172,12 +176,13 @@
 
 .status-text {
   font-size: 14px;
-  color: #28a745;
+  color: #000000;
   font-weight: 500;
+  font-family: Inter, sans-serif;
 }
 
 /* Location Name (second row) */
-.location-name {
+.location-name2 {
   font-size: 14px;
   color: #000;
   font-weight: 500;

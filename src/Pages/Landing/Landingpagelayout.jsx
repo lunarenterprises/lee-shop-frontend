@@ -14,7 +14,7 @@ import SignUpModal from "../Home/SignUpModal";
 
 const navItems = [
   { href: "/", label: "Home" },
-  { href: "/Why", label: "Why Lee Shop" },
+  { href: "/Why", label: "Why LeeShop" },
   { href: "/ourGoal", label: "Our Goal" },
 ];
 

@@ -85,7 +85,7 @@ function DeliveryAgents() {
 
   return (
     <div className="delivery-container2">
-      <div className="delivery-header">
+      <div className="delivery-header2">
         <h2>Find your delivery agent</h2>
         <a href="#" className="view-all">
           View All →
@@ -134,7 +134,7 @@ function DeliveryAgents() {
               <div className="delivery-distance">{agent.distance}</div>
             </div>
             <div className="delivery-location-status">
-              <div className="location-section">
+              <div className="location-section2">
                 <div className="location-row">
                   <span className="location-icon">
                     <svg
@@ -152,7 +152,7 @@ function DeliveryAgents() {
                   </span>
                   <span className="location-label">Location</span>
                 </div>
-                <div className="location-name">{agent.location}</div>
+                <div className="location-name2">{agent.location}</div>
               </div>
               <div className="status">
                 <span>

@@ -57,7 +57,7 @@ const BusinessRegistrationForm = ({
           </div>
         </div>
       </div>
-      <div className="right-panel2">
+      <div className="right-panel_2">
         {/* Progress Header */}
         <ProgressSteps
           title={"Business Registration."}
@@ -73,7 +73,7 @@ const BusinessRegistrationForm = ({
               {options.map((option) => (
                 <label
                   key={option.id}
-                  className={`option-card ${
+                  className={`option-card2 ${
                     selectedOption === option.value ? "selected" : ""
                   }`}
                   onClick={() => handleOptionSelect(option.value)}
