@@ -2,7 +2,7 @@
   display: flex;
   flex-wrap: wrap;
   min-height: 100vh;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Segoe UI", sans-serif;
 }
 
 .left-panel {
@@ -68,33 +68,76 @@
 }
 
 .section-subtitle {
-  font-weight: 600;
   margin-bottom: 0.5rem;
+  font-family: "Raleway", sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 20px !important;
+  color: #0a5c15 !important;
 }
 
 .image-upload-box {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #dadada;
+}
+
+.form-content {
+  margin-left: 25px;
+  max-width: 650px !important;
 }
 
 .upload-box {
   flex: 1;
-  min-width: 200px;
-  border: 2px dashed #ccc;
+  min-width: 230px;
+  border: 2px dashed #0a5c15;
   border-radius: 10px;
   padding: 1rem;
   text-align: center;
+  background-color: #ffffff;
+  color: #59595a;
+  vertical-align: middle;
+  align-items: center;
+  margin: 0px !important;
 }
 
 .upload-btn {
   margin-top: 0.5rem;
-  padding: 0.5rem 1rem;
-  background-color: #004400;
+  background-color: #ffffff;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  white-space: nowrap;
+  align-items: center !important;
+  text-align: center !important;
+  justify-content: center;
+  width: 166px;
+  vertical-align: middle;
+  font-family: "Raleway" !important;
+  font-weight: 600 !important;
+  font-style: "SemiBold" !important;
+  font-size: 12px !important;
+  line-height: 100% !important;
+  letter-spacing: 0%;
+  text-align: center;
+}
+
+.shop-description {
+  width: 630px;
+  height: 79px;
+  border-radius: 6px;
+  border: 1px solid #0a5c15;
+  padding: 20px;
+  font-family: "Raleway";
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: 0%;
 }
 
 .image-gallery {
@@ -102,6 +145,7 @@
   grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
   gap: 0.5rem;
   flex: 2;
+  margin-top: 0px !important;
 }
 
 .image-gallery img {
@@ -121,10 +165,14 @@
 
 .product-service-input {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  border: 1px solid #0a5c15;
+  border-radius: 6px;
+  margin: 0px !important;
 }
-
+.product-service-input input {
+  padding: 10px 20px;
+  min-width: 580px !important;
+}
 .add-btn {
   padding: 0 1rem;
   background-color: #004400;
@@ -137,12 +185,18 @@
 
 .product-tag {
   margin-top: 1rem;
-  background-color: #e0f2e0;
+  background-color: #ffffff;
   padding: 0.5rem 1rem;
   border-radius: 20px;
   display: inline-block;
-  font-size: 0.95rem;
-  color: #004400;
+  color: #0a5c15;
+  border: 1px solid #0a5c15;
+  font-family: Inter;
+  font-weight: 500;
+  font-style: Medium;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0%;
 }
 
 .buttons {

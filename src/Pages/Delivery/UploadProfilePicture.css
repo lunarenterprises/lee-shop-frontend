@@ -98,8 +98,8 @@
 }
 
 .choose-file-btn {
-  background-color: #1b611d;
-  color: white;
+  background-color: #0A5C15;
+  color: white !important;
   padding: 8px 16px;
   margin-top: 10px;
   display: inline-block;

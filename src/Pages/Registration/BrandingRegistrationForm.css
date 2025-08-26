@@ -105,7 +105,7 @@
   margin-top: 0.5rem;
   padding: 0.5rem 1rem;
   background-color: #004400;
-  color: white;
+  color: white !important;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -129,7 +129,6 @@
   padding: 0.75rem;
   margin-top: 1rem;
   border-radius: 5px;
-  border: 1px solid #ccc;
 }
 
 .product-service-input {
@@ -139,8 +138,8 @@
 }
 
 .add-btn {
-  padding: 0 1rem;
-  background-color: #004400;
+  padding: 0 0.5rem;
+  background-color: #0a5c15;
   color: white;
   border: none;
   border-radius: 5px;

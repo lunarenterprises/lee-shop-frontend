@@ -2,7 +2,7 @@
   display: flex;
   flex-wrap: wrap;
   min-height: 100vh;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 .left-panel {
@@ -80,17 +80,34 @@
   gap: 8px;
 }
 
+.section label {
+  font-family: Raleway;
+  font-weight: 700;
+  font-style: Bold;
+  font-size: 20px;
+  line-height: 100%;
+  letter-spacing: 0%;
+}
+
+.section input {
+  border: 1px solid #0a5c15 !important;
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+}
+
 .phone-input input {
   flex: 1;
   padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid #0a5c15 !important;
+  border-radius: 6px !important;
 }
 
 .country-code {
-  background: #eee;
-  padding: 8px;
-  border-radius: 4px;
+  background: #fff !important;
+  padding: 8px !important;
+  border-radius: 6px;
+  border: 1px solid #0a5c15 !important;
 }
 
 .contact-form input[type="email"],

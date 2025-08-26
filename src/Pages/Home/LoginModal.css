@@ -70,6 +70,16 @@ p {
   position: relative;
 }
 
+.password-wrapper input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  font-size: 15px;
+  border-radius: 6px;
+  border: 1px solid #1e3811;
+  color: black;
+}
+
 .eye-icon {
   position: absolute;
   top: 10px;

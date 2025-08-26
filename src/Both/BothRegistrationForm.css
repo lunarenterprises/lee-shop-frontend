@@ -74,9 +74,15 @@
 }
 
 .section-title {
-  color: #2e7d32;
   font-size: 20px;
   margin-bottom: 20px;
+  font-family: "Raleway";
+  font-weight: 400;
+  font-style: "Regular";
+  font-size: 32px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  color: #0a5c15;
 }
 
 .form-row {
@@ -101,7 +107,13 @@
 .category-section label {
   display: block;
   margin-bottom: 10px;
-  font-weight: 600;
+  font-family: "Raleway";
+  font-weight: 700;
+  font-style: Bold;
+  font-size: 20px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  color: #0a5c15;
 }
 
 .categories {
@@ -112,12 +124,17 @@
 
 .category-btn {
   padding: 6px 14px;
-  border: 1px solid #2e7d32;
+  border: 1px solid #0a5c15;
   border-radius: 20px;
   background: white;
-  color: #2e7d32;
+  color: #0a5c15;
   font-size: 14px;
   cursor: pointer;
+}
+
+.category-btn .selected {
+  background-color: #0a5c15;
+  color: white;
 }
 
 .view-more {
@@ -128,7 +145,7 @@
   width: 100%;
   min-height: 60px;
   padding: 10px;
-  border: 1px solid #2e7d32;
+  border: 1px solid #0a5c15;
   border-radius: 5px;
   resize: vertical;
   margin-bottom: 20px;

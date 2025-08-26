@@ -25,6 +25,8 @@ const EditShopModal = ({ isOpen, onClose, shopData, onSave }) => {
     closingTime: "08:00",
     closingPeriod: "AM",
     deliveryType: "own",
+    primaryPhone: "+91 8934814581",
+    whatsappNumber: "+91 8934814581",
     phoneNumbers: [
       "+91 8934814581",
       "+91 8934814581",
@@ -398,61 +400,81 @@ const EditShopModal = ({ isOpen, onClose, shopData, onSave }) => {
             </div>
           )}
           {activeTab === "gallery" && (
-            <div className="gallery-form">
-              <div className="gallery-content">
-                {/* Upload Area */}
-                <div className="upload-area">
-                  <div className="upload-icon">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M7 10L12 15L17 10"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M12 15V3"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-                  <p className="upload-text">
-                    Drag and drop your images anywhere or
-                  </p>
-                  <label className="upload-button">
-                    Upload a Image
-                    <input
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      style={{ display: "none" }}
-                    />
-                  </label>
-                </div>
-
-                {/* Existing Images */}
-                <div className="existing-images">
-                  <div className="images-grid">
-                    {formData.galleryImages.map((image, index) => (
-                      <div key={index} className="image-item">
-                        <img
-                          src={image || "/placeholder.svg"}
-                          alt={`Gallery ${index + 1}`}
+            <div
+              style={{
+                padding: "10px",
+                backgroundColor: "#F9F9F9",
+                borderRadius: "10px",
+                stroke: "#DADADA",
+                strokeWidth: "1px",
+              }}
+            >
+              <div className="gallery-form">
+                <div className="gallery-content">
+                  {/* Upload Area */}
+                  <div className="upload-area">
+                    <div className="upload-icon">
+                      <svg
+                        width="44"
+                        height="43"
+                        viewBox="0 0 44 43"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M38.5726 23.2918V15.2293C38.5726 12.8534 37.6288 10.5748 35.9488 8.89483C34.2687 7.21482 31.9902 6.271 29.6143 6.271H14.3851C12.0092 6.271 9.73061 7.21482 8.05059 8.89483C6.37058 10.5748 5.42676 12.8534 5.42676 15.2293V27.771C5.42676 28.9474 5.65847 30.1123 6.10867 31.1992C6.55887 32.2861 7.21873 33.2736 8.05059 34.1055C9.73061 35.7855 12.0092 36.7293 14.3851 36.7293H25.6009"
+                          stroke="#0A5C15"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
                         />
-                      </div>
-                    ))}
+                        <path
+                          d="M5.89258 30.4584L10.8017 24.7251C11.4465 24.0848 12.2926 23.6869 13.197 23.5987C14.1014 23.5105 15.0084 23.7376 15.7647 24.2413C16.5209 24.7451 17.428 24.9721 18.3323 24.884C19.2367 24.7958 20.0829 24.3979 20.7276 23.7576L24.9022 19.583C26.1017 18.3794 27.6898 17.6412 29.3832 17.5001C31.0766 17.359 32.765 17.8241 34.1472 18.8126L38.5726 22.2347M14.8509 18.2213C15.2415 18.219 15.6278 18.1397 15.9877 17.9881C16.3477 17.8364 16.6742 17.6154 16.9487 17.3376C17.2232 17.0597 17.4403 16.7305 17.5876 16.3688C17.7349 16.007 17.8095 15.6198 17.8072 15.2293C17.8048 14.8387 17.7255 14.4524 17.5739 14.0925C17.4223 13.7325 17.2012 13.406 16.9234 13.1314C16.6455 12.8569 16.3163 12.6398 15.9546 12.4925C15.5929 12.3452 15.2057 12.2707 14.8151 12.273C14.0263 12.2778 13.2717 12.5957 12.7173 13.1568C12.1629 13.7179 11.8541 14.4763 11.8588 15.2651C11.8636 16.0539 12.1815 16.8085 12.7426 17.3629C13.3037 17.9173 14.0621 18.2261 14.8509 18.2213Z"
+                          stroke="#0A5C15"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M34.0166 26.875V35.8333"
+                          stroke="#0A5C15"
+                          stroke-width="2"
+                          stroke-miterlimit="10"
+                          stroke-linecap="round"
+                        />
+                        <path
+                          d="M38.1248 30.6468L34.6006 27.1226C34.524 27.0457 34.433 26.9846 34.3327 26.943C34.2325 26.9013 34.125 26.8799 34.0165 26.8799C33.908 26.8799 33.8005 26.9013 33.7002 26.943C33.6 26.9846 33.509 27.0457 33.4324 27.1226L29.9082 30.6468"
+                          stroke="#0A5C15"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </div>
+                    <p className="upload-text">
+                      Drag and drop your images anywhere or
+                    </p>
+                    <label className="upload-button">
+                      Upload a Image
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        style={{ display: "none" }}
+                      />
+                    </label>
+                  </div>
+
+                  {/* Existing Images */}
+                  <div className="existing-images">
+                    <div className="images-grid">
+                      {formData.galleryImages.map((image, index) => (
+                        <div key={index} className="image-item">
+                          <img src={image || "/placeholder.svg"} alt={``} />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -465,7 +487,7 @@ const EditShopModal = ({ isOpen, onClose, shopData, onSave }) => {
               <div className="form-group">
                 <label>Delivery Type</label>
                 <div className="delivery-options">
-                  <label className="radio-option">
+                  <label className="custom-radio-option">
                     <input
                       type="radio"
                       name="deliveryType"
@@ -475,11 +497,12 @@ const EditShopModal = ({ isOpen, onClose, shopData, onSave }) => {
                         handleInputChange("deliveryType", e.target.value)
                       }
                     />
+                    <span className="custom-radio"></span>
                     <span className="radio-text">
                       I have my own delivery staff
                     </span>
                   </label>
-                  <label className="radio-option">
+                  <label className="custom-radio-option">
                     <input
                       type="radio"
                       name="deliveryType"
@@ -489,11 +512,12 @@ const EditShopModal = ({ isOpen, onClose, shopData, onSave }) => {
                         handleInputChange("deliveryType", e.target.value)
                       }
                     />
+                    <span className="custom-radio"></span>
                     <span className="radio-text">
                       I need freelance delivery support
                     </span>
                   </label>
-                  <label className="radio-option">
+                  <label className="custom-radio-option">
                     <input
                       type="radio"
                       name="deliveryType"
@@ -503,11 +527,11 @@ const EditShopModal = ({ isOpen, onClose, shopData, onSave }) => {
                         handleInputChange("deliveryType", e.target.value)
                       }
                     />
+                    <span className="custom-radio"></span>
                     <span className="radio-text">Only In-store service</span>
                   </label>
                 </div>
               </div>
-
               {/* Phone Numbers */}
               <div className="phone-numbers-section">
                 <div className="form-row">
@@ -515,37 +539,21 @@ const EditShopModal = ({ isOpen, onClose, shopData, onSave }) => {
                     <label>Primary Phone Number</label>
                     <input
                       type="tel"
-                      value={formData.phoneNumbers[0]}
-                      onChange={(e) => updatePhoneNumber(0, e.target.value)}
+                      value={formData.primaryPhone}
+                      onChange={(e) =>
+                        handleInputChange("primaryPhone", e.target.value)
+                      }
                       className="form-input"
                     />
                   </div>
                   <div className="form-group">
-                    <label>Primary Phone Number</label>
+                    <label>Whatsapp Number</label>
                     <input
                       type="tel"
-                      value={formData.phoneNumbers[1]}
-                      onChange={(e) => updatePhoneNumber(1, e.target.value)}
-                      className="form-input"
-                    />
-                  </div>
-                </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Primary Phone Number</label>
-                    <input
-                      type="tel"
-                      value={formData.phoneNumbers[2]}
-                      onChange={(e) => updatePhoneNumber(2, e.target.value)}
-                      className="form-input"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Primary Phone Number</label>
-                    <input
-                      type="tel"
-                      value={formData.phoneNumbers[3]}
-                      onChange={(e) => updatePhoneNumber(3, e.target.value)}
+                      value={formData.whatsappNumber}
+                      onChange={(e) =>
+                        handleInputChange("whatsappNumber", e.target.value)
+                      }
                       className="form-input"
                     />
                   </div>

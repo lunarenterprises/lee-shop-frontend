@@ -185,7 +185,7 @@
 }
 
 .option-card2.selected {
-  border-color: #0A5C15;
+  border-color: #0a5c15;
   background: #dcfce7;
   display: flex;
   flex-direction: unset;
@@ -225,7 +225,27 @@
   font-size: 24px;
   font-weight: 700;
   color: #0a5c15;
-  font-family: 'Raleway', sans-serif;
+  font-family: "Raleway", sans-serif;
+}
+
+.next-btn2 {
+  color: #d4f49c !important;
+  font-family: "Inter", sans-serif !important;
+  font-weight: 600 !important; /* Semi-bold */
+  font-size: 20px !important;
+  line-height: 24px !important;
+}
+
+.skip-btn2,
+.back-btn2 {
+  background: none !important;
+  border: 1px solid #0a5c15 !important;
+  font-family: "Inter", sans-serif !important;
+  font-weight: 500 !important; /* Semi-bold */
+  font-size: 16px !important;
+  line-height: 24px !important;
+  border-radius: 10px !important;
+  color: #0a5c15 !important;
 }
 
 /* Navigation Footer */

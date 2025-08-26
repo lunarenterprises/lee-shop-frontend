@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./OperatingDetails.css"; // renamed CSS file
+import "./OperatingDetails.css";
 import ProgressSteps from "../ProgressSteps";
 
 const OperatingDetails = () => {
@@ -11,6 +11,10 @@ const OperatingDetails = () => {
   const [openingMeridian, setOpeningMeridian] = useState("AM");
   const [closingHour, setClosingHour] = useState("10:00");
   const [closingMeridian, setClosingMeridian] = useState("PM");
+  const [deliveryService, setDeliveryService] = useState("yes");
+
+  const [errors, setErrors] = useState({});
+  const [showErrors, setShowErrors] = useState(false);
 
   const navigate = useNavigate();
 
@@ -30,6 +34,64 @@ const OperatingDetails = () => {
 
   const serviceAreaOptions = ["In-shop Only", "Home Service", "Both"];
   const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Validate working days
+    if (selectedDays.length === 0) {
+      newErrors.workingDays = "Please select at least one working day";
+    }
+
+    // Validate opening/closing hours
+    const openingTime = convertTo24Hour(openingHour, openingMeridian);
+    const closingTime = convertTo24Hour(closingHour, closingMeridian);
+
+    if (openingTime >= closingTime) {
+      newErrors.hours = "Closing time must be after opening time";
+    }
+
+    // Validate service area selection
+    if (selectedServiceArea === null || selectedServiceArea === undefined) {
+      newErrors.serviceArea = "Please select a service area option";
+    }
+
+    // Validate delivery service selection
+    if (!deliveryService) {
+      newErrors.deliveryService = "Please select a delivery service option";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const convertTo24Hour = (time, meridian) => {
+    const [hours, minutes] = time.split(":").map(Number);
+    let hour24 = hours;
+
+    if (meridian === "AM" && hours === 12) {
+      hour24 = 0;
+    } else if (meridian === "PM" && hours !== 12) {
+      hour24 = hours + 12;
+    }
+
+    return hour24 * 60 + minutes; // Convert to minutes for easier comparison
+  };
+
+  useEffect(() => {
+    if (showErrors) {
+      validateForm();
+    }
+  }, [
+    selectedDays,
+    openingHour,
+    openingMeridian,
+    closingHour,
+    closingMeridian,
+    deliveryService,
+    selectedServiceArea,
+    showErrors,
+  ]);
 
   // Load operating details from localStorage when component mounts
   useEffect(() => {
@@ -69,6 +131,9 @@ const OperatingDetails = () => {
           );
           if (deliveryIndex !== -1) {
             setSelectedDelivery(deliveryIndex);
+            setDeliveryService(
+              parsedData.delivery_option.toLowerCase().replace(/\s+/g, "")
+            );
           }
         }
 
@@ -123,6 +188,17 @@ const OperatingDetails = () => {
   };
 
   const handleNext = () => {
+    setShowErrors(true);
+
+    if (!validateForm()) {
+      // Scroll to first error or show alert
+      const firstError = Object.values(errors)[0];
+      if (firstError) {
+        alert(`Please fix the following error: ${firstError}`);
+      }
+      return;
+    }
+
     // Format and save all operating details
     const formattedOpening = `${openingHour} ${openingMeridian}`;
     const formattedClosing = `${closingHour} ${closingMeridian}`;
@@ -130,7 +206,9 @@ const OperatingDetails = () => {
     const serviceOpDetails = {
       working_days: selectedDays,
       opening_hours: `${formattedOpening} - ${formattedClosing}`,
-      delivery_option: deliveryOptions[selectedDelivery],
+      delivery_option:
+        deliveryService.replace(/\s+/g, " ").charAt(0).toUpperCase() +
+        deliveryService.slice(1),
       service_area: serviceAreaOptions[selectedServiceArea],
     };
 
@@ -152,7 +230,7 @@ const OperatingDetails = () => {
         <img src="/operationdetails.png" alt="Shop owner" />
       </div>
 
-      <div className="right-panel2">
+      <div className="right-panel_2">
         {/* Progress Header */}
         <ProgressSteps
           title={"Business Registration."}
@@ -177,7 +255,13 @@ const OperatingDetails = () => {
                 </button>
               ))}
             </div>
+            {showErrors && errors.workingDays && (
+              <div style={{ color: "red", fontSize: "14px", marginTop: "5px" }}>
+                {errors.workingDays}
+              </div>
+            )}
           </div>
+
           <div className="section">
             <label>Opening & Closing Hours*</label>
             <div className="time-box">
@@ -223,22 +307,188 @@ const OperatingDetails = () => {
 
               <div className="time-label">Closing</div>
             </div>
+            {showErrors && errors.hours && (
+              <div style={{ color: "red", fontSize: "14px", marginTop: "5px" }}>
+                {errors.hours}
+              </div>
+            )}
           </div>
 
-          <div className="section two-columns">
-            <div>
-              <label>Do you provide delivery services?</label>
-              <ul className="delivery-options">
-                {deliveryOptions.map((opt, index) => (
-                  <li
-                    key={opt}
-                    className={selectedDelivery === index ? "selected" : ""}
-                    onClick={() => setSelectedDelivery(index)}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              marginTop: "30px",
+              gap: "20px",
+              justifyContent:"space-between"
+            }}
+          >
+            {/* Service Area Section */}
+            <div className="section two-columns">
+              <div className="form-group">
+                <label>Service Area Coverage</label>
+                <div className="delivery-radio-options">
+                  <label
+                    className={`delivery-radio-item ${
+                      selectedServiceArea === 0 ? "selected" : ""
+                    }`}
                   >
-                    <span className="dot"></span> {opt}
-                  </li>
-                ))}
-              </ul>
+                    <input
+                      type="radio"
+                      name="serviceArea"
+                      value="0"
+                      checked={selectedServiceArea === 0}
+                      onChange={(e) =>
+                        setSelectedServiceArea(Number.parseInt(e.target.value))
+                      }
+                    />
+                    <span className="radio-indicator">
+                      {selectedServiceArea === 0 && (
+                        <span className="checkmark">✓</span>
+                      )}
+                    </span>
+                    <span className="radio-text">In-shop Only</span>
+                  </label>
+
+                  <label
+                    className={`delivery-radio-item ${
+                      selectedServiceArea === 1 ? "selected" : ""
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="serviceArea"
+                      value="1"
+                      checked={selectedServiceArea === 1}
+                      onChange={(e) =>
+                        setSelectedServiceArea(Number.parseInt(e.target.value))
+                      }
+                    />
+                    <span className="radio-indicator">
+                      {selectedServiceArea === 1 ? (
+                        <span className="checkmark">✓</span>
+                      ) : (
+                        <span className="dot"></span>
+                      )}
+                    </span>
+                    <span className="radio-text">Home Service</span>
+                  </label>
+
+                  <label
+                    className={`delivery-radio-item ${
+                      selectedServiceArea === 2 ? "selected" : ""
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="serviceArea"
+                      value="2"
+                      checked={selectedServiceArea === 2}
+                      onChange={(e) =>
+                        setSelectedServiceArea(Number.parseInt(e.target.value))
+                      }
+                    />
+                    <span className="radio-indicator">
+                      {selectedServiceArea === 2 ? (
+                        <span className="checkmark">✓</span>
+                      ) : (
+                        <span className="dot"></span>
+                      )}
+                    </span>
+                    <span className="radio-text">Both</span>
+                  </label>
+                </div>
+                {showErrors && errors.serviceArea && (
+                  <div
+                    style={{ color: "red", fontSize: "14px", marginTop: "5px" }}
+                  >
+                    {errors.serviceArea}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Delivery Service Section */}
+            <div className="section two-columns">
+              <div className="form-group">
+                <label>Do you provide delivery services?</label>
+                <div className="delivery-radio-options">
+                  <label
+                    className={`delivery-radio-item ${
+                      deliveryService === "yes" ? "selected" : ""
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="deliveryService"
+                      value="yes"
+                      checked={deliveryService === "yes"}
+                      onChange={(e) => setDeliveryService(e.target.value)}
+                    />
+                    <span className="radio-indicator">
+                      {deliveryService === "yes" && (
+                        <span className="checkmark">✓</span>
+                      )}
+                    </span>
+                    <span className="radio-text">
+                      Yes, I have my own delivery staff
+                    </span>
+                  </label>
+
+                  <label
+                    className={`delivery-radio-item ${
+                      deliveryService === "no" ? "selected" : ""
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="deliveryService"
+                      value="no"
+                      checked={deliveryService === "no"}
+                      onChange={(e) => setDeliveryService(e.target.value)}
+                    />
+                    <span className="radio-indicator">
+                      {deliveryService === "no" ? (
+                        <span className="checkmark">✓</span>
+                      ) : (
+                        <span className="dot"></span>
+                      )}
+                    </span>
+                    <span className="radio-text">
+                      No, I need freelance delivery support
+                    </span>
+                  </label>
+
+                  <label
+                    className={`delivery-radio-item ${
+                      deliveryService === "instore" ? "selected" : ""
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="deliveryService"
+                      value="instore"
+                      checked={deliveryService === "instore"}
+                      onChange={(e) => setDeliveryService(e.target.value)}
+                    />
+                    <span className="radio-indicator">
+                      {deliveryService === "instore" ? (
+                        <span className="checkmark">✓</span>
+                      ) : (
+                        <span className="dot"></span>
+                      )}
+                    </span>
+                    <span className="radio-text">Only in-store service</span>
+                  </label>
+                </div>
+                {showErrors && errors.deliveryService && (
+                  <div
+                    style={{ color: "red", fontSize: "14px", marginTop: "5px" }}
+                  >
+                    {errors.deliveryService}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

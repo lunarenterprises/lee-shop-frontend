@@ -65,7 +65,7 @@
 .form-input {
   width: 100%;
   padding: 0.875rem 1rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid #0a5c15;
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -139,7 +139,7 @@ select.form-input {
   display: flex;
   justify-content: space-between;
   align-items: center;
- }
+}
 
 .left-buttons {
   display: flex;

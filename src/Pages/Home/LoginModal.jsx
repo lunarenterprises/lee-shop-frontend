@@ -82,9 +82,9 @@ const LoginModal = ({ onClose, onForgotPassword, onSignUp, onLoginSuccess }) => 
           &times;
         </button>
 
-        <img src="/logo.png" alt="Lee Shop Logo" className="modal-logo" />
+        <img src="/logo.png" alt="LeeShop Logo" className="modal-logo" />
         <h2>Welcome Back!</h2>
-        <p>Sign in to <strong>Lee Shop</strong></p>
+        <p>Sign in to <strong>LeeShop</strong></p>
 
         <label htmlFor="email">Email</label>
         <input
