@@ -19,7 +19,7 @@ const LocalBusinessPromo = ({ onLoginClick }) => {
           Products, Offer Services, or Shop Locally
         </h1>
         <p>
-          Lee Shop connects local shop owners and service providers with nearby
+          LeeShop connects local shop owners and service providers with nearby
           customers with flexible delivery powered by freelance partners.
         </p>
         <button className="get-started-btn" onClick={onLoginClick}>

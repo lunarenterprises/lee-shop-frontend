@@ -11,9 +11,9 @@ const ChooseRole = () => {
 
   return (
     <div className="choose-role-container">
-      <h2 className="choose-role-heading">Join Lee Shop – Choose Your Role</h2>
+      <h2 className="choose-role-heading">Join LeeShop – Choose Your Role</h2>
       <p className="choose-role-subheading">
-        Whether you're here to sell, shop, or deliver, Lee Shop is built for you.
+        Whether you're here to sell, shop, or deliver, LeeShop is built for you.
       </p>
 
       <div className="role-buttons">
@@ -22,7 +22,7 @@ const ChooseRole = () => {
           className="role-btn vendor"
           onClick={() => navigate("/RegistrationJoin")}
         >
-          Become a <strong>Lee Shop Vendor</strong>
+          Become a <strong>LeeShop Vendor</strong>
           <ArrowRight size={18} />
         </button>
 

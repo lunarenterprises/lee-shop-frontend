@@ -6,12 +6,12 @@ const WhyLeeShop = () => {
   return (
     <div className="leeshop-why">
       <section className="why-lee-shop">
-        <h2>Why Lee Shop?</h2>
+        <h2>Why LeeShop?</h2>
         <p>
           We bring together local shop owners, freelance delivery partners, and nearby
           customers in one smart, easy-to-use system. Whether you’re a product seller,
           a service provider, a delivery partner, or simply someone who loves to shop
-          local – Lee Shop is built for you.
+          local – LeeShop is built for you.
         </p>
 
         {/* Dashed line image behind steps */}
@@ -27,7 +27,7 @@ const WhyLeeShop = () => {
           <div className="icon-wrapper">
             <PackageCheck size={24} />
           </div>
-          <span>Packaged by your neighborhood shop</span>
+          <span>Packaged by your neighbourhood shop</span>
         </div>
 
         <div className="step-card center">

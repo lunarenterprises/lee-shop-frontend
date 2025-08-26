@@ -43,9 +43,9 @@
 
 .days button {
   padding: 8px 16px;
-  border: 1px solid #3a6b35;
+  border: 1px solid #0A5C15 !important;
   background-color: transparent;
-  color: #3a6b35;
+  color: #0A5C15;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -53,8 +53,8 @@
 
 .days button.day-selected,
 .days button:hover {
-  background-color: #3a6b35;
-  color: #fff;
+  background-color: #0A5C15;
+  color: #fff !important;
 }
 
 .delivery-options {
@@ -66,7 +66,6 @@
 .delivery-options li {
   cursor: pointer;
   padding: 6px 10px;
-  border: 1px solid #3a6b35;
   margin-bottom: 5px;
   border-radius: 5px;
   user-select: none;
@@ -75,8 +74,7 @@
   gap: 8px;
 }
 .delivery-options li.selected {
-  background-color: #3a6b35;
-  color: white;
+  color: #0A5C15;
 }
 .delivery-options li:hover {
   background-color: #a3d39c;
@@ -138,6 +136,86 @@
   background-color: #3a6b35;
   color: white;
 }
+
+/* Updated delivery options styling to match Figma design */
+.delivery-radio-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.delivery-radio-item {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  
+}
+
+.delivery-radio-item:hover {
+  background-color: #f8f9fa;
+}
+
+.delivery-radio-item input[type="radio"] {
+  display: none;
+}
+
+.radio-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  background-color: #D4F49C !important;
+}
+
+.delivery-radio-item.selected .radio-indicator {
+  border-color: #0A5C15;
+  background-color: #D4F49C;
+  border: 1px solid;
+}
+
+.checkmark {
+  color: #0A5C15;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #D4F49C !important;
+}
+
+.radio-text {
+  flex: 1;
+  font-size: 16px;
+  color: #0A5C15;
+  font-weight: 500;
+}
+
+.highlight-badge {
+  background-color: #2196f3;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Remove old delivery-options styles */
+.delivery-options {
+  display: none;
+}
+
 
 /* Responsive Design */
 @media (max-width: 900px) {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./RegistrationJoin.css"; // renamed CSS file
 import ProgressSteps from "../../ProgressSteps";
@@ -39,6 +39,13 @@ const BusinessRegistrationForm = ({
     }
   };
 
+  useEffect(() => {
+    const savedOption = localStorage.getItem("businessType");
+    if (savedOption) {
+      setSelectedOption(savedOption);
+    }
+  }, []);
+
   const progressSteps = [
     { id: 1, completed: false, active: true },
     { id: 2, completed: false, active: false },
@@ -50,14 +57,14 @@ const BusinessRegistrationForm = ({
   return (
     <div className="registration-container">
       {/* Left Panel - Hero Image */}
-      <div className="registration-hero" >
+      <div className="registration-hero">
         <div className="hero-content">
           <div className="logo-container">
             <img src="/logo.png" alt="LeeShop" className="hero-logo" />
           </div>
         </div>
       </div>
-      <div className="right-panel2">
+      <div className="right-panel_2">
         {/* Progress Header */}
         <ProgressSteps
           title={"Business Registration."}
@@ -73,7 +80,7 @@ const BusinessRegistrationForm = ({
               {options.map((option) => (
                 <label
                   key={option.id}
-                  className={`option-card ${
+                  className={`option-card2 ${
                     selectedOption === option.value ? "selected" : ""
                   }`}
                   onClick={() => handleOptionSelect(option.value)}

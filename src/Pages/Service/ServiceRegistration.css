@@ -233,33 +233,33 @@
 
 .service-category-btn {
   padding: 8px 16px;
-  border: 1px solid #d1d5db;
   border-radius: 20px;
-  background: #f9fafb;
-  color: #374151;
-  font-size: 14px;
-  font-weight: 500;
+  background: #ffffff !important;
+  font-family: "Raleway", sans-serif !important;
+  font-weight: 600 !important; /* Semi-bold */
+  font-size: 16px !important;
+  color: #0a5c15 !important;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  border: 1px solid #0a5c15 !important;
 }
 
 .service-category-btn:hover {
-  border-color: #065e13;
+  border-color: #0a5c15;
   background-color: #f0fdf4;
   color: #065e13;
 }
 
 .service-category-btn.selected {
-  background-color: #065e13;
-  color: white;
-  border-color: #065e13;
+  background-color: #0a5c15 !important;
+  color: #ffffff !important;
 }
 
 .service-category-btn.view-more {
-  background-color: #d4f49c;
-  border-color: #065e13;
-  color: #065e13;
+  background-color: #ffffff;
+  border-color: #0a5c15;
+  color: #0a5c15;
   font-weight: 600;
 }
 

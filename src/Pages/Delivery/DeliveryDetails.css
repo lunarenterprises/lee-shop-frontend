@@ -120,6 +120,15 @@
   color: #14532d;
 }
 
+.upload-box {
+  flex: 1;
+  min-width: 200px !important;
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+}
+
 .file-note {
   font-size: 0.8rem;
   display: block;
@@ -197,17 +206,19 @@
   align-items: center;
 }
 
-.radio-option {
+.radio-option2 {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-weight: 500;
-  color: #14532d;
+  color: #a5e830 !important;
   cursor: pointer;
 }
 
-.radio-option input[type="radio"] {
-  accent-color: #28a745;
+.radio-option2 input[type="radio"] {
+  accent-color: #a5e830 !important;
   width: 16px;
   height: 16px;
+  border: 6px solid #0a5c15 !important;
+  background-color: #a5e830 !important;
 }

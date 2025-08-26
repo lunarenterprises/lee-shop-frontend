@@ -6,14 +6,14 @@ import ConfirmIdentityModal from "./ConfirmIdentityModal";
 import EmailVerificationModal from "./EmailVerificationModal";
 import ResetPasswordModal from "./ResetPasswordModal";
 import SuccessModal from "./SuccessModal";
-import Header from "./Header";
-import Footer from "../Footer";
 import JoinLeeShop from "../JoinLeeShop";
 import LocationSearchBar from "../LocationSearchBar";
 import ShopCard from "../ShopCard";
 import FreshProductList from "../FreshProductList";
 import DeliveryAgents from "../DeliveryAgents";
 import ShopDetailCard from "../Service/ShopDetailCard";
+import Footer from "../Footer";
+import Header from "./Header";
 
 const API_BASE_URL = "https://lunarsenterprises.com:6031/leeshop";
 

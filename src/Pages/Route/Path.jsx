@@ -26,6 +26,7 @@ import NearbyService from "../Service/NearbyService";
 import NearbyShop from "../Service/NearbyShop";
 import DeliveryProfile from "../Delivery/DeliveryProfile";
 import ServiceProfile from "../Service/ServiceProfile";
+import ServiceFinder from "../Home/ServiceFinder";
 function Path() {
   return (
     <div>
@@ -53,42 +54,18 @@ function Path() {
             path="/BothBusinessOperatingDetails"
             element={<BothBusinessOperatingDetails />}
           />
-          <Route
-            path="/ShopProfile"
-            element={<ServiceProfile
-            />}
-          />
+          <Route path="/ShopProfile" element={<ServiceProfile />} />
+          <Route path="/ServiceFinder" element={<ServiceFinder />} />
           <Route path="/DeliveryAgentForm" element={<DeliveryAgentForm />} />
-          <Route
-            path="/DeliveryDetails"
-            element={<DeliveryDetails />}
-
-          />
-          <Route
-            path="/NearbyService"
-            element={<NearbyService />}
-
-          />
-          <Route
-            path="/NearbyShop"
-            element={<NearbyShop />}
-
-          />
-          <Route
-            path="/DeliveryProfile"
-            element={<DeliveryProfile />}
-
-          />
-          <Route
-            path="/AssignDelivery"
-            element={<AssignDeliveryAgent />}
-
-          />
+          <Route path="/DeliveryDetails" element={<DeliveryDetails />} />
+          <Route path="/NearbyService" element={<NearbyService />} />
+          <Route path="/NearbyShop" element={<NearbyShop />} />
+          <Route path="/DeliveryProfile" element={<DeliveryProfile />} />
+          <Route path="/AssignDelivery" element={<AssignDeliveryAgent />} />
 
           <Route
             path="/uploadProfilePicture"
             element={<UploadProfilePicture />}
-
           />
 
           <Route
@@ -105,7 +82,10 @@ function Path() {
           />
           <Route path="/ContactInfoform" element={<ContactInfoForm />} />
           <Route path="/ShopProfileLayout" element={<ShopProfileLayout />} />
-          <Route path="/DeliveryContactInformation" element={<DeliveryContactInformation />} />
+          <Route
+            path="/DeliveryContactInformation"
+            element={<DeliveryContactInformation />}
+          />
           {/* /DeliveryContactInformation */}
         </Routes>
       </Router>

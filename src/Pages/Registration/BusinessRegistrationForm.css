@@ -114,19 +114,23 @@
 
 .category-btn {
   padding: 6px 14px;
-  border: 1px solid #2e7d32;
-  border-radius: 20px;
+  border: 1px solid #0a5c15;
+  border-radius: 28px;
   background: white;
   color: #2e7d32;
-  font-size: 14px;
   cursor: pointer;
+  font-family: "Raleway" !important;
+  font-weight: 600 !important;
+  font-style: "SemiBold";
+  font-size: 16px !important;
+  line-height: 100%;
+  letter-spacing: 0%;
 }
 .category-btn.selected {
-  background-color: #16781b;
+  background-color: #0a5c15 !important;
   color: white;
-  border-color: #2e7d32;
+  border-color: #0a5c15;
   font-weight: bold;
-  box-shadow: 0 0 5px rgba(0, 255, 85, 0.5);
 }
 
 .view-more {
@@ -140,7 +144,7 @@
   border: 1px solid #2e7d32;
   border-radius: 5px;
   resize: vertical;
-  margin-bottom: 20px;
+  margin: 0px !important;
 }
 
 .button-row {
