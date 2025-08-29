@@ -335,6 +335,10 @@
   position: relative;
 }
 
+.tabs-header .active{
+  border-bottom: none !important;
+}
+
 .tab.active {
   color: #4caf50;
   border-bottom-color: #4caf50;

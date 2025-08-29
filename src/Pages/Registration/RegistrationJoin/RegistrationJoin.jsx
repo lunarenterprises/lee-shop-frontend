@@ -57,12 +57,12 @@ const BusinessRegistrationForm = ({
   return (
     <div className="registration-container">
       {/* Left Panel - Hero Image */}
-      <div className="registration-hero">
-        <div className="hero-content">
-          <div className="logo-container">
-            <img src="/logo.png" alt="LeeShop" className="hero-logo" />
-          </div>
-        </div>
+      <div className="left-panel2">
+        <img
+          src="/register.jpeg"
+          alt="Team working"
+          className="left-image2"
+        />
       </div>
       <div className="right-panel_2">
         {/* Progress Header */}
@@ -78,7 +78,7 @@ const BusinessRegistrationForm = ({
           <div className="section">
             <div className="options-container">
               {options.map((option) => (
-                <label
+                <div
                   key={option.id}
                   className={`option-card2 ${
                     selectedOption === option.value ? "selected" : ""
@@ -89,7 +89,7 @@ const BusinessRegistrationForm = ({
                     <div className="radio-inner"></div>
                   </div>
                   <span className="option-label">{option.label}</span>
-                </label>
+                </div>
               ))}
             </div>
           </div>

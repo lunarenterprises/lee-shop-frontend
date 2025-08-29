@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ServiceRegistrationForm.css"; // renamed CSS file
 import ProgressSteps from "../ProgressSteps";
 
 const ServiceRegistrationForm = () => {
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
   const [images, setImages] = useState([]);
   const [imageFiles, setImageFiles] = useState([]);
   const [description, setDescription] = useState("");
@@ -36,6 +37,10 @@ const ServiceRegistrationForm = () => {
     { id: 4, completed: true, active: true },
     { id: 5, completed: false, active: false },
   ];
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
 
   const validateImages = (files) => {
     const errors = [];
@@ -233,6 +238,22 @@ const ServiceRegistrationForm = () => {
     setNewService("");
   };
 
+  // Add handleRemoveService function
+  const handleRemoveService = (indexToRemove) => {
+    const newServices = services.filter((_, index) => index !== indexToRemove);
+    setServices(newServices);
+
+    // Re-validate services after removal
+    if (newServices.length === 0) {
+      setErrors((prev) => ({
+        ...prev,
+        services: "At least one service is required",
+      }));
+    } else {
+      clearError("services");
+    }
+  };
+
   const handleDescriptionChange = (e) => {
     const value = e.target.value;
     setDescription(value);
@@ -374,16 +395,21 @@ const ServiceRegistrationForm = () => {
                     </svg>
                   </span>
                   <p>Drag and drop your service images here or</p>
-                  <label className="upload-btn">
+                  <span
+                    className="upload-btn"
+                    onClick={handleUploadClick}
+                    style={{ cursor: "pointer" }}
+                  >
                     Upload an Image
                     <input
+                      ref={fileInputRef}
                       type="file"
                       multiple
                       accept="image/*"
                       style={{ display: "none" }}
                       onChange={handleImageUpload}
                     />
-                  </label>
+                  </span>
                 </div>
                 <div className="image-gallery">
                   {images.map((img, i) => (
@@ -424,16 +450,13 @@ const ServiceRegistrationForm = () => {
               <div style={{ color: "red", fontSize: "14px" }}>
                 {errors.description}
               </div>
-              <div style={{ color: "#666", fontSize: "12px" }}>
-                {description.length}/{VALIDATION_RULES.MAX_DESCRIPTION_LENGTH}
-              </div>
             </div>
           </div>
 
           <div className="section">
             <p className="section-subtitle">services</p>
 
-            <div className="product-service-input">
+            <div style={{ display: "flex", gap: "10px" }}>
               <input
                 type="text"
                 placeholder="Write about the product and services"
@@ -462,7 +485,13 @@ const ServiceRegistrationForm = () => {
             <div className="product-tag-container">
               {services.map((service, i) => (
                 <div key={i} className="product-tag">
-                  {service}
+                  <span className="product-tag-text">{service}</span>
+                  <button
+                    onClick={() => handleRemoveService(i)}
+                    className="product-tag-remove"
+                  >
+                    ×
+                  </button>
                 </div>
               ))}
             </div>
@@ -476,9 +505,6 @@ const ServiceRegistrationForm = () => {
             >
               <div style={{ color: "red", fontSize: "14px" }}>
                 {errors.services}
-              </div>
-              <div style={{ color: "#666", fontSize: "12px" }}>
-                {services.length}/{VALIDATION_RULES.MAX_SERVICES} services
               </div>
             </div>
           </div>

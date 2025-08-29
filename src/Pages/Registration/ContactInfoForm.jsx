@@ -29,6 +29,14 @@ const ContactInfoForm = () => {
     { id: 5, completed: true, active: true },
   ];
 
+  // Test toast function (you can remove this after testing)
+  const testToast = () => {
+    toast.success("Success toast is working!");
+    toast.error("Error toast is working!");
+    toast.warn("Warning toast is working!");
+    toast.info("Info toast is working!");
+  };
+
   useEffect(() => {
     const businessType = localStorage.getItem("businessType");
     const businessInfo = JSON.parse(
@@ -73,27 +81,34 @@ const ContactInfoForm = () => {
   // Validation functions
   const validatePhone = (phone, fieldName) => {
     const errors = [];
-    
+
     if (!phone.trim()) {
       errors.push(`${fieldName} is required`);
       return errors;
     }
 
     // Remove any non-digit characters for validation
-    const cleanPhone = phone.replace(/\D/g, '');
-    
+    const cleanPhone = phone.replace(/\D/g, "");
+
     if (cleanPhone.length !== 10) {
       errors.push(`${fieldName} must be exactly 10 digits`);
     }
 
     // Check if phone starts with valid digits (6-9 for Indian mobile numbers)
-    if (cleanPhone.length === 10 && !['6', '7', '8', '9'].includes(cleanPhone[0])) {
+    if (
+      cleanPhone.length === 10 &&
+      !["6", "7", "8", "9"].includes(cleanPhone[0])
+    ) {
       errors.push(`${fieldName} must start with 6, 7, 8, or 9`);
     }
 
     // Check for invalid patterns
-    if (cleanPhone === '0000000000' || cleanPhone === '1111111111' || 
-        cleanPhone === '1234567890' || cleanPhone === '9999999999') {
+    if (
+      cleanPhone === "0000000000" ||
+      cleanPhone === "1111111111" ||
+      cleanPhone === "1234567890" ||
+      cleanPhone === "9999999999"
+    ) {
       errors.push(`${fieldName} appears to be invalid`);
     }
 
@@ -112,7 +127,7 @@ const ContactInfoForm = () => {
 
   const validateEmail = (email) => {
     const errors = [];
-    
+
     if (!email.trim()) {
       errors.push("Email is required");
       return errors;
@@ -130,14 +145,14 @@ const ContactInfoForm = () => {
     }
 
     // Check for common invalid patterns
-    if (email.includes('..') || email.startsWith('.') || email.endsWith('.')) {
+    if (email.includes("..") || email.startsWith(".") || email.endsWith(".")) {
       errors.push("Email address format is invalid");
     }
 
     // Check for valid domain patterns
-    const domain = email.split('@')[1];
+    const domain = email.split("@")[1];
     if (domain && domain.length > 0) {
-      if (domain.length < 4 || !domain.includes('.')) {
+      if (domain.length < 4 || !domain.includes(".")) {
         errors.push("Email domain is invalid");
       }
     }
@@ -147,7 +162,7 @@ const ContactInfoForm = () => {
 
   const validatePassword = (password) => {
     const errors = [];
-    
+
     if (!password) {
       errors.push("Password is required");
       return errors;
@@ -182,14 +197,22 @@ const ContactInfoForm = () => {
     }
 
     // Check for common weak passwords
-    const weakPasswords = ['password', '12345678', 'qwerty123', 'admin123', 'password123'];
+    const weakPasswords = [
+      "password",
+      "12345678",
+      "qwerty123",
+      "admin123",
+      "password123",
+    ];
     if (weakPasswords.includes(password.toLowerCase())) {
       errors.push("Password is too common, please choose a stronger password");
     }
 
     // Check for sequential or repeated patterns
     if (/(.)\1{3,}/.test(password)) {
-      errors.push("Password should not contain more than 3 repeated characters");
+      errors.push(
+        "Password should not contain more than 3 repeated characters"
+      );
     }
 
     return errors;
@@ -197,7 +220,7 @@ const ContactInfoForm = () => {
 
   const validateConfirmPassword = (password, confirmPassword) => {
     const errors = [];
-    
+
     if (!confirmPassword) {
       errors.push("Please confirm your password");
       return errors;
@@ -214,13 +237,15 @@ const ContactInfoForm = () => {
     const errors = {};
     // Only check uniqueness between primary and secondary phone
     // WhatsApp can be same as either primary or secondary
-    
+
     if (phones.primary_phone.trim() && phones.secondary_phone.trim()) {
-      const primaryClean = phones.primary_phone.replace(/\D/g, '');
-      const secondaryClean = phones.secondary_phone.replace(/\D/g, '');
-      
+      const primaryClean = phones.primary_phone.replace(/\D/g, "");
+      const secondaryClean = phones.secondary_phone.replace(/\D/g, "");
+
       if (primaryClean === secondaryClean) {
-        errors.secondary_phone = ["Alternate phone number must be different from primary phone number"];
+        errors.secondary_phone = [
+          "Alternate phone number must be different from primary phone number",
+        ];
       }
     }
 
@@ -231,22 +256,22 @@ const ContactInfoForm = () => {
     let fieldErrors = [];
 
     switch (name) {
-      case 'primary_phone':
+      case "primary_phone":
         fieldErrors = validatePhone(value, "Primary phone number");
         break;
-      case 'secondary_phone':
+      case "secondary_phone":
         fieldErrors = validatePhone(value, "Alternate phone number");
         break;
-      case 'whatsapp_number':
+      case "whatsapp_number":
         fieldErrors = validatePhone(value, "WhatsApp number");
         break;
-      case 'email':
+      case "email":
         fieldErrors = validateEmail(value);
         break;
-      case 'password':
+      case "password":
         fieldErrors = validatePassword(value);
         break;
-      case 'confirm_password':
+      case "confirm_password":
         fieldErrors = validateConfirmPassword(allValues.password, value);
         break;
       default:
@@ -260,7 +285,7 @@ const ContactInfoForm = () => {
     const newErrors = {};
 
     // Validate each field
-    Object.keys(contact).forEach(key => {
+    Object.keys(contact).forEach((key) => {
       const fieldErrors = validateField(key, contact[key]);
       if (fieldErrors.length > 0) {
         newErrors[key] = fieldErrors;
@@ -269,7 +294,7 @@ const ContactInfoForm = () => {
 
     // Check for phone number uniqueness
     const phoneUniquenessErrors = validatePhoneUniqueness(contact);
-    Object.keys(phoneUniquenessErrors).forEach(key => {
+    Object.keys(phoneUniquenessErrors).forEach((key) => {
       if (newErrors[key]) {
         newErrors[key] = [...newErrors[key], ...phoneUniquenessErrors[key]];
       } else {
@@ -283,7 +308,7 @@ const ContactInfoForm = () => {
 
   const clearError = (field) => {
     if (errors[field]) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[field];
         return newErrors;
@@ -296,8 +321,10 @@ const ContactInfoForm = () => {
     let processedValue = value;
 
     // Handle phone number inputs - only allow digits and limit to 10
-    if (['primary_phone', 'secondary_phone', 'whatsapp_number'].includes(name)) {
-      processedValue = value.replace(/\D/g, '').slice(0, 10);
+    if (
+      ["primary_phone", "secondary_phone", "whatsapp_number"].includes(name)
+    ) {
+      processedValue = value.replace(/\D/g, "").slice(0, 10);
     }
 
     setContact((prev) => ({ ...prev, [name]: processedValue }));
@@ -305,17 +332,20 @@ const ContactInfoForm = () => {
     // Real-time validation
     if (processedValue.trim()) {
       clearError(name);
-      
+
       // For confirm password, also clear password errors if they now match
-      if (name === 'confirm_password' && processedValue === contact.password) {
-        clearError('confirm_password');
+      if (name === "confirm_password" && processedValue === contact.password) {
+        clearError("confirm_password");
       }
-      
+
       // For password, also validate confirm password if it exists
-      if (name === 'password' && contact.confirm_password) {
-        const confirmErrors = validateConfirmPassword(processedValue, contact.confirm_password);
+      if (name === "password" && contact.confirm_password) {
+        const confirmErrors = validateConfirmPassword(
+          processedValue,
+          contact.confirm_password
+        );
         if (confirmErrors.length === 0) {
-          clearError('confirm_password');
+          clearError("confirm_password");
         }
       }
     }
@@ -323,20 +353,20 @@ const ContactInfoForm = () => {
 
   const handleBlur = (e) => {
     const { name, value } = e.target;
-    
+
     // Validate field on blur
     const fieldErrors = validateField(name, value);
     if (fieldErrors.length > 0) {
-      setErrors(prev => ({ ...prev, [name]: fieldErrors }));
+      setErrors((prev) => ({ ...prev, [name]: fieldErrors }));
     }
 
     // Check phone uniqueness on blur (only for primary and secondary)
-    if (['primary_phone', 'secondary_phone'].includes(name)) {
+    if (["primary_phone", "secondary_phone"].includes(name)) {
       const phoneUniquenessErrors = validatePhoneUniqueness(contact);
       if (phoneUniquenessErrors[name]) {
-        setErrors(prev => ({ 
-          ...prev, 
-          [name]: [...(prev[name] || []), ...phoneUniquenessErrors[name]]
+        setErrors((prev) => ({
+          ...prev,
+          [name]: [...(prev[name] || []), ...phoneUniquenessErrors[name]],
         }));
       }
     }
@@ -344,6 +374,9 @@ const ContactInfoForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    console.log("Form submission started");
+    toast.info("Processing your request...");
 
     if (!merged) {
       toast.warn("Loading previous data...");
@@ -354,14 +387,15 @@ const ContactInfoForm = () => {
     if (!validateForm()) {
       toast.error("Please fix the errors before submitting");
       // Scroll to first error
-      const firstError = document.querySelector('.error-message');
+      const firstError = document.querySelector(".error-message");
       if (firstError) {
-        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstError.scrollIntoView({ behavior: "smooth", block: "center" });
       }
       return;
     }
 
     setLoading(true);
+    toast.info("Submitting your information...");
 
     const data = {
       ...merged,
@@ -396,52 +430,82 @@ const ContactInfoForm = () => {
       setLoading(false);
 
       if (response.data?.result) {
-        toast.success("Registration successful!");
-        localStorage.clear();
+        toast.success("🎉 Registration successful! Redirecting...");
+
+        // Clear specific business registration related localStorage items
+        localStorage.removeItem("businessType");
+        localStorage.removeItem("businessInfo");
+        localStorage.removeItem("operatingDetails");
+        localStorage.removeItem("brandingDetails");
+
+        // Or alternatively, clear all localStorage (your current approach)
+        // localStorage.clear();
+
+        // Clear any other related data
         window.brandingImageFiles = null;
 
-        // Navigate to home page after success
-        navigate("/");
+        // Navigate to home page after success with a delay
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
       } else {
-        toast.error(response.data?.message || "Registration failed.");
+        toast.error(
+          response.data?.message || "Registration failed. Please try again."
+        );
       }
     } catch (error) {
       setLoading(false);
-      
+      console.error("Registration error:", error);
+
       // Handle specific error cases
       if (error.response?.status === 400) {
-        const errorMessage = error.response.data?.message || "Invalid data provided";
-        if (errorMessage.includes("email")) {
-          setErrors(prev => ({ ...prev, email: ["Email already exists or is invalid"] }));
-        } else if (errorMessage.includes("phone")) {
-          setErrors(prev => ({ ...prev, primary_phone: ["Phone number already exists"] }));
+        const errorMessage =
+          error.response.data?.message || "Invalid data provided";
+        if (errorMessage.toLowerCase().includes("email")) {
+          setErrors((prev) => ({
+            ...prev,
+            email: ["Email already exists or is invalid"],
+          }));
+          toast.error("Email already exists or is invalid");
+        } else if (errorMessage.toLowerCase().includes("phone")) {
+          setErrors((prev) => ({
+            ...prev,
+            primary_phone: ["Phone number already exists"],
+          }));
+          toast.error("Phone number already exists");
+        } else {
+          toast.error(errorMessage);
         }
-        toast.error(errorMessage);
       } else if (error.response?.status === 409) {
         toast.error("Account already exists with this information");
+      } else if (error.response?.status === 500) {
+        toast.error("Server error. Please try again later.");
+      } else if (error.code === "NETWORK_ERROR" || !error.response) {
+        toast.error("Network error. Please check your internet connection.");
       } else {
         toast.error("Registration failed. Please try again.");
       }
-      
-      console.error("Registration error:", error);
     }
   };
 
   const handleBack = () => navigate(-1);
-  
+
   const handleSkip = () => {
     const confirmSkip = window.confirm(
       "Are you sure you want to skip? Contact information is required for account creation."
     );
     if (confirmSkip) {
-      navigate("/");
+      toast.info("Skipping contact information...");
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
     }
   };
 
   const ErrorMessage = ({ errors, field }) => {
     if (!errors[field]) return null;
     return (
-      <div style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>
+      <div style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>
         {errors[field].map((error, index) => (
           <div key={index}>{error}</div>
         ))}
@@ -451,13 +515,23 @@ const ContactInfoForm = () => {
 
   return (
     <div className="registration-container">
-      <ToastContainer position="top-right" autoClose={3000} />
+      {/* Enhanced ToastContainer with better configuration */}
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar
+        newestOnTop
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        toastClassName="custom-toast"
+        bodyClassName="custom-toast-body"
+        closeButton={false}
+      />
 
       <div className="left-panel2">
-        <img
-          src="/Rectangle-three.png"
-          alt="Shop Owner"
-        />
+        <img src="/Rectangle-three.png" alt="Shop Owner" />
       </div>
 
       <div className="right-panel2">

@@ -219,55 +219,142 @@ const BothBusinessOperatingDetails = () => {
           </div>
 
           <div className="section">
-            <label>Opening & Closing Hours*</label>
-            <div className="time-box">
-              <div className="time-label">Opening</div>
-              <select
-                value={openingHour}
-                onChange={(e) =>
-                  handleTimeChange(setOpeningHour, e.target.value)
-                }
-              >
-                <option>08:00</option>
-                <option>09:00</option>
-                <option>10:00</option>
-                <option>11:00</option>
-                <option>12:00</option>
-              </select>
-              <select
-                value={openingMeridian}
-                onChange={(e) =>
-                  handleTimeChange(setOpeningMeridian, e.target.value)
-                }
-              >
-                <option>AM</option>
-                <option>PM</option>
-              </select>
+            <label
+              style={{
+                fontWeight: "600",
+                fontSize: "16px",
+                marginBottom: "8px",
+                display: "block",
+              }}
+            >
+              Opening & Closing Hours*
+            </label>
+
+            {/* Header Row */}
+            <div
+              style={{
+                backgroundColor: "#0A5C15",
+                color: "white",
+                width: "100%",
+                padding: "15px 20px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                borderRadius: "6px",
+              }}
+            >
+              <span>Opening</span>
               <span>-</span>
-              <select
-                value={closingHour}
-                onChange={(e) =>
-                  handleTimeChange(setClosingHour, e.target.value)
-                }
-              >
-                <option>05:00</option>
-                <option>06:00</option>
-                <option>07:00</option>
-                <option>08:00</option>
-                <option>09:00</option>
-                <option>10:00</option>
-              </select>
-              <select
-                value={closingMeridian}
-                onChange={(e) =>
-                  handleTimeChange(setClosingMeridian, e.target.value)
-                }
-              >
-                <option>AM</option>
-                <option>PM</option>
-              </select>
-              <div className="time-label">Closing</div>
+              <span>Closing</span>
             </div>
+
+            {/* Time Selection Box */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginTop: "10px",
+                width: "100%",
+              }}
+            >
+              {/* Opening Time */}
+              <div
+                style={{
+                  display: "flex",
+                  gap: "8px",
+                  alignItems: "center",
+                  border: "1px solid #0A5C15",
+                  borderRadius: "6px",
+                  padding: "15px 20px",
+                }}
+              >
+                <select
+                  value={openingHour}
+                  onChange={(e) =>
+                    handleTimeChange(setOpeningHour, e.target.value)
+                  }
+                  style={{
+                    padding: "8px",
+                    borderRadius: "4px",
+                    border: "none",
+                    backgroundColor: "#F2F2F2",
+                  }}
+                >
+                  <option>08:00</option>
+                  <option>09:00</option>
+                  <option>10:00</option>
+                  <option>11:00</option>
+                  <option>12:00</option>
+                </select>
+                <select
+                  value={openingMeridian}
+                  onChange={(e) =>
+                    handleTimeChange(setOpeningMeridian, e.target.value)
+                  }
+                  style={{
+                    padding: "8px",
+                    border: "none",
+                    backgroundColor: "#F2F2F2",
+                    borderRadius: "4px",
+                  }}
+                >
+                  <option>AM</option>
+                  <option>PM</option>
+                </select>
+              </div>
+
+              <span style={{ fontWeight: "600" }}>-</span>
+
+              {/* Closing Time */}
+              <div
+                style={{
+                  display: "flex",
+                  gap: "8px",
+                  alignItems: "center",
+                  border: "1px solid #0A5C15",
+                  borderRadius: "6px",
+                  padding: "15px 20px",
+                }}
+              >
+                <select
+                  value={closingHour}
+                  onChange={(e) =>
+                    handleTimeChange(setClosingHour, e.target.value)
+                  }
+                  style={{
+                    padding: "8px",
+                    border: "none",
+                    backgroundColor: "#F2F2F2",
+                    borderRadius: "4px",
+                  }}
+                >
+                  <option>05:00</option>
+                  <option>06:00</option>
+                  <option>07:00</option>
+                  <option>08:00</option>
+                  <option>09:00</option>
+                  <option>10:00</option>
+                </select>
+                <select
+                  value={closingMeridian}
+                  onChange={(e) =>
+                    handleTimeChange(setClosingMeridian, e.target.value)
+                  }
+                  style={{
+                    padding: "8px",
+                    border: "none",
+                    backgroundColor: "#F2F2F2",
+                    borderRadius: "4px",
+                  }}
+                >
+                  <option>AM</option>
+                  <option>PM</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Error Message */}
             {errors.businessHours && (
               <div style={{ color: "red", fontSize: "14px", marginTop: "5px" }}>
                 {errors.businessHours}
@@ -279,10 +366,11 @@ const BothBusinessOperatingDetails = () => {
             <div className="form-group">
               <label>Do you provide delivery services?*</label>
               <div className="delivery-radio-options">
-                <label
+                <div
                   className={`delivery-radio-item ${
                     selectedDelivery === "yes" ? "selected" : ""
                   }`}
+                  onClick={() => handleDeliveryChange("yes")}
                 >
                   <input
                     type="radio"
@@ -299,11 +387,12 @@ const BothBusinessOperatingDetails = () => {
                   <span className="radio-text">
                     Yes, I have my own delivery staff
                   </span>
-                </label>
-                <label
+                </div>
+                <div
                   className={`delivery-radio-item ${
                     selectedDelivery === "no" ? "selected" : ""
                   }`}
+                  onClick={() => handleDeliveryChange("no")}
                 >
                   <input
                     type="radio"
@@ -322,11 +411,12 @@ const BothBusinessOperatingDetails = () => {
                   <span className="radio-text">
                     No, I need freelance delivery support
                   </span>
-                </label>
-                <label
+                </div>
+                <div
                   className={`delivery-radio-item ${
                     selectedDelivery === "instore" ? "selected" : ""
                   }`}
+                  onClick={() => handleDeliveryChange("instore")}
                 >
                   <input
                     type="radio"
@@ -343,7 +433,7 @@ const BothBusinessOperatingDetails = () => {
                     )}
                   </span>
                   <span className="radio-text">Only in-store service</span>
-                </label>
+                </div>
               </div>
               {errors.deliveryOption && (
                 <div

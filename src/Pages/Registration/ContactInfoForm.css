@@ -2,7 +2,7 @@
   display: flex;
   flex-wrap: wrap;
   min-height: 100vh;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 .left-panel {
@@ -159,6 +159,109 @@
   line-height: 24px; /* 120% */
   border-radius: 10px;
   background: #0a5c15;
+}
+
+/* Add this to your ContactInfoForm.css file */
+
+/* Toast container styles */
+.Toastify__toast-container {
+  z-index: 999999 !important;
+  position: fixed !important;
+}
+
+.Toastify__toast {
+  min-height: 64px !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  font-family: inherit !important;
+}
+
+.Toastify__toast--success {
+  background-color: #4caf50 !important;
+}
+
+.Toastify__toast--error {
+  background-color: #f44336 !important;
+}
+
+.Toastify__toast--warning {
+  background-color: #ff9800 !important;
+}
+
+.Toastify__toast--info {
+  background-color: #2196f3 !important;
+}
+
+.custom-toast {
+  border-radius: 8px !important;
+}
+
+.custom-toast-body {
+  padding: 12px !important;
+}
+
+/* Ensure toasts appear above all other content */
+.Toastify__toast-container--top-right {
+  top: 20px !important;
+  right: 20px !important;
+}
+
+/* Toast glassmorphism style */
+.custom-toast {
+  background: rgba(15, 15, 15, 0.85) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px !important;
+  padding: 14px 18px !important;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px !important;
+  color: #fff !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  animation: slideIn 0.4s ease forwards;
+}
+
+/* Toast body text */
+.custom-toast-body {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #f1f1f1 !important;
+}
+
+/* Different types */
+.Toastify__toast--success {
+  border-left: 6px solid #00c853 !important;
+  background: linear-gradient(135deg, #00c853, #009624) !important;
+  color: white !important;
+}
+
+.Toastify__toast--error {
+  border-left: 6px solid #ff1744 !important;
+  background: linear-gradient(135deg, #d50000, #ff1744) !important;
+  color: white !important;
+}
+
+.Toastify__toast--warning {
+  border-left: 6px solid #ffab00 !important;
+  background: linear-gradient(135deg, #ff6f00, #ffab00) !important;
+  color: white !important;
+}
+
+.Toastify__toast--info {
+  border-left: 6px solid #00b0ff !important;
+  background: linear-gradient(135deg, #0288d1, #00b0ff) !important;
+  color: white !important;
+}
+
+/* Slide in animation */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0%);
+    opacity: 1;
+  }
 }
 
 /* Responsive Design */

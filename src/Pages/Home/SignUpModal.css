@@ -113,6 +113,10 @@
   color: #065e13;
   font-size: 14px;
 }
+
+.terms-container input {
+  width: 5% !important;
+}
 /* error message */
 .error-message {
   color: #d93025;

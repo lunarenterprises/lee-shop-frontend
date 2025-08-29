@@ -1,19 +1,18 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import "./ServiceProfileComponent.css"
-import { FaStar, FaEdit, FaWhatsapp } from "react-icons/fa"
-import EditShopModal from "./EditShopModal"
+import { useState, useEffect } from "react";
+import "./ServiceProfileComponent.css";
+import { FaStar, FaEdit, FaWhatsapp } from "react-icons/fa";
+import EditShopModal from "./EditShopModal";
+import axios from "axios";
 
 const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
-  const [activeTab, setActiveTab] = useState("about")
-  const [showAllImages, setShowAllImages] = useState(false)
-  const [shopInfo, setShopInfo] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false) // Added state for modal visibility
+  const [activeTab, setActiveTab] = useState("about");
+  const [showAllImages, setShowAllImages] = useState(false);
+  const [shopInfo, setShopInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Added state for modal visibility
 
-  const userData = JSON.parse(localStorage.getItem("userData"))
+  const userData = JSON.parse(localStorage.getItem("userData"));
 
   // Default shop data fallback
   const defaultShopData = {
@@ -34,9 +33,9 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
       "Eggless and Sugar-free Options",
       "Pre-orders for Events",
     ],
-    openingHours: "Open Daily: 7:00 AM – 9:00 PM",
+    openingHours: "7:00 AM – 9:00 PM",
     images: ["/api/placeholder/800/400"],
-  }
+  };
 
   // Reviews state
   const [reviews, setReviews] = useState([
@@ -58,17 +57,17 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
       description:
         "I ordered a custom chocolate truffle cake from CakeZone for my sister's birthday — it was rich, moist, perfectly decorated, and delivered on time!",
     },
-  ])
+  ]);
 
   const [newReview, setNewReview] = useState({
     rating: 0,
     text: "",
-  })
+  });
 
   const handleSubmitReview = () => {
     if (newReview.rating === 0 || newReview.text.trim() === "") {
-      alert("Please provide a rating and write a review")
-      return
+      alert("Please provide a rating and write a review");
+      return;
     }
 
     const review = {
@@ -81,185 +80,348 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
       rating: newReview.rating,
       text: newReview.text,
       description: newReview.text,
-    }
+    };
 
-    setReviews([review, ...reviews])
-    setNewReview({ rating: 0, text: "" })
-  }
+    setReviews([review, ...reviews]);
+    setNewReview({ rating: 0, text: "" });
+  };
 
   // Handle star rating click
   const handleStarClick = (rating) => {
-    setNewReview({ ...newReview, rating })
-  }
+    setNewReview({ ...newReview, rating });
+  };
 
   // Fetch shop data from API
   useEffect(() => {
     const fetchShopData = async () => {
       try {
-        setLoading(true)
-        const response = await fetch("https://lunarsenterprises.com:6031/leeshop/shop/list/shop", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            sh_id: userData?.id || userData?.sh_id || "16",
-          }),
-        })
+        setLoading(true);
+        const response = await fetch(
+          "https://lunarsenterprises.com:6031/leeshop/shop/list/shop",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              sh_id: userData?.id || userData?.sh_id || "16",
+            }),
+          }
+        );
 
         if (!response.ok) {
-          throw new Error("Failed to fetch shop data")
+          throw new Error("Failed to fetch shop data");
         }
 
-        const data = await response.json()
+        const data = await response.json();
 
         if (data.result && data.list && data.list.length > 0) {
-          const shop = data.list[0]
-
+          const shop = data.list[0];
+          console.log({ shop }, "shop data");
           // Parse products/services string to array
-          let products = []
+          let products = [];
           try {
-            const productString = shop.sh_product_and_service
-            if (productString && productString.startsWith("[") && productString.endsWith("]")) {
-              products = productString
-                .slice(1, -1)
-                .split(" ")
-                .filter((item) => item.length > 0)
+            const productData = shop.sh_product_and_service;
+
+            if (Array.isArray(productData)) {
+              // Already an array
+              products = productData;
+            } else if (typeof productData === "string") {
+              products = JSON.parse(productData);
             }
           } catch (e) {
-            products = ["Hair Styling", "Skin Care", "Bridal Makeup", "Spa Services"]
+            products = [
+              "Hair Styling",
+              "Skin Care",
+              "Bridal Makeup",
+              "Spa Services",
+            ];
           }
 
           // Format phone numbers
           const formatPhone = (phone) => {
-            if (!phone) return ""
-            const phoneStr = phone.toString()
-            return phoneStr.startsWith("+91") ? phoneStr : `+91${phoneStr}`
-          }
+            if (!phone) return "";
+            const phoneStr = phone.toString();
+            return phoneStr.startsWith("+91") ? phoneStr : `+91${phoneStr}`;
+          };
 
           // Process shop images
           const shopImages =
             shop.shopimages && shop.shopimages.length > 0
-              ? shop.shopimages.map((img) => `https://lunarsenterprises.com:6031${img.si_image}`)
-              : ["/api/placeholder/800/400"]
+              ? shop.shopimages.map(
+                  (img) => `https://lunarsenterprises.com:6031${img.si_image}`
+                )
+              : ["/api/placeholder/800/400"];
+
+          const previousImages =
+            shop.shopimages && shop.shopimages.length > 0
+              ? shop.shopimages.map((img) => ({
+                  id: img.si_id,
+                  url: `https://lunarsenterprises.com:6031${img.si_image}`, // ✅ full image URL
+                }))
+              : [{ id: null, url: "/api/placeholder/800/400" }];
 
           const processedShopData = {
+            shopId: shop.sh_id,
             name: shop.sh_name || "Shop Name",
             rating: shop.sh_ratings || 0,
             reviewCount: 0, // Not provided in API
-            location: `${shop.sh_location || ""}, ${shop.sh_city || ""}, ${shop.sh_state || ""}`.replace(
-              /^,\s*|,\s*$/g,
-              "",
-            ),
-            availability: shop.sh_opening_hours ? `Open ${shop.sh_opening_hours}` : "Contact for hours",
+            location: `${shop.sh_location || ""}, ${shop.sh_city || ""}, ${
+              shop.sh_state || ""
+            }`.replace(/^,\s*|,\s*$/g, ""),
+            availability: shop.sh_opening_hours
+              ? `Open ${shop.sh_opening_hours}`
+              : "Contact for hours",
             deliveryAvailable: shop.sh_delivery_option === "Available",
             distance: "1.5 km away", // Calculate based on coordinates if needed
             phone: formatPhone(shop.sh_primary_phone),
             whatsapp: formatPhone(shop.sh_whatsapp_number),
             description: shop.sh_description || "Professional service provider",
             products: products,
-            openingHours: shop.sh_opening_hours ? `Open Daily: ${shop.sh_opening_hours}` : "Contact for hours",
+            openingHours: shop.sh_opening_hours
+              ? `${shop.sh_opening_hours}`
+              : "Contact for hours",
             category: shop.sh_category_name || "Service",
             owner: shop.sh_owner_name || "Owner",
             email: shop.sh_email || "",
             address: shop.sh_address || "",
             workingDays: shop.sh_working_days || "",
             images: shopImages,
-          }
+            previousImages: previousImages,
+          };
 
-          setShopInfo(processedShopData)
+          setShopInfo(processedShopData);
         } else {
-          throw new Error("No shop data found")
+          throw new Error("No shop data found");
         }
       } catch (err) {
-        console.error("Error fetching shop data:", err)
-        setError(err.message)
-        setShopInfo(defaultShopData) // Use default data on error
+        console.error("Error fetching shop data:", err);
+        setError(err.message);
+        setShopInfo(defaultShopData); // Use default data on error
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
     if (userData?.id || userData?.sh_id) {
-      fetchShopData()
+      fetchShopData();
     } else {
-      setShopInfo(defaultShopData)
-      setLoading(false)
+      setShopInfo(defaultShopData);
+      setLoading(false);
     }
-  }, [userData?.id, userData?.sh_id])
+  }, [userData?.id, userData?.sh_id]);
 
-  const shop = shopData || shopInfo || defaultShopData
+  const shop = shopData || shopInfo || defaultShopData;
 
-  const renderStars = (rating) => {
-    const stars = []
-    const fullStars = Math.floor(rating)
-    const hasHalfStar = rating % 1 !== 0
-
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(<FaStar key={i} className="star filled" />)
-    }
-
-    if (hasHalfStar) {
-      stars.push(<FaStar key="half" className="star half" />)
-    }
-
-    const emptyStars = 5 - Math.ceil(rating)
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push(<FaStar key={`empty-${i}`} className="star" />)
-    }
-
-    return stars
-  }
-
-  const handleContact = () => {
-    if (shop.phone) {
-      window.open(`tel:${shop.phone}`, "_self")
-    }
-  }
 
   const handleWhatsapp = () => {
     if (shop.whatsapp) {
-      const message = `Hi! I'm interested in your services at ${shop.name}`
-      const phoneNumber = shop.whatsapp.replace(/\D/g, "")
-      const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
-      window.open(url, "_blank")
+      const message = `Hi! I'm interested in your services at ${shop.name}`;
+      const phoneNumber = shop.whatsapp.replace(/\D/g, "");
+      const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+        message
+      )}`;
+      window.open(url, "_blank");
     }
-  }
+  };
 
-  const handleDirections = () => {
-    console.log("Opening directions to:", shop.location)
-    // Implement directions functionality
-  }
 
   const handleEdit = () => {
-    console.log("Edit shop profile")
-    setIsEditModalOpen(true) // Open modal instead of just logging
-  }
+    console.log("Edit shop profile");
+    setIsEditModalOpen(true); // Open modal instead of just logging
+  };
 
-  const handleSaveShopData = (updatedData) => {
-    // Added function to handle saving shop data
-    console.log("Saving shop data:", updatedData)
-    // Here you would typically make an API call to update the shop data
-    // For now, we'll just update the local state
+// Add this function to refetch shop data
+const refetchShopData = async () => {
+  try {
+    setLoading(true);
+    const response = await fetch(
+      "https://lunarsenterprises.com:6031/leeshop/shop/list/shop",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          sh_id: userData?.id || userData?.sh_id || "16",
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch shop data");
+    }
+
+    const data = await response.json();
+
+    if (data.result && data.list && data.list.length > 0) {
+      const shop = data.list[0];
+      
+      // Same processing logic as in useEffect
+      let products = [];
+      try {
+        const productData = shop.sh_product_and_service;
+        if (Array.isArray(productData)) {
+          products = productData;
+        } else if (typeof productData === "string") {
+          products = JSON.parse(productData);
+        }
+      } catch (e) {
+        products = ["Hair Styling", "Skin Care", "Bridal Makeup", "Spa Services"];
+      }
+
+      const formatPhone = (phone) => {
+        if (!phone) return "";
+        const phoneStr = phone.toString();
+        return phoneStr.startsWith("+91") ? phoneStr : `+91${phoneStr}`;
+      };
+
+      const shopImages =
+        shop.shopimages && shop.shopimages.length > 0
+          ? shop.shopimages.map(
+              (img) => `https://lunarsenterprises.com:6031${img.si_image}`
+            )
+          : ["/api/placeholder/800/400"];
+
+      const previousImages =
+        shop.shopimages && shop.shopimages.length > 0
+          ? shop.shopimages.map((img) => ({
+              id: img.si_id,
+              url: `https://lunarsenterprises.com:6031${img.si_image}`,
+            }))
+          : [{ id: null, url: "/api/placeholder/800/400" }];
+
+      const processedShopData = {
+        shopId: shop.sh_id,
+        name: shop.sh_name || "Shop Name",
+        rating: shop.sh_ratings || 0,
+        reviewCount: 0,
+        location: `${shop.sh_location || ""}, ${shop.sh_city || ""}, ${
+          shop.sh_state || ""
+        }`.replace(/^,\s*|,\s*$/g, ""),
+        availability: shop.sh_opening_hours
+          ? `Open ${shop.sh_opening_hours}`
+          : "Contact for hours",
+        deliveryAvailable: shop.sh_delivery_option === "Available",
+        distance: "1.5 km away",
+        phone: formatPhone(shop.sh_primary_phone),
+        whatsapp: formatPhone(shop.sh_whatsapp_number),
+        description: shop.sh_description || "Professional service provider",
+        products: products,
+        openingHours: shop.sh_opening_hours
+          ? `${shop.sh_opening_hours}`
+          : "Contact for hours",
+        category: shop.sh_category_name || "Service",
+        owner: shop.sh_owner_name || "Owner",
+        email: shop.sh_email || "",
+        address: shop.sh_address || "",
+        workingDays: shop.sh_working_days || "",
+        images: shopImages,
+        previousImages: previousImages,
+      };
+
+      setShopInfo(processedShopData);
+    }
+  } catch (err) {
+    console.error("Error refetching shop data:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleSaveShopData = async (updatedData, formDataToSend) => {
+  console.log("Saving shop data:", formDataToSend);
+
+  try {
+    // Make API call with the FormData
+    const response = await axios.post(
+      "https://lunarsenterprises.com:6031/leeshop/shop/edit/shop",
+      formDataToSend,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    console.log("API Response:", response.data);
+
+    // Option 1: Update local state with comprehensive data merge
     setShopInfo((prev) => ({
       ...prev,
-      name: updatedData.shopName,
-      sh_name: updatedData.shopName,
-      owner: updatedData.ownerName,
-      sh_owner_name: updatedData.ownerName,
-      sh_category_name: updatedData.businessType,
-    }))
+      name: updatedData.shopName || updatedData.name || prev.name,
+      sh_name: updatedData.shopName || updatedData.name || prev.sh_name,
+      owner: updatedData.ownerName || updatedData.owner || prev.owner,
+      sh_owner_name: updatedData.ownerName || updatedData.owner || prev.sh_owner_name,
+      sh_category_name: updatedData.businessType || updatedData.category || prev.sh_category_name,
+      category: updatedData.selectedCategory || updatedData.category || prev.category,
+      address: updatedData.address || prev.address,
+      phone: updatedData.phone || prev.phone,
+      whatsapp: updatedData.whatsapp || prev.whatsapp,
+      email: updatedData.email || prev.email,
+      description: updatedData.description || prev.description,
+      sh_description: updatedData.description || prev.sh_description,
+      deliveryAvailable: updatedData.deliveryAvailable ?? prev.deliveryAvailable,
+      sh_delivery_option: updatedData.deliveryAvailable ? "Available" : prev.sh_delivery_option,
+      workingDays: updatedData.workingDays || prev.workingDays,
+      sh_working_days: updatedData.workingDays || prev.sh_working_days,
+      openingHours: updatedData.openingHours || prev.openingHours,
+      sh_opening_hours: updatedData.openingHours || prev.sh_opening_hours,
+      images: updatedData.images || prev.images,
+      products: updatedData.products || prev.products,
+    }));
+
+    // Close the modal
+    setIsEditModalOpen(false);
+
+    // Option 2: Refetch data from server to ensure consistency
+    await refetchShopData();
+
+    // Close the modal
+    setIsEditModalOpen(false);
+
+    // Show success message
+    alert("Shop details updated successfully!");
+
+    return response.data;
+  } catch (error) {
+    console.error("Error updating shop:", error);
+
+    // Handle different types of errors
+    let errorMessage = "Failed to update shop details. Please try again.";
+
+    if (error.response) {
+      // Server responded with error status
+      errorMessage = error.response.data?.message || errorMessage;
+      console.error(
+        "Server error:",
+        error.response.status,
+        error.response.data
+      );
+    } else if (error.request) {
+      // Request was made but no response received
+      errorMessage = "Network error. Please check your connection.";
+      console.error("Network error:", error.request);
+    } else {
+      // Something else happened
+      console.error("Error:", error.message);
+    }
+
+    // Show error message
+    alert(errorMessage);
+    throw error; // Re-throw to let the modal handle loading states
   }
+};
 
   if (loading) {
     return (
       <div className="shop-profile loading">
         <div className="loading-spinner">Loading shop information...</div>
       </div>
-    )
+    );
   }
 
-  const isOpen = shop.openingHours || shop.isOpen
+  const isOpen = shop.openingHours || shop.isOpen;
 
   return (
     <div className="shop-details-container">
@@ -280,13 +442,23 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
             <div className="shop-info-card">
               {/* Row 1: Shop Name + Opening Hours */}
               <div className="shop-header-row">
-                <h1 className="shop-title2">{shop.sh_name || shop.name || "Cakezone"}</h1>
+                <h1 className="shop-title2">
+                  {shop.sh_name || shop.name || "Cakezone"}
+                </h1>
                 {isOpen && (
                   <div className="status-section">
-                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg
+                      width="8"
+                      height="8"
+                      viewBox="0 0 8 8"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
                       <circle cx="4" cy="4" r="4" fill="black" />
                     </svg>
-                    <span className="status-text open">{shop.openingHours}</span>
+                    <span className="status-text open">
+                      {shop.openingHours}
+                    </span>
                   </div>
                 )}
               </div>
@@ -294,7 +466,13 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
               {/* Row 2: Rating + Delivery */}
               <div className="shop-meta-row">
                 <div className="rating-section">
-                  <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg
+                    width="30"
+                    height="30"
+                    viewBox="0 0 30 30"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
                     <path
                       d="M14.9999 21.5938L9.81242 24.7187C9.58326 24.8646 9.34367 24.9271 9.09367 24.9062C8.84367 24.8854 8.62492 24.8021 8.43742 24.6562C8.24992 24.5104 8.10409 24.3283 7.99992 24.11C7.89576 23.8917 7.87492 23.6467 7.93742 23.375L9.31242 17.4688L4.71867 13.5C4.51034 13.3125 4.38034 13.0988 4.32867 12.8587C4.27701 12.6187 4.29242 12.3846 4.37492 12.1563C4.45742 11.9279 4.58242 11.7404 4.74992 11.5938C4.91742 11.4471 5.14659 11.3533 5.43742 11.3125L11.4999 10.7812L13.8437 5.21875C13.9478 4.96875 14.1095 4.78125 14.3287 4.65625C14.5478 4.53125 14.7716 4.46875 14.9999 4.46875C15.2283 4.46875 15.452 4.53125 15.6712 4.65625C15.8903 4.78125 16.052 4.96875 16.1562 5.21875L18.4999 10.7812L24.5624 11.3125C24.8541 11.3542 25.0833 11.4479 25.2499 11.5938C25.4166 11.7396 25.5416 11.9271 25.6249 12.1563C25.7083 12.3854 25.7241 12.62 25.6724 12.86C25.6208 13.1 25.4903 13.3133 25.2812 13.5L20.6874 17.4688L22.0624 23.375C22.1249 23.6458 22.1041 23.8908 21.9999 24.11C21.8958 24.3292 21.7499 24.5112 21.5624 24.6562C21.3749 24.8013 21.1562 24.8846 20.9062 24.9062C20.6562 24.9279 20.4166 24.8654 20.1874 24.7187L14.9999 21.5938Z"
                       fill="#E8C930"
@@ -305,19 +483,33 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
                     {shop.sh_review_count || shop.reviewCount || 120} Reviews)
                   </span>
                   {/* Location - Full width */}
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
                     <path
                       d="M12 11.5C11.337 11.5 10.7011 11.2366 10.2322 10.7678C9.76339 10.2989 9.5 9.66304 9.5 9C9.5 8.33696 9.76339 7.70107 10.2322 7.23223C10.7011 6.76339 11.337 6.5 12 6.5C12.663 6.5 13.2989 6.76339 13.7678 7.23223C14.2366 7.70107 14.5 8.33696 14.5 9C14.5 9.3283 14.4353 9.65339 14.3097 9.95671C14.1841 10.26 13.9999 10.5356 13.7678 10.7678C13.5356 10.9999 13.26 11.1841 12.9567 11.3097C12.6534 11.4353 12.3283 11.5 12 11.5ZM12 2C10.1435 2 8.36301 2.7375 7.05025 4.05025C5.7375 5.36301 5 7.14348 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 7.14348 18.2625 5.36301 16.9497 4.05025C15.637 2.7375 13.8565 2 12 2Z"
                       fill="#0A5C15"
                     />
                   </svg>
                   <span className="rating-text2">
-                    {shop.sh_location || shop.location || "Panampilly Nagar"}, {shop.sh_city || shop.city || "Kochi"}
+                    {shop.sh_location || shop.location || "Panampilly Nagar"},{" "}
+                    {shop.sh_city || shop.city || "Kochi"}
                   </span>
                 </div>
-                {(shop.sh_delivery_option === "Available" || shop.delivery !== false) && (
+                {(shop.sh_delivery_option === "Available" ||
+                  shop.delivery !== false) && (
                   <div className="delivery-section">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
                       <path
                         d="M8.33366 13.7497L10.8337 14.583C10.8337 14.583 17.0837 13.333 17.917 13.333C18.7503 13.333 18.7503 14.1663 17.917 14.9997C17.0837 15.833 14.167 18.333 11.667 18.333C9.16699 18.333 7.50033 17.083 5.83366 17.083H1.66699"
                         stroke="#0A5C15"
@@ -349,8 +541,18 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
               <div className="action-buttons-row">
                 <div className="left-buttons">
                   {shop.phone && (
-                    <button className="btn-contact" onClick={() => (window.location.href = `tel:${shop.phone}`)}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
+                    <button
+                      className="btn-contact"
+                      onClick={() =>
+                        (window.location.href = `tel:${shop.phone}`)
+                      }
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="22"
+                        height="22"
+                        viewBox="0 0 22 22"
+                      >
                         <path
                           d="M16.537 20.1876C15.7364 20.1876 14.6117 19.898 12.9276 18.9571C10.8797 17.8087 9.29568 16.7484 7.25884 14.7169C5.29501 12.7543 4.33935 11.4837 3.00183 9.04982C1.49082 6.30177 1.74839 4.8613 2.03632 4.24565C2.37921 3.50983 2.88535 3.06974 3.53955 2.63292C3.91113 2.38947 4.30435 2.18077 4.71423 2.00948C4.75525 1.99185 4.79339 1.97503 4.82744 1.95985C5.03046 1.86839 5.33808 1.73017 5.72773 1.87782C5.98777 1.97544 6.21992 2.17519 6.58332 2.53407C7.32857 3.26907 8.34699 4.90601 8.72269 5.70991C8.97494 6.25173 9.14187 6.60939 9.14228 7.01052C9.14228 7.48015 8.90603 7.84232 8.61933 8.23319C8.5656 8.30661 8.51228 8.37675 8.4606 8.44483C8.14847 8.85499 8.07998 8.97353 8.12509 9.18517C8.21656 9.6105 8.89865 10.8767 10.0196 11.9951C11.1406 13.1136 12.3702 13.7527 12.7972 13.8437C13.0178 13.8909 13.1388 13.8195 13.5621 13.4963C13.6228 13.45 13.6852 13.402 13.7504 13.354C14.1876 13.0287 14.533 12.7986 14.9915 12.7986H14.994C15.3931 12.7986 15.7347 12.9717 16.3007 13.2572C17.039 13.6296 18.7252 14.6349 19.4647 15.381C19.8244 15.7436 20.025 15.9749 20.123 16.2345C20.2706 16.6254 20.1316 16.9318 20.041 17.1369C20.0258 17.1709 20.009 17.2082 19.9913 17.2497C19.8187 17.6588 19.6087 18.0512 19.3642 18.4219C18.9282 19.074 18.4865 19.5789 17.749 19.9222C17.3703 20.1014 16.9559 20.1921 16.537 20.1876Z"
                           fill="#D4F49C"
@@ -377,13 +579,16 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
           </div>
 
           {/* Image Gallery */}
-          <div className="images-gallery" style={{ marginTop: "10rem", backgroundColor: "#e2e2e2" }}>
+          <div
+            className="images-gallery"
+            style={{ marginTop: "10rem", backgroundColor: "#e2e2e2" }}
+          >
             <div className="main-image">
               <img
                 src={shop.images[0] || "/placeholder.svg"}
                 alt="Gallery main"
                 onError={(e) => {
-                  e.target.src = "/api/placeholder/200/150"
+                  e.target.src = "/api/placeholder/200/150";
                 }}
               />
             </div>
@@ -394,7 +599,7 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
                     src={image || "/placeholder.svg"}
                     alt={`Gallery ${index + 2}`}
                     onError={(e) => {
-                      e.target.src = "/api/placeholder/200/150"
+                      e.target.src = "/api/placeholder/200/150";
                     }}
                   />
                   {index === 3 && shop.images.length > 5 && (
@@ -409,7 +614,7 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
 
           {/* Tabs Section */}
           <div className="tabs-container" style={{ marginTop: "0px" }}>
-            <div className="tabs-header">
+            <div style={{ display: "flex", gap: "20px", maxWidth: "400px" }}>
               <button
                 className={`tab-btn ${activeTab === "about" ? "active" : ""}`}
                 onClick={() => setActiveTab("about")}
@@ -427,19 +632,24 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
             <div className="tabs-content">
               {activeTab === "about" ? (
                 <div className="about-content">
-                  <p className="description">{shop.sh_description || shop.description}</p>
+                  <p className="description">
+                    {shop.sh_description || shop.description}
+                  </p>
 
                   <div className="info-section">
                     <h3>Products and services</h3>
                     <ul className="products-list2">
-                      {shop.products.length > 0 && shop.products.map((item, idx) => <li key={idx}>{item}</li>)}
+                      {shop.products.length > 0 &&
+                        shop.products.map((item, idx) => (
+                          <li key={idx}>{item}</li>
+                        ))}
                     </ul>
                   </div>
 
                   <div className="info-section">
                     <h3>Opening Hours</h3>
                     <ul className="products-list2">
-                      <li>Open Daily: {shop.openingHours}</li>
+                      <li>{shop.openingHours}</li>
                     </ul>
                   </div>
                 </div>
@@ -456,19 +666,27 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
                           <button
                             key={star}
                             type="button"
-                            className={`star-btn ${star <= newReview.rating ? "active" : ""}`}
+                            className={`star-btn ${
+                              star <= newReview.rating ? "active" : ""
+                            }`}
                             onClick={() => handleStarClick(star)}
                           >
                             <svg
                               width="25"
                               height="24"
                               viewBox="0 0 25 24"
-                              fill={star <= newReview.rating ? "#FFD700" : "none"}
+                              fill={
+                                star <= newReview.rating ? "#FFD700" : "none"
+                              }
                               xmlns="http://www.w3.org/2000/svg"
                             >
                               <path
                                 d="M8.26839 7.52838L10.3472 3.39785C10.4077 3.27831 10.5007 3.17777 10.6159 3.1075C10.7311 3.03722 10.8639 3 10.9993 3C11.1347 3 11.2675 3.03722 11.3826 3.1075C11.4978 3.17777 11.5909 3.27831 11.6514 3.39785L13.7302 7.52838L18.3774 8.1947C18.5114 8.21304 18.6376 8.26819 18.7414 8.35386C18.8452 8.43954 18.9225 8.55228 18.9644 8.67922C19.0064 8.80616 19.0113 8.94218 18.9787 9.07177C18.9461 9.20135 18.8772 9.31927 18.7799 9.41207L15.4177 12.6252L16.2114 17.1647C16.313 17.7473 15.6889 18.191 15.1552 17.9163L10.9993 15.7721L6.84253 17.9163C6.30964 18.1918 5.68553 17.7473 5.78715 17.1639L6.58089 12.6244L3.21869 9.41128C3.12186 9.31842 3.05337 9.20061 3.02102 9.07126C2.98867 8.94191 2.99374 8.8062 3.03567 8.67955C3.07759 8.5529 3.15469 8.4404 3.25819 8.35483C3.36169 8.26926 3.48744 8.21405 3.62116 8.19549L8.26839 7.52838Z"
-                                stroke={star <= newReview.rating ? "#FFD700" : "#000000"}
+                                stroke={
+                                  star <= newReview.rating
+                                    ? "#FFD700"
+                                    : "#000000"
+                                }
                                 strokeWidth="1.5"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -483,11 +701,16 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
                       className="review-textarea"
                       placeholder="Write about the shop & more."
                       value={newReview.text}
-                      onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
+                      onChange={(e) =>
+                        setNewReview({ ...newReview, text: e.target.value })
+                      }
                       rows={4}
                     />
 
-                    <button className="post-review-btn" onClick={handleSubmitReview}>
+                    <button
+                      className="post-review-btn"
+                      onClick={handleSubmitReview}
+                    >
                       Post Review
                     </button>
                   </div>
@@ -502,7 +725,10 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
                           <div className="review-header">
                             <div className="reviewer-info">
                               <div className="reviewer-avatar">
-                                <img src="/icons-user-default.png" alt={review.name} />
+                                <img
+                                  src="/icons-user-default.png"
+                                  alt={review.name}
+                                />
                               </div>
                               <h4 className="reviewer-name2">{review.name}</h4>
                             </div>
@@ -522,7 +748,11 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
                               >
                                 <path
                                   d="M8.26839 7.52838L10.3472 3.39785C10.4077 3.27831 10.5007 3.17777 10.6159 3.1075C10.7311 3.03722 10.8639 3 10.9993 3C11.1347 3 11.2675 3.03722 11.3826 3.1075C11.4978 3.17777 11.5909 3.27831 11.6514 3.39785L13.7302 7.52838L18.3774 8.1947C18.5114 8.21304 18.6376 8.26819 18.7414 8.35387C18.8452 8.43954 18.9225 8.55228 18.9644 8.67922C19.0064 8.80616 19.0113 8.94218 18.9787 9.07177C18.9461 9.20135 18.8772 9.31927 18.7799 9.41207L15.4177 12.6252L16.2114 17.1647C16.313 17.7473 15.6889 18.191 15.1552 17.9163L10.9993 15.7721L6.84253 17.9163C6.30964 18.1918 5.68553 17.7473 5.78715 17.1639L6.58089 12.6244L3.21869 9.41128C3.12186 9.31842 3.05337 9.20061 3.02102 9.07126C2.98867 8.94191 2.99374 8.8062 3.03567 8.67955C3.07759 8.5529 3.15469 8.4404 3.25819 8.35483C3.36169 8.26926 3.48744 8.21405 3.62116 8.19549L8.26839 7.52838Z"
-                                  fill={star <= review.rating ? "#E8C930" : "#000000"} // gold if filled, gray if not
+                                  fill={
+                                    star <= review.rating
+                                      ? "#E8C930"
+                                      : "#000000"
+                                  } // gold if filled, gray if not
                                 />
                               </svg>
                             ))}
@@ -530,7 +760,9 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
 
                           <div className="review-content">
                             <h5 className="review-title">{review.text}</h5>
-                            <p className="review-description">{review.description}</p>
+                            <p className="review-description">
+                              {review.description}
+                            </p>
                           </div>
                         </div>
                       ))}
@@ -550,7 +782,7 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
         onSave={handleSaveShopData}
       />
     </div>
-  )
-}
+  );
+};
 
-export default ServiceProfileComponent
+export default ServiceProfileComponent;

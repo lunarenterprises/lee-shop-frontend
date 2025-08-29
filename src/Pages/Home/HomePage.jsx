@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import "./HomePage.css";
-import { FaMapMarkerAlt, FaSearch } from "react-icons/fa";
 import LoginModal from "./LoginModal";
 import ConfirmIdentityModal from "./ConfirmIdentityModal";
 import EmailVerificationModal from "./EmailVerificationModal";
@@ -67,6 +66,44 @@ const HomePage = () => {
     setSearching(false);
   };
 
+  // NEW: Handle shop card click from ShopCard component
+  const handleShopCardClick = async (shopId) => {
+    setSearching(true);
+    try {
+      // Fetch all shops to get the full shop list for sidebar
+      const response = await fetch(`${API_BASE_URL}/shop/list/shop`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}), // Empty search to get all shops
+      });
+      const resData = await response.json();
+
+      if (
+        resData.result &&
+        Array.isArray(resData.list) &&
+        resData.list.length
+      ) {
+        // Find the clicked shop
+        const clickedShop = resData.list.find((shop) => shop.sh_id === shopId);
+
+        if (clickedShop) {
+          setSearchedShop(clickedShop);
+          setSearchedShopList(resData.list); // Set full list for sidebar
+        } else {
+          setSearchedShop({ error: "Shop not found." });
+          setSearchedShopList([]);
+        }
+      } else {
+        setSearchedShop({ error: "No shops available." });
+        setSearchedShopList([]);
+      }
+    } catch (e) {
+      setSearchedShop({ error: "Failed to fetch shop details. Try again." });
+      setSearchedShopList([]);
+    }
+    setSearching(false);
+  };
+
   //----------------------------
 
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -76,6 +113,7 @@ const HomePage = () => {
 
   const [showResetModal, setShowResetModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
   const closeAllModals = () => {
     setShowLoginModal(false);
@@ -103,12 +141,26 @@ const HomePage = () => {
     setShowResetModal(true); // Open reset password modal
   };
 
+  const handleLoginSuccess = (user) => {
+    localStorage.setItem("userData", JSON.stringify(user));
+    setUserData(user);
+    navigate(
+      user.role?.toLowerCase() === "shop"
+        ? "/ShopProfile"
+        : user.role?.toLowerCase() === "deliverystaff"
+        ? "/DeliveryProfile"
+        : "/UserProfile"
+    );
+    setShowLogin(false);
+  };
+
   return (
     <div className="homepage-container">
       {showLoginModal && (
         <LoginModal
           onClose={closeAllModals}
           onForgotPassword={handleForgotPassword}
+          onLoginSuccess={handleLoginSuccess}
         />
       )}
 
@@ -163,7 +215,7 @@ const HomePage = () => {
       ) : (
         <>
           <div className="shop-list-section">
-            <ShopCard />
+            <ShopCard onShopClick={handleShopCardClick} />
           </div>
           <div className="shop-list-section">
             <FreshProductList />
