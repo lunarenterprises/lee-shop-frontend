@@ -78,6 +78,15 @@ const OperatingDetails = () => {
     return hour24 * 60 + minutes; // Convert to minutes for easier comparison
   };
 
+  // Add the missing handleTimeChange function
+  const handleTimeChange = (setter, value) => {
+    setter(value);
+    // Clear hours error when user changes time
+    if (errors.hours) {
+      setErrors((prev) => ({ ...prev, hours: null }));
+    }
+  };
+
   useEffect(() => {
     if (showErrors) {
       validateForm();
@@ -131,9 +140,18 @@ const OperatingDetails = () => {
           );
           if (deliveryIndex !== -1) {
             setSelectedDelivery(deliveryIndex);
-            setDeliveryService(
-              parsedData.delivery_option.toLowerCase().replace(/\s+/g, "")
-            );
+            
+            // Map back to the short values used by deliveryService state
+            const deliveryValueMapping = {
+              "Yes, I have my own delivery staff": "yes",
+              "No, I need freelance delivery support": "no",
+              "Only in-store service": "instore"
+            };
+            
+            const shortValue = deliveryValueMapping[parsedData.delivery_option];
+            if (shortValue) {
+              setDeliveryService(shortValue);
+            }
           }
         }
 
@@ -203,12 +221,17 @@ const OperatingDetails = () => {
     const formattedOpening = `${openingHour} ${openingMeridian}`;
     const formattedClosing = `${closingHour} ${closingMeridian}`;
 
+    // Create proper mapping for delivery options
+    const deliveryMapping = {
+      yes: deliveryOptions[0],  // "Yes, I have my own delivery staff"
+      no: deliveryOptions[1],   // "No, I need freelance delivery support"
+      instore: deliveryOptions[2] // "Only in-store service"
+    };
+
     const serviceOpDetails = {
       working_days: selectedDays,
       opening_hours: `${formattedOpening} - ${formattedClosing}`,
-      delivery_option:
-        deliveryService.replace(/\s+/g, " ").charAt(0).toUpperCase() +
-        deliveryService.slice(1),
+      delivery_option: deliveryMapping[deliveryService],
       service_area: serviceAreaOptions[selectedServiceArea],
     };
 
@@ -263,64 +286,154 @@ const OperatingDetails = () => {
           </div>
 
           <div className="section">
-            <label>Opening & Closing Hours*</label>
-            <div className="time-box">
-              <div className="time-label">Opening</div>
-              <select
-                value={openingHour}
-                onChange={(e) => setOpeningHour(e.target.value)}
-              >
-                <option>08:00</option>
-                <option>09:00</option>
-                <option>10:00</option>
-                <option>11:00</option>
-                <option>12:00</option>
-              </select>
-              <select
-                value={openingMeridian}
-                onChange={(e) => setOpeningMeridian(e.target.value)}
-              >
-                <option>AM</option>
-                <option>PM</option>
-              </select>
+            <label
+              style={{
+                fontWeight: "600",
+                fontSize: "16px",
+                marginBottom: "8px",
+                display: "block",
+              }}
+            >
+              Opening & Closing Hours*
+            </label>
 
+            {/* Header Row */}
+            <div
+              style={{
+                backgroundColor: "#0A5C15",
+                color: "white",
+                width: "100%",
+                padding: "15px 20px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                borderRadius: "6px",
+              }}
+            >
+              <span>Opening</span>
               <span>-</span>
-
-              <select
-                value={closingHour}
-                onChange={(e) => setClosingHour(e.target.value)}
-              >
-                <option>05:00</option>
-                <option>06:00</option>
-                <option>07:00</option>
-                <option>08:00</option>
-                <option>09:00</option>
-                <option>10:00</option>
-              </select>
-              <select
-                value={closingMeridian}
-                onChange={(e) => setClosingMeridian(e.target.value)}
-              >
-                <option>AM</option>
-                <option>PM</option>
-              </select>
-
-              <div className="time-label">Closing</div>
+              <span>Closing</span>
             </div>
+
+            {/* Time Selection Box */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginTop: "10px",
+                width: "100%",
+              }}
+            >
+              {/* Opening Time */}
+              <div
+                style={{
+                  display: "flex",
+                  gap: "8px",
+                  alignItems: "center",
+                  border: "1px solid #0A5C15",
+                  borderRadius: "6px",
+                  padding: "15px 20px",
+                }}
+              >
+                <select
+                  value={openingHour}
+                  onChange={(e) =>
+                    handleTimeChange(setOpeningHour, e.target.value)
+                  }
+                  style={{
+                    padding: "8px",
+                    borderRadius: "4px",
+                    border: "none",
+                    backgroundColor: "#F2F2F2",
+                  }}
+                >
+                  <option>08:00</option>
+                  <option>09:00</option>
+                  <option>10:00</option>
+                  <option>11:00</option>
+                  <option>12:00</option>
+                </select>
+                <select
+                  value={openingMeridian}
+                  onChange={(e) =>
+                    handleTimeChange(setOpeningMeridian, e.target.value)
+                  }
+                  style={{
+                    padding: "8px",
+                    border: "none",
+                    backgroundColor: "#F2F2F2",
+                    borderRadius: "4px",
+                  }}
+                >
+                  <option>AM</option>
+                  <option>PM</option>
+                </select>
+              </div>
+
+              <span style={{ fontWeight: "600" }}>-</span>
+
+              {/* Closing Time */}
+              <div
+                style={{
+                  display: "flex",
+                  gap: "8px",
+                  alignItems: "center",
+                  border: "1px solid #0A5C15",
+                  borderRadius: "6px",
+                  padding: "15px 20px",
+                }}
+              >
+                <select
+                  value={closingHour}
+                  onChange={(e) =>
+                    handleTimeChange(setClosingHour, e.target.value)
+                  }
+                  style={{
+                    padding: "8px",
+                    border: "none",
+                    backgroundColor: "#F2F2F2",
+                    borderRadius: "4px",
+                  }}
+                >
+                  <option>05:00</option>
+                  <option>06:00</option>
+                  <option>07:00</option>
+                  <option>08:00</option>
+                  <option>09:00</option>
+                  <option>10:00</option>
+                </select>
+                <select
+                  value={closingMeridian}
+                  onChange={(e) =>
+                    handleTimeChange(setClosingMeridian, e.target.value)
+                  }
+                  style={{
+                    padding: "8px",
+                    border: "none",
+                    backgroundColor: "#F2F2F2",
+                    borderRadius: "4px",
+                  }}
+                >
+                  <option>AM</option>
+                  <option>PM</option>
+                </select>
+              </div>
+            </div>
+            {/* Error Message */}
             {showErrors && errors.hours && (
               <div style={{ color: "red", fontSize: "14px", marginTop: "5px" }}>
                 {errors.hours}
               </div>
             )}
           </div>
-
           <div
             style={{
               display: "flex",
               flexDirection: "row",
               marginTop: "30px",
               gap: "20px",
-              justifyContent:"space-between"
+              justifyContent: "space-between",
             }}
           >
             {/* Service Area Section */}
@@ -328,10 +441,11 @@ const OperatingDetails = () => {
               <div className="form-group">
                 <label>Service Area Coverage</label>
                 <div className="delivery-radio-options">
-                  <label
+                  <div
                     className={`delivery-radio-item ${
                       selectedServiceArea === 0 ? "selected" : ""
                     }`}
+                    onClick={() => setSelectedServiceArea(0)}
                   >
                     <input
                       type="radio"
@@ -348,12 +462,13 @@ const OperatingDetails = () => {
                       )}
                     </span>
                     <span className="radio-text">In-shop Only</span>
-                  </label>
+                  </div>
 
-                  <label
+                  <div
                     className={`delivery-radio-item ${
                       selectedServiceArea === 1 ? "selected" : ""
                     }`}
+                    onClick={() => setSelectedServiceArea(1)}
                   >
                     <input
                       type="radio"
@@ -372,12 +487,13 @@ const OperatingDetails = () => {
                       )}
                     </span>
                     <span className="radio-text">Home Service</span>
-                  </label>
+                  </div>
 
-                  <label
+                  <div
                     className={`delivery-radio-item ${
                       selectedServiceArea === 2 ? "selected" : ""
                     }`}
+                    onClick={() => setSelectedServiceArea(2)}
                   >
                     <input
                       type="radio"
@@ -396,7 +512,7 @@ const OperatingDetails = () => {
                       )}
                     </span>
                     <span className="radio-text">Both</span>
-                  </label>
+                  </div>
                 </div>
                 {showErrors && errors.serviceArea && (
                   <div
@@ -413,10 +529,11 @@ const OperatingDetails = () => {
               <div className="form-group">
                 <label>Do you provide delivery services?</label>
                 <div className="delivery-radio-options">
-                  <label
+                  <div
                     className={`delivery-radio-item ${
                       deliveryService === "yes" ? "selected" : ""
                     }`}
+                    onClick={() => setDeliveryService("yes")}
                   >
                     <input
                       type="radio"
@@ -433,12 +550,13 @@ const OperatingDetails = () => {
                     <span className="radio-text">
                       Yes, I have my own delivery staff
                     </span>
-                  </label>
+                  </div>
 
-                  <label
+                  <div
                     className={`delivery-radio-item ${
                       deliveryService === "no" ? "selected" : ""
                     }`}
+                    onClick={() => setDeliveryService("no")}
                   >
                     <input
                       type="radio"
@@ -457,12 +575,13 @@ const OperatingDetails = () => {
                     <span className="radio-text">
                       No, I need freelance delivery support
                     </span>
-                  </label>
+                  </div>
 
-                  <label
+                  <div
                     className={`delivery-radio-item ${
                       deliveryService === "instore" ? "selected" : ""
                     }`}
+                    onClick={() => setDeliveryService("instore")}
                   >
                     <input
                       type="radio"
@@ -479,7 +598,7 @@ const OperatingDetails = () => {
                       )}
                     </span>
                     <span className="radio-text">Only in-store service</span>
-                  </label>
+                  </div>
                 </div>
                 {showErrors && errors.deliveryService && (
                   <div

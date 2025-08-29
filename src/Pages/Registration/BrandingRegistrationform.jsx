@@ -390,10 +390,17 @@ const BrandingRegistrationForm = () => {
     }
   };
 
-  const ErrorMessage = ({ errors, field }) => {
+  const ErrorMessage = ({ errors, field, style }) => {
     if (!errors[field]) return null;
     return (
-      <div style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>
+      <div
+        style={{
+          color: "red",
+          fontSize: "12px",
+          marginTop: "5px",
+          ...style, // 👈 custom styles override defaults
+        }}
+      >
         {errors[field].map((error, index) => (
           <div key={index}>{error}</div>
         ))}
@@ -419,7 +426,6 @@ const BrandingRegistrationForm = () => {
 
         <div className="form-content">
           <h2 className="section-title">▶ Branding & Details</h2>
-
           <div className="section">
             <div className="image-upload-section">
               <p className="section-subtitle">
@@ -498,7 +504,7 @@ const BrandingRegistrationForm = () => {
           </div>
           <div className="section">
             <label>Products and services</label>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
+            <div className="service-input-container">
               <input
                 type="text"
                 placeholder="Write about the product and services"
@@ -506,7 +512,6 @@ const BrandingRegistrationForm = () => {
                 onChange={handleNewServiceChange}
                 onKeyPress={handleServiceKeyPress}
                 maxLength={50}
-                style={{ paddingLeft: "20px" }}
               />
               <button
                 type="button"
@@ -516,29 +521,25 @@ const BrandingRegistrationForm = () => {
                 +
               </button>
             </div>
-            <ErrorMessage errors={errors} field="newService" />
+            <ErrorMessage errors={errors} field="newService"/>
 
             <div className="product-tag-container">
               {services.map((tag, i) => (
                 <div key={i} className="product-tag">
-                  {tag}
+                  <span className="product-tag-text" title={tag}>
+                    {tag}
+                  </span>
                   <button
+                    className="product-tag-remove"
                     onClick={() => handleRemoveService(i)}
-                    style={{
-                      marginLeft: "8px",
-                      background: "none",
-                      border: "none",
-                      color: "#666",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                    }}
+                    aria-label={`Remove ${tag}`}
                   >
                     ×
                   </button>
                 </div>
               ))}
             </div>
-            <ErrorMessage errors={errors} field="services" />
+            <ErrorMessage errors={errors} field="services" style={{marginTop:"-10px"}} />
           </div>
         </div>
 

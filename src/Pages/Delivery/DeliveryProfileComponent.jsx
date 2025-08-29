@@ -26,8 +26,12 @@ const DeliveryProfile = () => {
   const [licenceImage, setLicenceImage] = useState(null);
   const [profileFile, setProfileFile] = useState(null);
   const [licenceFile, setLicenceFile] = useState(null);
-  const [loading, setLoading] = useState(false); // Set to false for demo purposes
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Validation states
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
 
   const getUserData = () => {
     try {
@@ -39,6 +43,143 @@ const DeliveryProfile = () => {
   };
 
   const userData = getUserData();
+
+  /* ───────────── validation functions ───────────── */
+  const validationRules = {
+    name: {
+      required: true,
+      minLength: 2,
+      maxLength: 50,
+      pattern: /^[a-zA-Z\s]+$/,
+    },
+    email: {
+      required: true,
+      pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    },
+    mobileNumber: {
+      required: true,
+      pattern: /^\+91[6-9]\d{9}$/,
+    },
+    secondaryMobile: {
+      required: false,
+      pattern: /^\+91[6-9]\d{9}$/,
+    },
+    whatsappNumber: {
+      required: false,
+      pattern: /^\+91[6-9]\d{9}$/,
+    },
+    vehicleType: {
+      required: true,
+      minLength: 2,
+    },
+    workType: {
+      required: true,
+    },
+    location: {
+      required: true,
+      minLength: 2,
+    },
+  };
+
+  const validateField = (name, value) => {
+    const rules = validationRules[name];
+    if (!rules) return "";
+
+    // Required validation
+    if (rules.required && (!value || value.toString().trim() === "")) {
+      return `${name.charAt(0).toUpperCase() + name.slice(1)} is required`;
+    }
+
+    // Skip other validations if field is empty and not required
+    if (!value || value.toString().trim() === "") {
+      return "";
+    }
+
+    // Length validations
+    if (rules.minLength && value.length < rules.minLength) {
+      return `${
+        name.charAt(0).toUpperCase() + name.slice(1)
+      } must be at least ${rules.minLength} characters`;
+    }
+
+    if (rules.maxLength && value.length > rules.maxLength) {
+      return `${
+        name.charAt(0).toUpperCase() + name.slice(1)
+      } must be less than ${rules.maxLength} characters`;
+    }
+
+    // Pattern validation
+    if (rules.pattern && !rules.pattern.test(value)) {
+      switch (name) {
+        case "name":
+          return "Name should contain only letters and spaces";
+        case "email":
+          return "Please enter a valid email address";
+        case "mobileNumber":
+        case "secondaryMobile":
+        case "whatsappNumber":
+          return "Please enter a valid Indian mobile number (+91XXXXXXXXXX)";
+        default:
+          return `Invalid ${name} format`;
+      }
+    }
+
+    return "";
+  };
+
+  const validateAllFields = () => {
+    const newErrors = {};
+    Object.keys(validationRules).forEach((field) => {
+      const error = validateField(field, profileData[field]);
+      if (error) {
+        newErrors[field] = error;
+      }
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateFile = (file, type) => {
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+    if (!file) return "";
+
+    if (!allowedTypes.includes(file.type)) {
+      return "Please upload a valid image file (JPEG, JPG, PNG, WEBP)";
+    }
+
+    if (file.size > maxSize) {
+      return "File size should not exceed 5MB";
+    }
+
+    return "";
+  };
+
+  const formatPhoneNumber = (value) => {
+    if (!value) return "";
+
+    // Remove all non-digits
+    const digitsOnly = value.replace(/\D/g, "");
+
+    // If already properly formatted, return as is
+    if (value.startsWith("+91") && digitsOnly.length === 12) {
+      return value;
+    }
+
+    // If it's 12 digits starting with 91, format as +91XXXXXXXXXX
+    if (digitsOnly.startsWith("91") && digitsOnly.length === 12) {
+      return `+${digitsOnly}`;
+    }
+
+    // If it's 10 digits starting with 6-9, add +91
+    if (digitsOnly.length === 10 && /^[6-9]/.test(digitsOnly)) {
+      return `+91${digitsOnly}`;
+    }
+
+    // If it's less than 10 digits or doesn't match pattern, return original
+    return value;
+  };
 
   /* ───────────── fetch profile ───────────── */
   useEffect(() => {
@@ -113,12 +254,52 @@ const DeliveryProfile = () => {
   }, [userData?.u_id, userData?.id]);
 
   /* ───────────── input handlers ───────────── */
-  const onChange = (e) =>
-    setProfileData((p) => ({ ...p, [e.target.name]: e.target.value }));
+  const onChange = (e) => {
+    const { name, value } = e.target;
+
+    // Don't format phone numbers during typing - let user type freely
+    setProfileData((p) => ({ ...p, [name]: value }));
+
+    // Validate field on change if it was touched
+    if (touched[name]) {
+      const error = validateField(name, value);
+      setErrors((prev) => ({
+        ...prev,
+        [name]: error,
+      }));
+    }
+  };
+
+  const onBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+
+    // Format phone numbers on blur (when user finishes editing)
+    let formattedValue = value;
+    if (
+      ["mobileNumber", "secondaryMobile", "whatsappNumber"].includes(name) &&
+      value
+    ) {
+      formattedValue = formatPhoneNumber(value);
+      setProfileData((p) => ({ ...p, [name]: formattedValue }));
+    }
+
+    const error = validateField(name, formattedValue);
+    setErrors((prev) => ({
+      ...prev,
+      [name]: error,
+    }));
+  };
 
   const onProfilePic = (e) => {
     const f = e.target.files[0];
     if (f) {
+      const error = validateFile(f, "profile");
+      if (error) {
+        toast.error(error, { position: "bottom-center" });
+        e.target.value = ""; // Clear the input
+        return;
+      }
       setProfileFile(f);
       setProfileImage(URL.createObjectURL(f));
     }
@@ -127,6 +308,12 @@ const DeliveryProfile = () => {
   const onLicencePic = (e) => {
     const f = e.target.files[0];
     if (f) {
+      const error = validateFile(f, "licence");
+      if (error) {
+        toast.error(error, { position: "bottom-center" });
+        e.target.value = ""; // Clear the input
+        return;
+      }
       setLicenceFile(f);
       setLicenceImage(URL.createObjectURL(f));
     }
@@ -135,6 +322,15 @@ const DeliveryProfile = () => {
   /* ───────────── SAVE (multipart) ───────────── */
   const handleSave = async () => {
     try {
+      // Validate all fields before saving
+      const isValid = validateAllFields();
+      if (!isValid) {
+        toast.error("Please fix the validation errors before saving", {
+          position: "bottom-center",
+        });
+        return;
+      }
+
       const fd = new FormData();
       const id = userData?.u_id || userData?.id;
       if (!id) throw new Error("User ID missing");
@@ -154,7 +350,7 @@ const DeliveryProfile = () => {
       fd.append("u_vehicle_type", profileData.vehicleType.trim());
       fd.append("u_work_type", profileData.workType.trim());
 
-      if (profileFile) fd.append("profile", profileFile); // backend expects these keys
+      if (profileFile) fd.append("profile", profileFile);
       if (licenceFile) fd.append("licence", licenceFile);
 
       const res = await fetch(
@@ -315,8 +511,16 @@ const DeliveryProfile = () => {
                   name="name"
                   value={profileData.name}
                   onChange={onChange}
+                  onBlur={onBlur}
                   className="form-input"
                 />
+                {errors.name && (
+                  <div
+                    style={{ color: "red", fontSize: "12px", marginTop: "4px" }}
+                  >
+                    {errors.name}
+                  </div>
+                )}
               </div>
               <div className="form-group">
                 <label className="form-label">WhatsApp</label>
@@ -324,9 +528,17 @@ const DeliveryProfile = () => {
                   name="whatsappNumber"
                   value={profileData.whatsappNumber}
                   onChange={onChange}
+                  onBlur={onBlur}
                   className="form-input"
                   placeholder="+91…"
                 />
+                {errors.whatsappNumber && (
+                  <div
+                    style={{ color: "red", fontSize: "12px", marginTop: "4px" }}
+                  >
+                    {errors.whatsappNumber}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -338,8 +550,16 @@ const DeliveryProfile = () => {
                   name="email"
                   value={profileData.email}
                   onChange={onChange}
+                  onBlur={onBlur}
                   className="form-input"
                 />
+                {errors.email && (
+                  <div
+                    style={{ color: "red", fontSize: "12px", marginTop: "4px" }}
+                  >
+                    {errors.email}
+                  </div>
+                )}
               </div>
               <div className="form-group">
                 <label className="form-label">Secondary Mobile</label>
@@ -347,9 +567,17 @@ const DeliveryProfile = () => {
                   name="secondaryMobile"
                   value={profileData.secondaryMobile}
                   onChange={onChange}
+                  onBlur={onBlur}
                   className="form-input"
                   placeholder="+91…"
                 />
+                {errors.secondaryMobile && (
+                  <div
+                    style={{ color: "red", fontSize: "12px", marginTop: "4px" }}
+                  >
+                    {errors.secondaryMobile}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -361,9 +589,17 @@ const DeliveryProfile = () => {
                   name="location"
                   value={profileData.location}
                   onChange={onChange}
+                  onBlur={onBlur}
                   className="form-input"
                   placeholder="City / Area"
                 />
+                {errors.location && (
+                  <div
+                    style={{ color: "red", fontSize: "12px", marginTop: "4px" }}
+                  >
+                    {errors.location}
+                  </div>
+                )}
               </div>
               <div className="form-group">
                 <label className="form-label">Vehicle Type</label>
@@ -371,9 +607,17 @@ const DeliveryProfile = () => {
                   name="vehicleType"
                   value={profileData.vehicleType}
                   onChange={onChange}
+                  onBlur={onBlur}
                   className="form-input"
                   placeholder="Bike / Car…"
                 />
+                {errors.vehicleType && (
+                  <div
+                    style={{ color: "red", fontSize: "12px", marginTop: "4px" }}
+                  >
+                    {errors.vehicleType}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -385,8 +629,10 @@ const DeliveryProfile = () => {
                   name="workType"
                   value={profileData.workType}
                   onChange={onChange}
+                  onBlur={onBlur}
                   className="form-select"
                 >
+                  <option value="">Select Work Type</option>
                   {[
                     "Full Time",
                     "Part Time",
@@ -394,25 +640,38 @@ const DeliveryProfile = () => {
                     "Freelance",
                     "Delivery",
                   ].map((t) => (
-                    <option key={t}>{t}</option>
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
                   ))}
                 </select>
+                {errors.workType && (
+                  <div
+                    style={{ color: "red", fontSize: "12px", marginTop: "4px" }}
+                  >
+                    {errors.workType}
+                  </div>
+                )}
               </div>
               <div className="form-group mobile-group">
                 <label className="form-label">Mobile</label>
                 <div className="mobile-input">
-                  <div className="country-code">
-                    <span className="flag">🇮🇳</span>
-                    <span className="dropdown-arrow">▼</span>
-                  </div>
                   <input
                     name="mobileNumber"
                     value={profileData.mobileNumber}
                     onChange={onChange}
-                    className="mobile-number-input"
+                    onBlur={onBlur}
+                    className="form-input"
                     placeholder="+91…"
                   />
                 </div>
+                {errors.mobileNumber && (
+                  <div
+                    style={{ color: "red", fontSize: "12px", marginTop: "4px" }}
+                  >
+                    {errors.mobileNumber}
+                  </div>
+                )}
               </div>
             </div>
 

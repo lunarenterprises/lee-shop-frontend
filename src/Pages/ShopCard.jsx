@@ -4,6 +4,7 @@ import "./ShopCard.css";
 import { FaHeart, FaPhone, FaWhatsapp } from "react-icons/fa";
 
 const API_BASE_URL = "https://lunarsenterprises.com:6031/leeshop";
+const WISHLIST_API_URL = "https://lunarsenterprises.com:6030/leeshop/user/add/fav";
 
 const transformShop = (shop) => ({
   id: shop.sh_id,
@@ -26,10 +27,12 @@ const transformShop = (shop) => ({
   address: shop.sh_address,
 });
 
-const ShopCard = () => {
+const ShopCard = ({ onShopClick }) => { // Accept onShopClick prop
   const [shopList, setShopList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [wishlistItems, setWishlistItems] = useState(new Set()); // Track favorited items
+  const [wishlistLoading, setWishlistLoading] = useState(new Set()); // Track loading state for each item
 
   useEffect(() => {
     // Fetch shop data from the API
@@ -56,6 +59,86 @@ const ShopCard = () => {
     fetchShops();
   }, []);
 
+  // Function to handle wishlist toggle
+  const handleWishlistClick = async (e, shopId) => {
+    e.stopPropagation(); // Prevent card click when clicking wishlist
+    
+    // Prevent multiple clicks on the same item
+    if (wishlistLoading.has(shopId)) return;
+
+    // Add to loading state
+    setWishlistLoading(prev => new Set([...prev, shopId]));
+
+    try {
+      // Determine if item is currently in wishlist
+      const isCurrentlyFavorited = wishlistItems.has(shopId);
+      
+      // Call the API
+      const response = await axios.post(
+        WISHLIST_API_URL,
+        {
+          u_id: 2, // You might want to get this from user context/props
+          sh_id: shopId,
+          fav: isCurrentlyFavorited ? 1 : 0 // Toggle favorite status
+        },
+        {
+          headers: { "Content-Type": "application/json" }
+        }
+      );
+
+      // If API call is successful, update local state
+      if (response.data) {
+        setWishlistItems(prev => {
+          const newSet = new Set(prev);
+          if (isCurrentlyFavorited) {
+            newSet.delete(shopId);
+          } else {
+            newSet.add(shopId);
+          }
+          return newSet;
+        });
+        
+        // Optional: Show success message
+        console.log(`Shop ${isCurrentlyFavorited ? 'removed from' : 'added to'} wishlist successfully`);
+      }
+    } catch (err) {
+      console.error("Failed to update wishlist:", err);
+      // Optional: Show error message to user
+      alert("Failed to update wishlist. Please try again.");
+    } finally {
+      // Remove from loading state
+      setWishlistLoading(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(shopId);
+        return newSet;
+      });
+    }
+  };
+
+  // Handle shop card click
+  const handleCardClick = (shopId) => {
+    if (onShopClick) {
+      onShopClick(shopId);
+    }
+  };
+
+  // Handle contact button click
+  const handleContactClick = (e, phone) => {
+    e.stopPropagation(); // Prevent card click when clicking contact button
+    if (phone) {
+      window.location.href = `tel:${phone}`;
+    }
+  };
+
+  // Handle WhatsApp button click
+  const handleWhatsAppClick = (e, whatsappNumber) => {
+    e.stopPropagation(); // Prevent card click when clicking WhatsApp button
+    window.open(
+      `https://wa.me/${whatsappNumber.replace(/\D/g, "")}`,
+      "_blank"
+    );
+  };
+
   if (loading) {
     return (
       <div className="product-container">
@@ -76,7 +159,12 @@ const ShopCard = () => {
       <h2 className="product-heading">Discover Local Shops & Services</h2>
       <div className="product-grid">
         {shopList.map((product, index) => (
-          <div className="product-card" key={product.id || index}>
+          <div 
+            className="product-card" 
+            key={product.id || index}
+            onClick={() => handleCardClick(product.id)}
+            style={{ cursor: 'pointer' }}
+          >
             {product.image ? (
               <img
                 src={product.image}
@@ -103,7 +191,14 @@ const ShopCard = () => {
                 <span>{product.distance}</span>
                 <span className="open-dot"></span>
                 <span className="open-time">{product.openTime}</span>
-                <div className="wishlist-icon">
+                <div 
+                  className="wishlist-icon"
+                  onClick={(e) => handleWishlistClick(e, product.id)}
+                  style={{
+                    cursor: wishlistLoading.has(product.id) ? 'not-allowed' : 'pointer',
+                    opacity: wishlistLoading.has(product.id) ? 0.6 : 1
+                  }}
+                >
                   <svg
                     width="22"
                     height="23"
@@ -113,12 +208,25 @@ const ShopCard = () => {
                   >
                     <path
                       d="M17.8407 4.16131C15.3822 2.6534 13.2363 3.26115 11.9475 4.22915C11.4195 4.62606 11.1555 4.82498 10.9997 4.82498C10.8438 4.82498 10.5798 4.62606 10.0518 4.22915C8.76299 3.26115 6.61707 2.6534 4.15857 4.16131C0.932824 6.1404 0.203157 12.668 7.64466 18.1771C9.06182 19.2249 9.77041 19.7501 10.9997 19.7501C12.2289 19.7501 12.9375 19.2258 14.3547 18.1762C21.7962 12.6689 21.0665 6.1404 17.8407 4.16131Z"
-                      stroke="white"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      stroke={wishlistItems.has(product.id) ? "#ff4757" : "white"}
+                      fill={wishlistItems.has(product.id) ? "#ff4757" : "none"}
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     />
                   </svg>
+                  {wishlistLoading.has(product.id) && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      fontSize: '10px',
+                      color: 'white'
+                    }}>
+                      ...
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="product_info">
@@ -143,11 +251,7 @@ const ShopCard = () => {
                 {product.phone && (
                   <button
                     className="contact-btn2"
-                    onClick={() => {
-                      if (product.phone) {
-                        window.location.href = `tel:${product.phone}`;
-                      }
-                    }}
+                    onClick={(e) => handleContactClick(e, product.phone)}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -166,15 +270,7 @@ const ShopCard = () => {
                 {product.whatsapp && product.whatsappNumber && (
                   <button
                     className="whatsapp-btn2"
-                    onClick={() =>
-                      window.open(
-                        `https://wa.me/${product.whatsappNumber.replace(
-                          /\D/g,
-                          ""
-                        )}`,
-                        "_blank"
-                      )
-                    }
+                    onClick={(e) => handleWhatsAppClick(e, product.whatsappNumber)}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -183,10 +279,10 @@ const ShopCard = () => {
                       viewBox="0 0 19 20"
                       fill="none"
                     >
-                      <g clip-path="url(#clip0_291_731)">
+                      <g clipPath="url(#clip0_291_731)">
                         <path
-                          fill-rule="evenodd"
-                          clip-rule="evenodd"
+                          fillRule="evenodd"
+                          clipRule="evenodd"
                           d="M16.2316 3.25896C14.4458 1.4807 12.0706 0.500902 9.5399 0.5C4.32519 0.5 0.0811965 4.7201 0.079382 9.90736C0.0784748 11.5656 0.514396 13.1842 1.34224 14.6106L0 19.4861L5.01513 18.1779C6.39682 18.9277 7.95271 19.3224 9.53584 19.3229H9.5399C14.7537 19.3229 18.9982 15.1023 19 9.91502C19.0009 7.40104 18.0179 5.03768 16.2316 3.25941V3.25896ZM9.5399 17.7341H9.53673C8.12598 17.7336 6.74204 17.3565 5.53454 16.6442L5.24739 16.4746L2.27124 17.2509L3.06551 14.3652L2.87862 14.0693C2.0916 12.8242 1.67564 11.3852 1.67655 9.90784C1.67836 5.5966 5.20565 2.08879 9.54312 2.08879C11.6433 2.0897 13.6175 2.90395 15.1021 4.38222C16.5868 5.86005 17.4037 7.82508 17.4028 9.91413C17.401 14.2258 13.8737 17.7336 9.5399 17.7336V17.7341ZM13.8528 11.8778C13.6165 11.7601 12.4544 11.1916 12.2375 11.1132C12.0207 11.0347 11.8633 10.9955 11.7059 11.2309C11.5485 11.4664 11.0954 11.996 10.9575 12.1525C10.8196 12.3095 10.6816 12.3289 10.4453 12.2111C10.209 12.0934 9.44738 11.8453 8.54425 11.0446C7.84162 10.4211 7.36709 9.6516 7.22924 9.41609C7.09133 9.18064 7.21472 9.05341 7.33263 8.93658C7.43876 8.83103 7.56897 8.66186 7.68735 8.52472C7.80578 8.38757 7.84478 8.28927 7.92369 8.1327C8.00264 7.97571 7.96316 7.83862 7.90421 7.72084C7.84521 7.60311 7.37258 6.446 7.17524 5.97552C6.98334 5.5172 6.78833 5.57946 6.64361 5.57179C6.50571 5.56502 6.34832 5.56367 6.19046 5.56367C6.03261 5.56367 5.77674 5.62231 5.55993 5.85779C5.34312 6.09324 4.73254 6.66209 4.73254 7.81873C4.73254 8.97536 5.57946 10.0937 5.69784 10.2507C5.81622 10.4077 7.36482 12.7818 9.73586 13.8004C10.2997 14.0426 10.7402 14.1875 11.0835 14.2957C11.6497 14.4748 12.165 14.4496 12.5723 14.3891C13.0264 14.3215 13.9708 13.8203 14.1677 13.2713C14.3645 12.7222 14.3645 12.2513 14.3056 12.1534C14.2466 12.0555 14.0888 11.9964 13.8524 11.8787L13.8528 11.8778Z"
                           fill="#0A5C15"
                         />

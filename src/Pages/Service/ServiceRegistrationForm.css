@@ -183,12 +183,22 @@
   cursor: pointer;
 }
 
-.product-tag {
+/* Updated product tag container for 5 tags per row */
+.product-tag-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
   margin-top: 1rem;
+}
+
+.product-tag {
   background-color: #ffffff;
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
   color: #0a5c15;
   border: 1px solid #0a5c15;
   font-family: Inter;
@@ -197,6 +207,36 @@
   font-size: 16px;
   line-height: 24px;
   letter-spacing: 0%;
+}
+
+.product-tag-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.product-tag-remove {
+  flex-shrink: 0;
+  margin-left: 8px;
+  background: none;
+  border: none;
+  color: #0a5c15;
+  cursor: pointer;
+  font-size: 16px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  font-weight: bold;
+}
+
+.product-tag-remove:hover {
+  background-color: rgba(10, 92, 21, 0.1);
 }
 
 .buttons {
@@ -231,6 +271,19 @@
   color: white;
 }
 
+/* Responsive design for smaller screens */
+@media (max-width: 1200px) {
+  .product-tag-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .product-tag-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .registration-container {
     flex-direction: column;
@@ -243,5 +296,15 @@
   .buttons {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .product-tag-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 400px) {
+  .product-tag-container {
+    grid-template-columns: 1fr;
   }
 }
