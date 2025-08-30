@@ -1,6 +1,3 @@
-"use client";
-
-// DeliveryProfileComponent.jsx
 import { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,9 +14,9 @@ const DeliveryProfile = () => {
     vehicleType: "",
     workType: "",
     location: "",
+    availability: "Not Available",
   });
 
-  const [availability, setAvailability] = useState("Not Available");
   const [profileImage, setProfileImage] = useState(
     "/placeholder.svg?height=120&width=120"
   );
@@ -78,6 +75,9 @@ const DeliveryProfile = () => {
     location: {
       required: true,
       minLength: 2,
+    },
+    availability: {
+      required: true,
     },
   };
 
@@ -181,6 +181,55 @@ const DeliveryProfile = () => {
     return value;
   };
 
+  // Fixed function to extract 10-digit phone number for saving
+  const extractPhoneDigits = (phoneNumber) => {
+    if (!phoneNumber) return "";
+
+    const digitsOnly = phoneNumber.replace(/\D/g, "");
+
+    // If it's 12 digits starting with 91, return the last 10 digits
+    if (digitsOnly.startsWith("91") && digitsOnly.length === 12) {
+      return digitsOnly.slice(2);
+    }
+
+    // If it's exactly 10 digits, return as is
+    if (digitsOnly.length === 10) {
+      return digitsOnly;
+    }
+
+    // Otherwise return the digits as-is (for validation to catch)
+    return digitsOnly;
+  };
+
+  // Fixed function to format phone number from database
+  const formatPhoneFromDB = (phoneValue) => {
+    if (!phoneValue) return "";
+
+    const phoneStr = phoneValue.toString().trim();
+    if (!phoneStr) return "";
+
+    // If already properly formatted with +91, return as is
+    if (phoneStr.startsWith("+91") && phoneStr.length === 13) {
+      return phoneStr;
+    }
+
+    // Remove any non-digits first
+    const digitsOnly = phoneStr.replace(/\D/g, "");
+
+    // If it's exactly 10 digits starting with 6-9, add +91
+    if (digitsOnly.length === 10 && /^[6-9]/.test(digitsOnly)) {
+      return `+91${digitsOnly}`;
+    }
+
+    // If it's 12 digits starting with 91, format as +91XXXXXXXXXX
+    if (digitsOnly.startsWith("91") && digitsOnly.length === 12) {
+      return `+${digitsOnly}`;
+    }
+
+    // If none of the above, return the original value (let validation handle it)
+    return phoneStr;
+  };
+
   /* ───────────── fetch profile ───────────── */
   useEffect(() => {
     const fetchData = async () => {
@@ -202,18 +251,21 @@ const DeliveryProfile = () => {
           throw new Error("No data found");
 
         const d = json.list[0];
-        const fmt = (p) =>
-          !p ? "" : p.toString().startsWith("+91") ? p.toString() : `+91${p}`;
 
         setProfileData({
           name: d.u_name?.trim() || "",
           email: d.u_email || "",
-          mobileNumber: fmt(d.u_mobile),
-          secondaryMobile: fmt(d.u_secondary_mobile),
-          whatsappNumber: fmt(d.u_whatsapp_contact),
+          mobileNumber: formatPhoneFromDB(d.u_mobile),
+          secondaryMobile: formatPhoneFromDB(d.u_secondary_mobile),
+          whatsappNumber: formatPhoneFromDB(d.u_whatsapp_contact),
           vehicleType: d.u_vehicle_type?.trim() || "",
           workType: d.u_work_type?.trim() || "",
           location: d.u_location || d.u_district || "",
+          availability: d.u_delivery_status === "available"
+            ? "Available"
+            : d.u_delivery_status === "busy"
+            ? "Busy"
+            : "Not Available",
         });
 
         if (d.u_profile_pic)
@@ -224,27 +276,19 @@ const DeliveryProfile = () => {
           setLicenceImage(
             `https://lunarsenterprises.com:6031${d.u_licence_pic}`
           );
-
-        setAvailability(
-          d.u_delivery_status === "available"
-            ? "Available"
-            : d.u_delivery_status === "busy"
-            ? "Busy"
-            : "Not Available"
-        );
       } catch (err) {
         console.log("Demo mode - using default data");
         setProfileData({
           name: "Alexis Sanchez",
           email: "alexis@example.com",
-          mobileNumber: "+91 9876543210",
-          secondaryMobile: "+91 9876543211",
-          whatsappNumber: "+91 9876543210",
+          mobileNumber: "+918765432101",
+          secondaryMobile: "+918765432111",
+          whatsappNumber: "+918765432101",
           vehicleType: "Bike",
           workType: "Full Time",
           location: "Edappally, Kochi",
+          availability: "Not Available",
         });
-        setAvailability("Not Available");
       } finally {
         setLoading(false);
       }
@@ -335,20 +379,31 @@ const DeliveryProfile = () => {
       const id = userData?.u_id || userData?.id;
       if (!id) throw new Error("User ID missing");
 
+      console.log({ profileData }, "profile data");
+
       fd.append("u_id", id);
       fd.append("u_name", profileData.name.trim());
       fd.append("u_email", profileData.email.trim());
-      fd.append("u_mobile", profileData.mobileNumber.replace(/\D/g, ""));
+      fd.append("u_mobile", extractPhoneDigits(profileData.mobileNumber));
       fd.append(
         "u_secondary_mobile",
-        profileData.secondaryMobile.replace(/\D/g, "")
+        extractPhoneDigits(profileData.secondaryMobile)
       );
       fd.append(
         "u_whatsapp_contact",
-        profileData.whatsappNumber.replace(/\D/g, "")
+        extractPhoneDigits(profileData.whatsappNumber)
       );
       fd.append("u_vehicle_type", profileData.vehicleType.trim());
       fd.append("u_work_type", profileData.workType.trim());
+      
+      // Convert UI availability to database format
+      const availabilityForDB = profileData.availability === "Available" 
+        ? "available" 
+        : profileData.availability === "Busy" 
+        ? "busy" 
+        : "not_available";
+
+      fd.append("u_delivery_status", availabilityForDB);
 
       if (profileFile) fd.append("profile", profileFile);
       if (licenceFile) fd.append("licence", licenceFile);
@@ -463,11 +518,11 @@ const DeliveryProfile = () => {
             </svg>
           </button>
           <div className="availability-status">
-            <div className={`status-indicator ${availCls(availability)}`}>
-              <span className={`status-dot ${availCls(availability)}`} />
+            <div className={`status-indicator ${availCls(profileData.availability)}`}>
+              <span className={`status-dot ${availCls(profileData.availability)}`} />
               <select
-                value={availability}
-                onChange={(e) => setAvailability(e.target.value)}
+                value={profileData.availability}
+                onChange={(e) => setProfileData(prev => ({...prev, availability: e.target.value}))}
                 className="status-select"
                 aria-label="Change availability status"
               >

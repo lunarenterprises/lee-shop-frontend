@@ -13,11 +13,13 @@ import {
 } from "lucide-react";
 import Header from "./Header";
 import Footer from "../Footer";
+import { useNavigate } from "react-router-dom";
 
 // Add your API base URL here
 const API_BASE_URL = "https://lunarsenterprises.com:6031/leeshop"; // Replace with your actual API URL
 
 const ServiceFinder = () => {
+  const navigate = useNavigate();
   const [selectedLocation, setSelectedLocation] = useState(
     "Bangalore, Karnataka, India"
   );
@@ -33,6 +35,10 @@ const ServiceFinder = () => {
   const [searchedShop, setSearchedShop] = useState(null);
   const [searchedShopList, setSearchedShopList] = useState([]);
   const [searching, setSearching] = useState(false);
+
+  const handleBackHome = () => {
+    navigate("/");
+  };
 
   // Function to get URL parameters
   const getUrlParams = () => {
@@ -58,7 +64,7 @@ const ServiceFinder = () => {
   // Shop search handler
   const handleShopSearch = async (searchTermParam) => {
     const searchQuery = searchTermParam || searchTerm;
-    
+
     // If blank: clear and show default sections
     if (!searchQuery || !searchQuery.trim()) {
       setSearchedShop(null);
@@ -69,11 +75,11 @@ const ServiceFinder = () => {
     setSearching(true);
     try {
       // Determine sh_shop_or_service based on URL type parameter
-      const shopOrService = urlParams.type === 'shop' ? 'shop' : 'service';
-      
+      const shopOrService = urlParams.type === "shop" ? "shop" : "service";
+
       const requestBody = {
         search: searchQuery.trim(),
-        sh_shop_or_service: shopOrService
+        sh_shop_or_service: shopOrService,
       };
 
       const response = await fetch(`${API_BASE_URL}/shop/list/shop`, {
@@ -81,7 +87,7 @@ const ServiceFinder = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
       });
-      
+
       const resData = await response.json();
 
       let found = null;
@@ -183,7 +189,6 @@ const ServiceFinder = () => {
     handleShopSearch(tag);
   };
 
-  // Location options for the select dropdown
   const locationOptions = [
     "Bangalore, Karnataka, India",
     "Mumbai, Maharashtra, India",
@@ -195,6 +200,15 @@ const ServiceFinder = () => {
     "Ahmedabad, Gujarat, India",
     "Jaipur, Rajasthan, India",
     "Kochi, Kerala, India",
+    "Thiruvananthapuram, Kerala, India",
+    "Kozhikode, Kerala, India",
+    "Thrissur, Kerala, India",
+    "Alappuzha, Kerala, India",
+    "Palakkad, Kerala, India",
+    "Kannur, Kerala, India",
+    "Kottayam, Kerala, India",
+    "Malappuram, Kerala, India",
+    "Kollam, Kerala, India",
   ];
 
   const filterTags = [
@@ -277,29 +291,27 @@ const ServiceFinder = () => {
   ];
 
   // Use API data if available, otherwise use default data
-  const serviceProviders = searchedShopList.length > 0 
-    ? searchedShopList.map(shop => ({
-        id: shop.sh_id || Math.random(),
-        name: shop.sh_name || "Unknown Shop",
-        image: shop.sh_image || "/placeholder.svg",
-        distance: shop.distance || "N/A",
-        hours: shop.sh_hours || "Hours not available",
-        rating: shop.sh_rating || 4.0,
-        reviews: shop.sh_reviews || 0,
-        phone: shop.sh_phone || "N/A",
-        whatsapp: shop.sh_whatsapp || shop.sh_phone || "N/A",
-        whatsappNumber: shop.sh_whatsapp || shop.sh_phone || "N/A",
-      }))
-    : defaultServiceProviders;
+  const serviceProviders =
+    searchedShopList.length > 0
+      ? searchedShopList.map((shop) => ({
+          id: shop.sh_id || Math.random(),
+          name: shop.sh_name || "Unknown Shop",
+          image: shop.sh_image || "/placeholder.svg",
+          distance: shop.distance || "N/A",
+          hours: shop.sh_hours || "Hours not available",
+          rating: shop.sh_rating || 4.0,
+          reviews: shop.sh_reviews || 0,
+          phone: shop.sh_phone || "N/A",
+          whatsapp: shop.sh_whatsapp || shop.sh_phone || "N/A",
+          whatsappNumber: shop.sh_whatsapp || shop.sh_phone || "N/A",
+        }))
+      : defaultServiceProviders;
 
   // Enhanced map markers with service provider data
   const mapMarkers = [
     ...serviceProviders.slice(0, 3).map((provider, index) => ({
       id: provider.id,
-      position: [
-        12.9716 + (index * 0.01), 
-        77.5946 + (index * 0.015)
-      ],
+      position: [12.9716 + index * 0.01, 77.5946 + index * 0.015],
       label: "Service Available",
       type: "service",
       serviceData: provider,
@@ -508,6 +520,7 @@ const ServiceFinder = () => {
         {/* Back to Home Button Overlay */}
         <div className="back-to-home-btn">
           <button
+            onClick={handleBackHome} // 👈 added click handler
             style={{
               display: "flex",
               alignItems: "center",
@@ -529,7 +542,6 @@ const ServiceFinder = () => {
             Back to Home
           </button>
         </div>
-
         {/* Search Area Overlay */}
         <div className="search-overlay">
           <div className="search-overlay-content">
@@ -617,7 +629,7 @@ const ServiceFinder = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === "Enter") {
                       handleSearchClick();
                     }
                   }}
@@ -663,7 +675,10 @@ const ServiceFinder = () => {
                 }}
               >
                 {searching && (
-                  <Loader2 style={{ width: "16px", height: "16px" }} className="animate-spin" />
+                  <Loader2
+                    style={{ width: "16px", height: "16px" }}
+                    className="animate-spin"
+                  />
                 )}
                 {searching ? "Searching..." : "Search"}
               </button>
@@ -757,7 +772,10 @@ const ServiceFinder = () => {
               gap: "1rem",
             }}
           >
-            <Loader2 style={{ width: "2rem", height: "2rem", color: "#0A5C15" }} className="animate-spin" />
+            <Loader2
+              style={{ width: "2rem", height: "2rem", color: "#0A5C15" }}
+              className="animate-spin"
+            />
             <p style={{ color: "#6B7280", fontSize: "14px" }}>
               Searching for services...
             </p>
@@ -802,7 +820,8 @@ const ServiceFinder = () => {
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 12px rgba(0, 0, 0, 0.1)";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = "translateY(0)";
@@ -931,18 +950,20 @@ const ServiceFinder = () => {
         )}
 
         {/* No Results State */}
-        {!searching && !searchedShop?.error && serviceProviders.length === 0 && (
-          <div
-            style={{
-              textAlign: "center",
-              padding: "3rem",
-              color: "#6B7280",
-              fontSize: "16px",
-            }}
-          >
-            No services found. Try a different search term.
-          </div>
-        )}
+        {!searching &&
+          !searchedShop?.error &&
+          serviceProviders.length === 0 && (
+            <div
+              style={{
+                textAlign: "center",
+                padding: "3rem",
+                color: "#6B7280",
+                fontSize: "16px",
+              }}
+            >
+              No services found. Try a different search term.
+            </div>
+          )}
       </div>
 
       <Footer />
@@ -965,18 +986,22 @@ const ServiceFinder = () => {
           animation: spin 1s linear infinite;
         }
         @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
         }
         .filter-tag.active {
-          background-color: #0A5C15;
-          border-color: #0A5C15;
+          background-color: #0a5c15;
+          border-color: #0a5c15;
           color: white;
         }
         .filter-tag.inactive {
           background-color: white;
-          border-color: #D1D5DB;
-          color: #6B7280;
+          border-color: #d1d5db;
+          color: #6b7280;
         }
         .filter-tag:hover:not(:disabled) {
           transform: translateY(-1px);

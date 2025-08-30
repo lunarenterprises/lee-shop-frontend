@@ -6,15 +6,29 @@ const LocationSearchBar = ({ onSearch, onLocationChange }) => {
   const [selectedLocation, setSelectedLocation] = useState(
     "Bangalore, Karnataka, India"
   );
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Sample locations - you can replace with your data
   const locations = [
     "Bangalore, Karnataka, India",
     "Mumbai, Maharashtra, India",
-    "Delhi, Delhi, India",
+    "Delhi, India",
     "Chennai, Tamil Nadu, India",
+    "Kolkata, West Bengal, India",
     "Hyderabad, Telangana, India",
+    "Pune, Maharashtra, India",
+    "Ahmedabad, Gujarat, India",
+    "Jaipur, Rajasthan, India",
+    "Kochi, Kerala, India",
+    "Thiruvananthapuram, Kerala, India",
+    "Kozhikode, Kerala, India",
+    "Thrissur, Kerala, India",
+    "Alappuzha, Kerala, India",
+    "Palakkad, Kerala, India",
+    "Kannur, Kerala, India",
+    "Kottayam, Kerala, India",
+    "Malappuram, Kerala, India",
+    "Kollam, Kerala, India",
   ];
 
   // Fires whenever the search term changes/clears

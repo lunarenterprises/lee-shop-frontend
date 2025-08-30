@@ -449,7 +449,7 @@
 
 /* Add margin to sections below hero to account for overlapping card */
 .image-gallery {
-  margin-top: 160px;
+  margin-top: 140px !important;
   padding: 20px 32px;
   display: flex;
   gap: 12px;
@@ -498,7 +498,7 @@
 
 /* When no gallery, add margin to tabs */
 .shop-main-content:not(:has(.image-gallery)) .tabs-container {
-  margin-top: 160px;
+  margin-top: 180px;
 }
 
 /* Tabs */
@@ -908,7 +908,7 @@
 
   .image-gallery {
     padding: 16px 20px;
-    margin-top: 150px;
+    margin-top: 160px;
   }
 
   /* Floating card responsive adjustments */
@@ -921,7 +921,7 @@
 
   /* Adjust margin for mobile */
   .shop-main-content:not(:has(.image-gallery)) .tabs-container {
-    margin-top: 150px;
+    margin-top: 160px;
   }
 
   /* Responsive adjustments for reviews */
@@ -1014,11 +1014,11 @@
   }
 
   .image-gallery {
-    margin-top: 140px;
+    margin-top: 150px;
   }
 
   .shop-main-content:not(:has(.image-gallery)) .tabs-container {
-    margin-top: 140px;
+    margin-top: 150px;
   }
 
   .write-review-title,

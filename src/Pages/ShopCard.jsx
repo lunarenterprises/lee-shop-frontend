@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./ShopCard.css";
-import { FaHeart, FaPhone, FaWhatsapp } from "react-icons/fa";
 
 const API_BASE_URL = "https://lunarsenterprises.com:6031/leeshop";
-const WISHLIST_API_URL = "https://lunarsenterprises.com:6030/leeshop/user/add/fav";
+const WISHLIST_API_URL =
+  "https://lunarsenterprises.com:6031/leeshop/user/add/fav";
 
 const transformShop = (shop) => ({
   id: shop.sh_id,
@@ -27,12 +27,28 @@ const transformShop = (shop) => ({
   address: shop.sh_address,
 });
 
-const ShopCard = ({ onShopClick }) => { // Accept onShopClick prop
+const ShopCard = ({ onShopClick }) => {
+  // Accept onShopClick prop
   const [shopList, setShopList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [wishlistItems, setWishlistItems] = useState(new Set()); // Track favorited items
-  const [wishlistLoading, setWishlistLoading] = useState(new Set()); // Track loading state for each item
+  const [wishlistItems, setWishlistItems] = useState(new Set());
+  const [wishlistLoading, setWishlistLoading] = useState(new Set());
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("userData");
+      if (raw && raw !== "undefined" && raw !== "null") {
+        const parsed = JSON.parse(raw);
+        if (parsed?.id) setUserData(parsed);
+      }
+    } catch {
+      localStorage.removeItem("userData");
+    }
+  }, []);
+
+  console.log({ wishlistItems });
 
   useEffect(() => {
     // Fetch shop data from the API
@@ -62,33 +78,33 @@ const ShopCard = ({ onShopClick }) => { // Accept onShopClick prop
   // Function to handle wishlist toggle
   const handleWishlistClick = async (e, shopId) => {
     e.stopPropagation(); // Prevent card click when clicking wishlist
-    
+
     // Prevent multiple clicks on the same item
     if (wishlistLoading.has(shopId)) return;
 
     // Add to loading state
-    setWishlistLoading(prev => new Set([...prev, shopId]));
+    setWishlistLoading((prev) => new Set([...prev, shopId]));
 
     try {
       // Determine if item is currently in wishlist
       const isCurrentlyFavorited = wishlistItems.has(shopId);
-      
+
       // Call the API
       const response = await axios.post(
         WISHLIST_API_URL,
         {
-          u_id: 2, // You might want to get this from user context/props
+          u_id: userData?.id,
           sh_id: shopId,
-          fav: isCurrentlyFavorited ? 1 : 0 // Toggle favorite status
+          fav: 1,
         },
         {
-          headers: { "Content-Type": "application/json" }
+          headers: { "Content-Type": "application/json" },
         }
       );
 
       // If API call is successful, update local state
       if (response.data) {
-        setWishlistItems(prev => {
+        setWishlistItems((prev) => {
           const newSet = new Set(prev);
           if (isCurrentlyFavorited) {
             newSet.delete(shopId);
@@ -97,9 +113,13 @@ const ShopCard = ({ onShopClick }) => { // Accept onShopClick prop
           }
           return newSet;
         });
-        
+
         // Optional: Show success message
-        console.log(`Shop ${isCurrentlyFavorited ? 'removed from' : 'added to'} wishlist successfully`);
+        console.log(
+          `Shop ${
+            isCurrentlyFavorited ? "removed from" : "added to"
+          } wishlist successfully`
+        );
       }
     } catch (err) {
       console.error("Failed to update wishlist:", err);
@@ -107,7 +127,7 @@ const ShopCard = ({ onShopClick }) => { // Accept onShopClick prop
       alert("Failed to update wishlist. Please try again.");
     } finally {
       // Remove from loading state
-      setWishlistLoading(prev => {
+      setWishlistLoading((prev) => {
         const newSet = new Set(prev);
         newSet.delete(shopId);
         return newSet;
@@ -133,10 +153,7 @@ const ShopCard = ({ onShopClick }) => { // Accept onShopClick prop
   // Handle WhatsApp button click
   const handleWhatsAppClick = (e, whatsappNumber) => {
     e.stopPropagation(); // Prevent card click when clicking WhatsApp button
-    window.open(
-      `https://wa.me/${whatsappNumber.replace(/\D/g, "")}`,
-      "_blank"
-    );
+    window.open(`https://wa.me/${whatsappNumber.replace(/\D/g, "")}`, "_blank");
   };
 
   if (loading) {
@@ -159,11 +176,11 @@ const ShopCard = ({ onShopClick }) => { // Accept onShopClick prop
       <h2 className="product-heading">Discover Local Shops & Services</h2>
       <div className="product-grid">
         {shopList.map((product, index) => (
-          <div 
-            className="product-card" 
+          <div
+            className="product-card"
             key={product.id || index}
             onClick={() => handleCardClick(product.id)}
-            style={{ cursor: 'pointer' }}
+            style={{ cursor: "pointer" }}
           >
             {product.image ? (
               <img
@@ -191,12 +208,14 @@ const ShopCard = ({ onShopClick }) => { // Accept onShopClick prop
                 <span>{product.distance}</span>
                 <span className="open-dot"></span>
                 <span className="open-time">{product.openTime}</span>
-                <div 
+                <div
                   className="wishlist-icon"
                   onClick={(e) => handleWishlistClick(e, product.id)}
                   style={{
-                    cursor: wishlistLoading.has(product.id) ? 'not-allowed' : 'pointer',
-                    opacity: wishlistLoading.has(product.id) ? 0.6 : 1
+                    cursor: wishlistLoading.has(product.id)
+                      ? "not-allowed"
+                      : "pointer",
+                    opacity: wishlistLoading.has(product.id) ? 0.6 : 1,
                   }}
                 >
                   <svg
@@ -208,22 +227,26 @@ const ShopCard = ({ onShopClick }) => { // Accept onShopClick prop
                   >
                     <path
                       d="M17.8407 4.16131C15.3822 2.6534 13.2363 3.26115 11.9475 4.22915C11.4195 4.62606 11.1555 4.82498 10.9997 4.82498C10.8438 4.82498 10.5798 4.62606 10.0518 4.22915C8.76299 3.26115 6.61707 2.6534 4.15857 4.16131C0.932824 6.1404 0.203157 12.668 7.64466 18.1771C9.06182 19.2249 9.77041 19.7501 10.9997 19.7501C12.2289 19.7501 12.9375 19.2258 14.3547 18.1762C21.7962 12.6689 21.0665 6.1404 17.8407 4.16131Z"
-                      stroke={wishlistItems.has(product.id) ? "#ff4757" : "white"}
-                      fill={wishlistItems.has(product.id) ? "#ff4757" : "none"}
+                      stroke={
+                        wishlistItems.has(product.id) ? "#ff4757" : "white"
+                      }
+                      fill={wishlistItems.has(product.id) ? "none" : "none"}
                       strokeWidth="1.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                   </svg>
                   {wishlistLoading.has(product.id) && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      fontSize: '10px',
-                      color: 'white'
-                    }}>
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        fontSize: "10px",
+                        color: "white",
+                      }}
+                    >
                       ...
                     </div>
                   )}
@@ -270,7 +293,9 @@ const ShopCard = ({ onShopClick }) => { // Accept onShopClick prop
                 {product.whatsapp && product.whatsappNumber && (
                   <button
                     className="whatsapp-btn2"
-                    onClick={(e) => handleWhatsAppClick(e, product.whatsappNumber)}
+                    onClick={(e) =>
+                      handleWhatsAppClick(e, product.whatsappNumber)
+                    }
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

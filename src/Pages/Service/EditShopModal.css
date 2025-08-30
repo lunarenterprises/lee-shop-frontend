@@ -211,6 +211,13 @@
 .form-select {
   background: white;
   cursor: pointer;
+  padding: 10px;
+}
+
+.form-select {
+  appearance: auto; /* resets to browser default */
+  -webkit-appearance: auto; /* Safari/Chrome */
+  -moz-appearance: auto; /* Firefox */
 }
 
 /* Location & Working Hours tab */
