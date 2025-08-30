@@ -88,8 +88,10 @@ const ServiceRegistration = () => {
         break
 
       case "shopAddress":
-        if (value.trim() && value.trim().length < 10) {
-          newErrors.shopAddress = "Address must be at least 10 characters if provided"
+        if (!value.trim()) {
+          newErrors.shopAddress = "Full address is required"
+        } else if (value.trim().length < 10) {
+          newErrors.shopAddress = "Address must be at least 10 characters"
         } else if (value.trim().length > 200) {
           newErrors.shopAddress = "Address must be less than 200 characters"
         } else {
@@ -98,11 +100,13 @@ const ServiceRegistration = () => {
         break
 
       case "state":
-        if (value.trim() && value.trim().length < 2) {
-          newErrors.state = "State must be at least 2 characters if provided"
+        if (!value.trim()) {
+          newErrors.state = "State is required"
+        } else if (value.trim().length < 2) {
+          newErrors.state = "State must be at least 2 characters"
         } else if (value.trim().length > 50) {
           newErrors.state = "State must be less than 50 characters"
-        } else if (value.trim() && !/^[a-zA-Z\s.-]+$/.test(value.trim())) {
+        } else if (!/^[a-zA-Z\s.-]+$/.test(value.trim())) {
           newErrors.state = "State can only contain letters, spaces, dots, and hyphens"
         } else {
           delete newErrors.state
@@ -110,11 +114,13 @@ const ServiceRegistration = () => {
         break
 
       case "district":
-        if (value.trim() && value.trim().length < 2) {
-          newErrors.district = "City must be at least 2 characters if provided"
+        if (!value.trim()) {
+          newErrors.district = "City is required"
+        } else if (value.trim().length < 2) {
+          newErrors.district = "City must be at least 2 characters"
         } else if (value.trim().length > 50) {
           newErrors.district = "City must be less than 50 characters"
-        } else if (value.trim() && !/^[a-zA-Z\s.-]+$/.test(value.trim())) {
+        } else if (!/^[a-zA-Z\s.-]+$/.test(value.trim())) {
           newErrors.district = "City can only contain letters, spaces, dots, and hyphens"
         } else {
           delete newErrors.district
@@ -153,20 +159,25 @@ const ServiceRegistration = () => {
       newErrors.businessCategory = "Business category is required"
     }
 
-    // Optional field validations
-    if (formData.shopAddress.trim() && formData.shopAddress.trim().length < 10) {
-      newErrors.shopAddress = "Address must be at least 10 characters if provided"
+    if (!formData.shopAddress.trim()) {
+      newErrors.shopAddress = "Full address is required"
+    } else if (formData.shopAddress.trim().length < 10) {
+      newErrors.shopAddress = "Address must be at least 10 characters"
     }
 
-    if (formData.state.trim() && formData.state.trim().length < 2) {
-      newErrors.state = "State must be at least 2 characters if provided"
-    } else if (formData.state.trim() && !/^[a-zA-Z\s.-]+$/.test(formData.state.trim())) {
+    if (!formData.state.trim()) {
+      newErrors.state = "State is required"
+    } else if (formData.state.trim().length < 2) {
+      newErrors.state = "State must be at least 2 characters"
+    } else if (!/^[a-zA-Z\s.-]+$/.test(formData.state.trim())) {
       newErrors.state = "State can only contain letters, spaces, dots, and hyphens"
     }
 
-    if (formData.district.trim() && formData.district.trim().length < 2) {
-      newErrors.district = "City must be at least 2 characters if provided"
-    } else if (formData.district.trim() && !/^[a-zA-Z\s.-]+$/.test(formData.district.trim())) {
+    if (!formData.district.trim()) {
+      newErrors.district = "City is required"
+    } else if (formData.district.trim().length < 2) {
+      newErrors.district = "City must be at least 2 characters"
+    } else if (!/^[a-zA-Z\s.-]+$/.test(formData.district.trim())) {
       newErrors.district = "City can only contain letters, spaces, dots, and hyphens"
     }
 
@@ -175,7 +186,7 @@ const ServiceRegistration = () => {
   }
 
   const sanitizeInput = (value) => {
-    return value.replace(/[<>]/g, "").trim()
+    return value.replace(/[<>]/g, "")
   }
 
   // Load service info from localStorage when component mounts
@@ -325,7 +336,7 @@ const ServiceRegistration = () => {
           <div className="section">
             <div className="service-input-row">
               <div className="service-input-group">
-                <label>Service Name *</label>
+                <label>Shop Name *</label>
                 <input
                   type="text"
                   name="shopName"
@@ -406,13 +417,14 @@ const ServiceRegistration = () => {
           {/* Full Address */}
           <div className="section">
             <div className="service-input-group">
-              <label>Full Address</label>
+              <label>Full Address *</label>
               <input
                 type="text"
                 name="shopAddress"
                 value={formData.shopAddress}
                 onChange={handleInputChange}
                 placeholder="Enter your Shop Address."
+                required
                 maxLength="200"
                 style={{
                   borderColor: getFieldError("shopAddress") ? "#ef4444" : undefined,
@@ -430,13 +442,14 @@ const ServiceRegistration = () => {
           <div className="section">
             <div className="service-input-row">
               <div className="service-input-group">
-                <label>State</label>
+                <label>State *</label>
                 <input
                   type="text"
                   name="state"
                   value={formData.state}
                   onChange={handleInputChange}
                   placeholder="Enter your State your shop in."
+                  required
                   maxLength="50"
                   style={{
                     borderColor: getFieldError("state") ? "#ef4444" : undefined,
@@ -449,13 +462,14 @@ const ServiceRegistration = () => {
                 )}
               </div>
               <div className="service-input-group">
-                <label>City</label>
+                <label>City *</label>
                 <input
                   type="text"
                   name="district"
                   value={formData.district}
                   onChange={handleInputChange}
                   placeholder="Enter your City your shop in."
+                  required
                   maxLength="50"
                   style={{
                     borderColor: getFieldError("district") ? "#ef4444" : undefined,

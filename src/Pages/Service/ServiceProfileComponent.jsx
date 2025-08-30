@@ -6,7 +6,6 @@ import axios from "axios";
 
 const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
   const [activeTab, setActiveTab] = useState("about");
-  const [showAllImages, setShowAllImages] = useState(false);
   const [shopInfo, setShopInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -213,7 +212,6 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
 
   const shop = shopData || shopInfo || defaultShopData;
 
-
   const handleWhatsapp = () => {
     if (shop.whatsapp) {
       const message = `Hi! I'm interested in your services at ${shop.name}`;
@@ -225,193 +223,205 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
     }
   };
 
-
   const handleEdit = () => {
     console.log("Edit shop profile");
     setIsEditModalOpen(true); // Open modal instead of just logging
   };
 
-// Add this function to refetch shop data
-const refetchShopData = async () => {
-  try {
-    setLoading(true);
-    const response = await fetch(
-      "https://lunarsenterprises.com:6031/leeshop/shop/list/shop",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          sh_id: userData?.id || userData?.sh_id || "16",
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch shop data");
-    }
-
-    const data = await response.json();
-
-    if (data.result && data.list && data.list.length > 0) {
-      const shop = data.list[0];
-      
-      // Same processing logic as in useEffect
-      let products = [];
-      try {
-        const productData = shop.sh_product_and_service;
-        if (Array.isArray(productData)) {
-          products = productData;
-        } else if (typeof productData === "string") {
-          products = JSON.parse(productData);
+  // Add this function to refetch shop data
+  const refetchShopData = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        "https://lunarsenterprises.com:6031/leeshop/shop/list/shop",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            sh_id: userData?.id || userData?.sh_id || "16",
+          }),
         }
-      } catch (e) {
-        products = ["Hair Styling", "Skin Care", "Bridal Makeup", "Spa Services"];
-      }
-
-      const formatPhone = (phone) => {
-        if (!phone) return "";
-        const phoneStr = phone.toString();
-        return phoneStr.startsWith("+91") ? phoneStr : `+91${phoneStr}`;
-      };
-
-      const shopImages =
-        shop.shopimages && shop.shopimages.length > 0
-          ? shop.shopimages.map(
-              (img) => `https://lunarsenterprises.com:6031${img.si_image}`
-            )
-          : ["/api/placeholder/800/400"];
-
-      const previousImages =
-        shop.shopimages && shop.shopimages.length > 0
-          ? shop.shopimages.map((img) => ({
-              id: img.si_id,
-              url: `https://lunarsenterprises.com:6031${img.si_image}`,
-            }))
-          : [{ id: null, url: "/api/placeholder/800/400" }];
-
-      const processedShopData = {
-        shopId: shop.sh_id,
-        name: shop.sh_name || "Shop Name",
-        rating: shop.sh_ratings || 0,
-        reviewCount: 0,
-        location: `${shop.sh_location || ""}, ${shop.sh_city || ""}, ${
-          shop.sh_state || ""
-        }`.replace(/^,\s*|,\s*$/g, ""),
-        availability: shop.sh_opening_hours
-          ? `Open ${shop.sh_opening_hours}`
-          : "Contact for hours",
-        deliveryAvailable: shop.sh_delivery_option === "Available",
-        distance: "1.5 km away",
-        phone: formatPhone(shop.sh_primary_phone),
-        whatsapp: formatPhone(shop.sh_whatsapp_number),
-        description: shop.sh_description || "Professional service provider",
-        products: products,
-        openingHours: shop.sh_opening_hours
-          ? `${shop.sh_opening_hours}`
-          : "Contact for hours",
-        category: shop.sh_category_name || "Service",
-        owner: shop.sh_owner_name || "Owner",
-        email: shop.sh_email || "",
-        address: shop.sh_address || "",
-        workingDays: shop.sh_working_days || "",
-        images: shopImages,
-        previousImages: previousImages,
-      };
-
-      setShopInfo(processedShopData);
-    }
-  } catch (err) {
-    console.error("Error refetching shop data:", err);
-  } finally {
-    setLoading(false);
-  }
-};
-
-const handleSaveShopData = async (updatedData, formDataToSend) => {
-  console.log("Saving shop data:", formDataToSend);
-
-  try {
-    // Make API call with the FormData
-    const response = await axios.post(
-      "https://lunarsenterprises.com:6031/leeshop/shop/edit/shop",
-      formDataToSend,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    console.log("API Response:", response.data);
-
-    // Option 1: Update local state with comprehensive data merge
-    setShopInfo((prev) => ({
-      ...prev,
-      name: updatedData.shopName || updatedData.name || prev.name,
-      sh_name: updatedData.shopName || updatedData.name || prev.sh_name,
-      owner: updatedData.ownerName || updatedData.owner || prev.owner,
-      sh_owner_name: updatedData.ownerName || updatedData.owner || prev.sh_owner_name,
-      sh_category_name: updatedData.businessType || updatedData.category || prev.sh_category_name,
-      category: updatedData.selectedCategory || updatedData.category || prev.category,
-      address: updatedData.address || prev.address,
-      phone: updatedData.phone || prev.phone,
-      whatsapp: updatedData.whatsapp || prev.whatsapp,
-      email: updatedData.email || prev.email,
-      description: updatedData.description || prev.description,
-      sh_description: updatedData.description || prev.sh_description,
-      deliveryAvailable: updatedData.deliveryAvailable ?? prev.deliveryAvailable,
-      sh_delivery_option: updatedData.deliveryAvailable ? "Available" : prev.sh_delivery_option,
-      workingDays: updatedData.workingDays || prev.workingDays,
-      sh_working_days: updatedData.workingDays || prev.sh_working_days,
-      openingHours: updatedData.openingHours || prev.openingHours,
-      sh_opening_hours: updatedData.openingHours || prev.sh_opening_hours,
-      images: updatedData.images || prev.images,
-      products: updatedData.products || prev.products,
-    }));
-
-    // Close the modal
-    setIsEditModalOpen(false);
-
-    // Option 2: Refetch data from server to ensure consistency
-    await refetchShopData();
-
-    // Close the modal
-    setIsEditModalOpen(false);
-
-    // Show success message
-    alert("Shop details updated successfully!");
-
-    return response.data;
-  } catch (error) {
-    console.error("Error updating shop:", error);
-
-    // Handle different types of errors
-    let errorMessage = "Failed to update shop details. Please try again.";
-
-    if (error.response) {
-      // Server responded with error status
-      errorMessage = error.response.data?.message || errorMessage;
-      console.error(
-        "Server error:",
-        error.response.status,
-        error.response.data
       );
-    } else if (error.request) {
-      // Request was made but no response received
-      errorMessage = "Network error. Please check your connection.";
-      console.error("Network error:", error.request);
-    } else {
-      // Something else happened
-      console.error("Error:", error.message);
-    }
 
-    // Show error message
-    alert(errorMessage);
-    throw error; // Re-throw to let the modal handle loading states
-  }
-};
+      if (!response.ok) {
+        throw new Error("Failed to fetch shop data");
+      }
+
+      const data = await response.json();
+
+      if (data.result && data.list && data.list.length > 0) {
+        const shop = data.list[0];
+
+        // Same processing logic as in useEffect
+        let products = [];
+        try {
+          const productData = shop.sh_product_and_service;
+          if (Array.isArray(productData)) {
+            products = productData;
+          } else if (typeof productData === "string") {
+            products = JSON.parse(productData);
+          }
+        } catch (e) {
+          products = [
+            "Hair Styling",
+            "Skin Care",
+            "Bridal Makeup",
+            "Spa Services",
+          ];
+        }
+
+        const formatPhone = (phone) => {
+          if (!phone) return "";
+          const phoneStr = phone.toString();
+          return phoneStr.startsWith("+91") ? phoneStr : `+91${phoneStr}`;
+        };
+
+        const shopImages =
+          shop.shopimages && shop.shopimages.length > 0
+            ? shop.shopimages.map(
+                (img) => `https://lunarsenterprises.com:6031${img.si_image}`
+              )
+            : ["/api/placeholder/800/400"];
+
+        const previousImages =
+          shop.shopimages && shop.shopimages.length > 0
+            ? shop.shopimages.map((img) => ({
+                id: img.si_id,
+                url: `https://lunarsenterprises.com:6031${img.si_image}`,
+              }))
+            : [{ id: null, url: "/api/placeholder/800/400" }];
+
+        const processedShopData = {
+          shopId: shop.sh_id,
+          name: shop.sh_name || "Shop Name",
+          rating: shop.sh_ratings || 0,
+          reviewCount: 0,
+          location: `${shop.sh_location || ""}, ${shop.sh_city || ""}, ${
+            shop.sh_state || ""
+          }`.replace(/^,\s*|,\s*$/g, ""),
+          availability: shop.sh_opening_hours
+            ? `Open ${shop.sh_opening_hours}`
+            : "Contact for hours",
+          deliveryAvailable: shop.sh_delivery_option === "Available",
+          distance: "1.5 km away",
+          phone: formatPhone(shop.sh_primary_phone),
+          whatsapp: formatPhone(shop.sh_whatsapp_number),
+          description: shop.sh_description || "Professional service provider",
+          products: products,
+          openingHours: shop.sh_opening_hours
+            ? `${shop.sh_opening_hours}`
+            : "Contact for hours",
+          category: shop.sh_category_name || "Service",
+          owner: shop.sh_owner_name || "Owner",
+          email: shop.sh_email || "",
+          address: shop.sh_address || "",
+          workingDays: shop.sh_working_days || "",
+          images: shopImages,
+          previousImages: previousImages,
+        };
+
+        setShopInfo(processedShopData);
+      }
+    } catch (err) {
+      console.error("Error refetching shop data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveShopData = async (updatedData, formDataToSend) => {
+    console.log("Saving shop data:", formDataToSend);
+
+    try {
+      // Make API call with the FormData
+      const response = await axios.post(
+        "https://lunarsenterprises.com:6031/leeshop/shop/edit/shop",
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("API Response:", response.data);
+
+      // Option 1: Update local state with comprehensive data merge
+      setShopInfo((prev) => ({
+        ...prev,
+        name: updatedData.shopName || updatedData.name || prev.name,
+        sh_name: updatedData.shopName || updatedData.name || prev.sh_name,
+        owner: updatedData.ownerName || updatedData.owner || prev.owner,
+        sh_owner_name:
+          updatedData.ownerName || updatedData.owner || prev.sh_owner_name,
+        sh_category_name:
+          updatedData.businessType ||
+          updatedData.category ||
+          prev.sh_category_name,
+        category:
+          updatedData.selectedCategory || updatedData.category || prev.category,
+        address: updatedData.address || prev.address,
+        phone: updatedData.phone || prev.phone,
+        whatsapp: updatedData.whatsapp || prev.whatsapp,
+        email: updatedData.email || prev.email,
+        description: updatedData.description || prev.description,
+        sh_description: updatedData.description || prev.sh_description,
+        deliveryAvailable:
+          updatedData.deliveryAvailable ?? prev.deliveryAvailable,
+        sh_delivery_option: updatedData.deliveryAvailable
+          ? "Available"
+          : prev.sh_delivery_option,
+        workingDays: updatedData.workingDays || prev.workingDays,
+        sh_working_days: updatedData.workingDays || prev.sh_working_days,
+        openingHours: updatedData.openingHours || prev.openingHours,
+        sh_opening_hours: updatedData.openingHours || prev.sh_opening_hours,
+        images: updatedData.images || prev.images,
+        products: updatedData.products || prev.products,
+      }));
+
+      // Close the modal
+      setIsEditModalOpen(false);
+
+      // Option 2: Refetch data from server to ensure consistency
+      await refetchShopData();
+
+      // Close the modal
+      setIsEditModalOpen(false);
+
+      // Show success message
+      alert("Shop details updated successfully!");
+
+      return response.data;
+    } catch (error) {
+      console.error("Error updating shop:", error);
+
+      // Handle different types of errors
+      let errorMessage = "Failed to update shop details. Please try again.";
+
+      if (error.response) {
+        // Server responded with error status
+        errorMessage = error.response.data?.message || errorMessage;
+        console.error(
+          "Server error:",
+          error.response.status,
+          error.response.data
+        );
+      } else if (error.request) {
+        // Request was made but no response received
+        errorMessage = "Network error. Please check your connection.";
+        console.error("Network error:", error.request);
+      } else {
+        // Something else happened
+        console.error("Error:", error.message);
+      }
+
+      // Show error message
+      alert(errorMessage);
+      throw error; // Re-throw to let the modal handle loading states
+    }
+  };
 
   if (loading) {
     return (
@@ -462,7 +472,6 @@ const handleSaveShopData = async (updatedData, formDataToSend) => {
                   </div>
                 )}
               </div>
-
               {/* Row 2: Rating + Delivery */}
               <div className="shop-meta-row">
                 <div className="rating-section">
@@ -614,7 +623,14 @@ const handleSaveShopData = async (updatedData, formDataToSend) => {
 
           {/* Tabs Section */}
           <div className="tabs-container" style={{ marginTop: "0px" }}>
-            <div style={{ display: "flex", gap: "20px", maxWidth: "400px" }}>
+            <div
+              style={{
+                display: "flex",
+                gap: "20px",
+                maxWidth: "400px",
+                marginLeft: "20px",
+              }}
+            >
               <button
                 className={`tab-btn ${activeTab === "about" ? "active" : ""}`}
                 onClick={() => setActiveTab("about")}

@@ -1,39 +1,172 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./ShopDetailCard.css";
 import { FaStar, FaWhatsapp } from "react-icons/fa";
 import { FiMapPin } from "react-icons/fi";
 
-const ShopDetailCard = ({ shop, shopsList = [], servicesNearby = [] }) => {
+const ShopDetailCard = ({ shop, shopsList = [], servicesNearby = [], userId }) => {
   const [activeTab, setActiveTab] = useState("about");
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
 
   // Reviews state
-  const [reviews, setReviews] = useState([
-    {
-      id: 1,
-      name: "Julia Kim",
-      date: "Jan 11",
-      rating: 5,
-      text: "Absolutely delicious and beautifully made!",
-      description:
-        "I ordered a custom chocolate truffle cake from CakeZone for my sister's birthday — it was rich, moist, perfectly decorated, and delivered on time!",
-    },
-    {
-      id: 2,
-      name: "Julia Kim",
-      date: "Jan 11",
-      rating: 5,
-      text: "Absolutely delicious and beautifully made!",
-      description:
-        "I ordered a custom chocolate truffle cake from CakeZone for my sister's birthday — it was rich, moist, perfectly decorated, and delivered on time!",
-    },
-  ]);
+  const [reviews, setReviews] = useState([]);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(false);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   const [newReview, setNewReview] = useState({
     rating: 0,
     text: "",
   });
+
+  // Fetch reviews when component mounts or shop changes
+  useEffect(() => {
+    if (shop?.sh_id) {
+      fetchReviews();
+    }
+  }, [shop?.sh_id]);
+
+  // Function to fetch reviews from API
+  const fetchReviews = async () => {
+    if (!shop?.sh_id) return;
+    
+    setIsLoadingReviews(true);
+    try {
+      const response = await fetch('https://lunarsenterprises.com:6031/leeshop/shop/list/review', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          shop_id: shop.sh_id
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.result) {
+        // Transform API response to match your UI structure
+        const formattedReviews = data.list?.map(review => ({
+          id: review.r_id,
+          name: review.user_name || review.name || "Anonymous User",
+          date: review.created_at ? new Date(review.created_at).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          }) : "Recent",
+          rating: review.r_rating,
+          text: generateHeadingFromRating(review.r_rating),
+          description: review.r_comment || review.text || ""
+        })) || [];
+        
+        setReviews(formattedReviews);
+      } else {
+        console.error('Failed to fetch reviews:', data.message);
+        setReviews([]);
+      }
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+      setReviews([]);
+    } finally {
+      setIsLoadingReviews(false);
+    }
+  };
+
+  // Generate dynamic heading based on rating
+  const generateHeadingFromRating = (rating) => {
+    const headings = {
+      5: "Absolutely amazing experience!",
+      4: "Really good service!",
+      3: "Good overall experience",
+      2: "Could be better",
+      1: "Needs improvement"
+    };
+    return headings[rating] || "Customer feedback";
+  };
+
+  // Generate dynamic heading from review text
+  const generateHeadingFromText = (text, rating) => {
+    if (!text || text.trim().length === 0) {
+      return generateHeadingFromRating(rating);
+    }
+
+    // Take first few words as heading, max 6 words
+    const words = text.trim().split(' ');
+    if (words.length <= 6) {
+      return text;
+    }
+    return words.slice(0, 6).join(' ') + '...';
+  };
+
+  // Handle review submission
+  const handleSubmitReview = async () => {
+    if (newReview.rating === 0 || newReview.text.trim() === "") {
+      alert("Please provide a rating and write a review");
+      return;
+    }
+
+    if (!userId) {
+      alert("Please log in to submit a review");
+      return;
+    }
+
+    if (!shop?.sh_id) {
+      alert("Shop information not available");
+      return;
+    }
+
+    setIsSubmittingReview(true);
+
+    try {
+      const dynamicHeading = generateHeadingFromText(newReview.text, newReview.rating);
+      
+      const response = await fetch('https://lunarsenterprises.com:6031/leeshop/shop/add/review', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          shop_id: shop.sh_id,
+          comment: newReview.text,
+          heading: dynamicHeading,
+          rating: newReview.rating
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Add the new review to the local state immediately for better UX
+        const newReviewData = {
+          id: Date.now(), // Temporary ID
+          name: "You",
+          date: new Date().toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          }),
+          rating: newReview.rating,
+          text: dynamicHeading,
+          description: newReview.text,
+        };
+
+        setReviews([newReviewData, ...reviews]);
+        setNewReview({ rating: 0, text: "" });
+        
+        // Optionally refresh reviews from server
+        setTimeout(() => {
+          fetchReviews();
+        }, 1000);
+        
+        alert("Review submitted successfully!");
+      } else {
+        alert(data.message || "Failed to submit review. Please try again.");
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert("Network error. Please check your connection and try again.");
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
 
   if (!shop || shop.error) {
     return (
@@ -126,29 +259,6 @@ const ShopDetailCard = ({ shop, shopsList = [], servicesNearby = [] }) => {
   const openingHours =
     shop.sh_opening_hours || shop.opening_hours || "7:00 AM - 9:00 PM";
   const isOpen = shop.sh_status === "active" || shop.isOpen;
-
-  // Handle review submission
-  const handleSubmitReview = () => {
-    if (newReview.rating === 0 || newReview.text.trim() === "") {
-      alert("Please provide a rating and write a review");
-      return;
-    }
-
-    const review = {
-      id: reviews.length + 1,
-      name: "You", // In real app, get from user context
-      date: new Date().toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      }),
-      rating: newReview.rating,
-      text: newReview.text,
-      description: newReview.text,
-    };
-
-    setReviews([review, ...reviews]);
-    setNewReview({ rating: 0, text: "" });
-  };
 
   // Handle star rating click
   const handleStarClick = (rating) => {
@@ -509,7 +619,10 @@ const ShopDetailCard = ({ shop, shopsList = [], servicesNearby = [] }) => {
 
           {/* Tabs Section */}
           <div className="tabs-container">
-            <div className="tabs-header">
+            <div
+              className="tabs-header"
+              style={{ maxWidth: "400px", marginLeft: "20px" }}
+            >
               <button
                 className={`tab-btn ${activeTab === "about" ? "active" : ""}`}
                 onClick={() => setActiveTab("about")}
@@ -520,7 +633,7 @@ const ShopDetailCard = ({ shop, shopsList = [], servicesNearby = [] }) => {
                 className={`tab-btn ${activeTab === "reviews" ? "active" : ""}`}
                 onClick={() => setActiveTab("reviews")}
               >
-                Reviews
+                Reviews ({reviews.length})
               </button>
             </div>
 
@@ -563,6 +676,7 @@ const ShopDetailCard = ({ shop, shopsList = [], servicesNearby = [] }) => {
                               star <= newReview.rating ? "active" : ""
                             }`}
                             onClick={() => handleStarClick(star)}
+                            disabled={isSubmittingReview}
                           >
                             <svg
                               width="25"
@@ -598,68 +712,86 @@ const ShopDetailCard = ({ shop, shopsList = [], servicesNearby = [] }) => {
                         setNewReview({ ...newReview, text: e.target.value })
                       }
                       rows={4}
+                      disabled={isSubmittingReview}
                     />
 
                     <button
                       className="post-review-btn"
                       onClick={handleSubmitReview}
+                      disabled={isSubmittingReview || !userId}
                     >
-                      Post Review
+                      {isSubmittingReview ? "Posting..." : "Post Review"}
                     </button>
+                    
+                    {!userId && (
+                      <p className="login-notice" style={{ color: '#666', fontSize: '14px', marginTop: '10px' }}>
+                        Please log in to post a review
+                      </p>
+                    )}
                   </div>
 
                   {/* Customer Reviews Section */}
                   <div className="customer-reviews-section">
-                    <h3 className="customer-reviews-title">Customer Reviews</h3>
+                    <h3 className="customer-reviews-title">
+                      Customer Reviews {isLoadingReviews && "(Loading...)"}
+                    </h3>
 
-                    <div className="reviews-grid">
-                      {reviews.map((review) => (
-                        <div key={review.id} className="review-card">
-                          <div className="review-header">
-                            <div className="reviewer-info">
-                              <div className="reviewer-avatar">
-                                <img
-                                  src="/icons-user-default.png"
-                                  alt={review.name}
-                                />
+                    {isLoadingReviews ? (
+                      <div className="loading-reviews">Loading reviews...</div>
+                    ) : reviews.length === 0 ? (
+                      <div className="no-reviews">
+                        <p>No reviews yet. Be the first to review this shop!</p>
+                      </div>
+                    ) : (
+                      <div className="reviews-grid">
+                        {reviews.map((review) => (
+                          <div key={review.id} className="review-card">
+                            <div className="review-header">
+                              <div className="reviewer-info">
+                                <div className="reviewer-avatar">
+                                  <img
+                                    src="/icons-user-default.png"
+                                    alt={review.name}
+                                  />
+                                </div>
+                                <h4 className="reviewer-name2">{review.name}</h4>
                               </div>
-                              <h4 className="reviewer-name2">{review.name}</h4>
+
+                              <span className="review-date">{review.date}</span>
                             </div>
 
-                            <span className="review-date">{review.date}</span>
-                          </div>
+                            <div className="review-rating">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <svg
+                                  key={star}
+                                  width="25"
+                                  height="25"
+                                  viewBox="0 0 25 25"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M8.26839 7.52838L10.3472 3.39785C10.4077 3.27831 10.5007 3.17777 10.6159 3.1075C10.7311 3.03722 10.8639 3 10.9993 3C11.1347 3 11.2675 3.03722 11.3826 3.1075C11.4978 3.17777 11.5909 3.27831 11.6514 3.39785L13.7302 7.52838L18.3774 8.1947C18.5114 8.21304 18.6376 8.26819 18.7414 8.35387C18.8452 8.43954 18.9225 8.55228 18.9644 8.67922C19.0064 8.80616 19.0113 8.94218 18.9787 9.07177C18.9461 9.20135 18.8772 9.31927 18.7799 9.41207L15.4177 12.6252L16.2114 17.1647C16.313 17.7473 15.6889 18.191 15.1552 17.9163L10.9993 15.7721L6.84253 17.9163C6.30964 18.1918 5.68553 17.7473 5.78715 17.1639L6.58089 12.6244L3.21869 9.41128C3.12186 9.31842 3.05337 9.20061 3.02102 9.07126C2.98867 8.94191 2.99374 8.8062 3.03567 8.67955C3.07759 8.5529 3.15469 8.4404 3.25819 8.35483C3.36169 8.26926 3.48744 8.21405 3.62116 8.19549L8.26839 7.52838Z"
+                                    fill={
+                                      star <= review.rating
+                                        ? "#E8C930"
+                                        : "#000000"
+                                    }
+                                  />
+                                </svg>
+                              ))}
+                            </div>
 
-                          <div className="review-rating">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <svg
-                                key={star}
-                                width="25"
-                                height="25"
-                                viewBox="0 0 25 25"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M8.26839 7.52838L10.3472 3.39785C10.4077 3.27831 10.5007 3.17777 10.6159 3.1075C10.7311 3.03722 10.8639 3 10.9993 3C11.1347 3 11.2675 3.03722 11.3826 3.1075C11.4978 3.17777 11.5909 3.27831 11.6514 3.39785L13.7302 7.52838L18.3774 8.1947C18.5114 8.21304 18.6376 8.26819 18.7414 8.35387C18.8452 8.43954 18.9225 8.55228 18.9644 8.67922C19.0064 8.80616 19.0113 8.94218 18.9787 9.07177C18.9461 9.20135 18.8772 9.31927 18.7799 9.41207L15.4177 12.6252L16.2114 17.1647C16.313 17.7473 15.6889 18.191 15.1552 17.9163L10.9993 15.7721L6.84253 17.9163C6.30964 18.1918 5.68553 17.7473 5.78715 17.1639L6.58089 12.6244L3.21869 9.41128C3.12186 9.31842 3.05337 9.20061 3.02102 9.07126C2.98867 8.94191 2.99374 8.8062 3.03567 8.67955C3.07759 8.5529 3.15469 8.4404 3.25819 8.35483C3.36169 8.26926 3.48744 8.21405 3.62116 8.19549L8.26839 7.52838Z"
-                                  fill={
-                                    star <= review.rating
-                                      ? "#E8C930"
-                                      : "#000000"
-                                  } // gold if filled, gray if not
-                                />
-                              </svg>
-                            ))}
+                            <div className="review-content">
+                              <h5 className="review-title">{review.text}</h5>
+                              <p className="review-description">
+                                {review.description}
+                              </p>
+                            </div>
                           </div>
-
-                          <div className="review-content">
-                            <h5 className="review-title">{review.text}</h5>
-                            <p className="review-description">
-                              {review.description}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

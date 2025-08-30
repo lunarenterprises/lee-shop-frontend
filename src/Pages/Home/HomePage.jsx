@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./HomePage.css";
 import LoginModal from "./LoginModal";
 import ConfirmIdentityModal from "./ConfirmIdentityModal";
@@ -114,6 +114,7 @@ const HomePage = () => {
   const [showResetModal, setShowResetModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [userData, setUserData] = useState(null);
 
   const closeAllModals = () => {
     setShowLoginModal(false);
@@ -128,6 +129,18 @@ const HomePage = () => {
     setShowIdentityModal(true);
   };
   const [userEmail, setUserEmail] = useState("");
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("userData");
+      if (raw && raw !== "undefined" && raw !== "null") {
+        const parsed = JSON.parse(raw);
+        if (parsed?.id) setUserData(parsed);
+      }
+    } catch {
+      localStorage.removeItem("userData");
+    }
+  }, []);
 
   // ✅ Called from ConfirmIdentityModal on success
   const handleConfirmEmail = (email) => {
@@ -209,7 +222,11 @@ const HomePage = () => {
             </div>
           ) : (
             // <<< Pass the full list for the sidebar, main shop as prop
-            <ShopDetailCard shop={searchedShop} shopsList={searchedShopList} />
+            <ShopDetailCard
+              shop={searchedShop}
+              shopsList={searchedShopList}
+              userId={userData?.id}
+            />
           )}
         </div>
       ) : (

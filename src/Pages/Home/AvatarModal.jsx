@@ -56,7 +56,7 @@ const AvatarModal = ({
         });
 
         const data = await response.json();
-
+        console.log({data})
         if (data.result) {
           let profileInfo = {};
 
@@ -64,13 +64,15 @@ const AvatarModal = ({
           switch (userData.role.toLowerCase()) {
             case "user":
               const userList = data.list || [];
-
+              const userImage = userList[0].u_profile_pic
+                  ? `https://lunarsenterprises.com:6031/${userList[0].u_profile_pic}`
+                  : "/shop.png";
               if (userList.length > 0) {
                 const user = userList[0];
                 profileInfo = {
                   id: user.u_id,
                   name: user.u_name || user.name || "User",
-                  image: user.u_profile_pic || user.profile_image || null,
+                  image: userImage,
                   email: user.u_email || user.email,
                   phone: user.u_phone || user.phone,
                   role: "User",
@@ -93,16 +95,16 @@ const AvatarModal = ({
               break;
             case "shop":
               const shopList = data.list || [];
-              
+
               if (shopList.length > 0) {
                 const shop = shopList[0];
+                const shopImage = shop.shopimages?.[0]?.si_image
+                  ? `https://lunarsenterprises.com:6031/${shop.shopimages[0].si_image}`
+                  : "/shop.png";
                 profileInfo = {
                   id: shop.sh_id,
                   name: shop.sh_name || shop.name || "Shop",
-                  image:
-                    shop.shopimages && shop.shopimages.length > 0
-                      ? shop.shopimages[0].si_image
-                      : shop.shop_image || null,
+                  image: shopImage,
                   email: shop.sh_email || shop.email,
                   phone: shop.sh_phone || shop.phone,
                   role: "Shop Owner",
