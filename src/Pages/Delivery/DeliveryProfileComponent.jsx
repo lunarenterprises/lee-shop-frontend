@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Add this import
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./DeliveryProfileComponent.css";
 
 const DeliveryProfile = () => {
+  // Add navigate hook
+  const navigate = useNavigate();
+
   /* ───────────── state ───────────── */
   const [profileData, setProfileData] = useState({
     name: "",
@@ -29,6 +33,8 @@ const DeliveryProfile = () => {
   // Validation states
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+
+  // ... rest of your existing code remains the same until the render section ...
 
   const getUserData = () => {
     try {
@@ -261,11 +267,12 @@ const DeliveryProfile = () => {
           vehicleType: d.u_vehicle_type?.trim() || "",
           workType: d.u_work_type?.trim() || "",
           location: d.u_location || d.u_district || "",
-          availability: d.u_delivery_status === "available"
-            ? "Available"
-            : d.u_delivery_status === "busy"
-            ? "Busy"
-            : "Not Available",
+          availability:
+            d.u_delivery_status === "available"
+              ? "Available"
+              : d.u_delivery_status === "busy"
+              ? "Busy"
+              : "Not Available",
         });
 
         if (d.u_profile_pic)
@@ -395,13 +402,14 @@ const DeliveryProfile = () => {
       );
       fd.append("u_vehicle_type", profileData.vehicleType.trim());
       fd.append("u_work_type", profileData.workType.trim());
-      
+
       // Convert UI availability to database format
-      const availabilityForDB = profileData.availability === "Available" 
-        ? "available" 
-        : profileData.availability === "Busy" 
-        ? "busy" 
-        : "not_available";
+      const availabilityForDB =
+        profileData.availability === "Available"
+          ? "available"
+          : profileData.availability === "Busy"
+          ? "busy"
+          : "not_available";
 
       fd.append("u_delivery_status", availabilityForDB);
 
@@ -416,7 +424,6 @@ const DeliveryProfile = () => {
         }
       );
       const json = await res.json();
-      console.log("Result", json);
       if (!json.result) throw new Error(json.message || "Update failed");
 
       toast.success("Profile updated!", { position: "bottom-center" });
@@ -477,6 +484,11 @@ const DeliveryProfile = () => {
     ratingBreakdown: { 5: 50, 4: 39, 3: 20, 2: 4, 1: 1 },
   };
 
+  // Handler for back button - UPDATED
+  const handleGoBack = () => {
+    navigate("/DeliveryProfile");
+  };
+
   /* ───────────── loading / error ───────────── */
   if (loading)
     return (
@@ -497,12 +509,12 @@ const DeliveryProfile = () => {
     <>
       <ToastContainer />
       <div className="delivery-profile-container">
-        {/* Header */}
+        {/* Header - UPDATED back button */}
         <header className="profile-header">
           <button
             className="back-btn"
-            onClick={() => window.history.back()}
-            aria-label="Go back"
+            onClick={handleGoBack} // Changed from window.history.back()
+            aria-label="Go back to DeliveryProfile"
           >
             <svg
               width="56"
@@ -518,11 +530,22 @@ const DeliveryProfile = () => {
             </svg>
           </button>
           <div className="availability-status">
-            <div className={`status-indicator ${availCls(profileData.availability)}`}>
-              <span className={`status-dot ${availCls(profileData.availability)}`} />
+            <div
+              className={`status-indicator ${availCls(
+                profileData.availability
+              )}`}
+            >
+              <span
+                className={`status-dot ${availCls(profileData.availability)}`}
+              />
               <select
                 value={profileData.availability}
-                onChange={(e) => setProfileData(prev => ({...prev, availability: e.target.value}))}
+                onChange={(e) =>
+                  setProfileData((prev) => ({
+                    ...prev,
+                    availability: e.target.value,
+                  }))
+                }
                 className="status-select"
                 aria-label="Change availability status"
               >

@@ -66,7 +66,7 @@ const HomePage = () => {
     setSearching(false);
   };
 
-  // NEW: Handle shop card click from ShopCard component
+  // Handle shop card click from ShopCard component
   const handleShopCardClick = async (shopId) => {
     setSearching(true);
     try {
@@ -104,13 +104,66 @@ const HomePage = () => {
     setSearching(false);
   };
 
-  //----------------------------
+  // NEW: Handle similar shop click from ShopDetailCard
+  const handleSimilarShopClick = async (shopId) => {
+    setSearching(true);
+    try {
+      // Check if the shop is already in our current list
+      const existingShop = searchedShopList.find(
+        (shop) => shop.sh_id === shopId
+      );
 
+      if (existingShop) {
+        // Shop is already in the list, just switch to it
+        setSearchedShop(existingShop);
+        setSearching(false);
+        return;
+      }
+
+      // Fetch fresh data to ensure we have the latest shop info
+      const response = await fetch(`${API_BASE_URL}/shop/list/shop`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}), // Empty search to get all shops
+      });
+      const resData = await response.json();
+
+      if (
+        resData.result &&
+        Array.isArray(resData.list) &&
+        resData.list.length
+      ) {
+        const selectedShop = resData.list.find((shop) => shop.sh_id === shopId);
+
+        if (selectedShop) {
+          setSearchedShop(selectedShop);
+          setSearchedShopList(resData.list);
+        } else {
+          setSearchedShop({ error: "Shop not found." });
+        }
+      } else {
+        setSearchedShop({ error: "No shops available." });
+        setSearchedShopList([]);
+      }
+    } catch (e) {
+      console.error("Error fetching similar shop:", e);
+      setSearchedShop({ error: "Failed to fetch shop details. Try again." });
+    }
+    setSearching(false);
+  };
+
+  // NEW: Handle similar service click from ShopDetailCard
+  const handleSimilarServiceClick = async (shopId) => {
+    console.log({ shopId }, "service");
+    handleSimilarShopClick(shopId);
+  };
+
+  //----------------------------
+  // Modal States
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showIdentityModal, setShowIdentityModal] = useState(false);
   const [showEmailVerificationModal, setShowEmailVerificationModal] =
     useState(false);
-
   const [showResetModal, setShowResetModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
@@ -119,15 +172,16 @@ const HomePage = () => {
   const closeAllModals = () => {
     setShowLoginModal(false);
     setShowIdentityModal(false);
-    setShowEmailVerificationModal(false); // <-- Add this
-    setShowResetModal(false); // <-- Add this
-    setShowSuccessModal(false); // <-- Add this
+    setShowEmailVerificationModal(false);
+    setShowResetModal(false);
+    setShowSuccessModal(false);
   };
 
   const handleForgotPassword = () => {
     setShowLoginModal(false);
     setShowIdentityModal(true);
   };
+
   const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
@@ -142,7 +196,7 @@ const HomePage = () => {
     }
   }, []);
 
-  // ✅ Called from ConfirmIdentityModal on success
+  // Called from ConfirmIdentityModal on success
   const handleConfirmEmail = (email) => {
     setUserEmail(email); // Store email for next modal
     setShowIdentityModal(false); // Hide this modal
@@ -191,9 +245,10 @@ const HomePage = () => {
           onVerify={handleVerify}
         />
       )}
+
       {showResetModal && (
         <ResetPasswordModal
-          email={userEmail} // dynamically passed
+          email={userEmail}
           onClose={() => setShowResetModal(false)}
           onSuccess={() => {
             setShowResetModal(false);
@@ -207,6 +262,7 @@ const HomePage = () => {
       )}
 
       <Header />
+
       <div className="homepage-hero">
         <LocationSearchBar onSearch={handleShopSearch} />
       </div>
@@ -221,11 +277,16 @@ const HomePage = () => {
               {searchedShop.error}
             </div>
           ) : (
-            // <<< Pass the full list for the sidebar, main shop as prop
             <ShopDetailCard
               shop={searchedShop}
               shopsList={searchedShopList}
               userId={userData?.id}
+              onSimilarShopClick={handleSimilarShopClick}
+              onSimilarServiceClick={handleSimilarServiceClick}
+              onBackToHome={() => {
+                setSearchedShop(null);
+                setSearchedShopList([]);
+              }}
             />
           )}
         </div>
