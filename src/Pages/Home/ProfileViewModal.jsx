@@ -5,6 +5,7 @@ const ProfileViewModal = ({ isOpen, onClose, userData }) => {
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({});
 
   // All hooks first
   useEffect(() => {
@@ -12,6 +13,7 @@ const ProfileViewModal = ({ isOpen, onClose, userData }) => {
 
     const fetchProfileData = async () => {
       setLoading(true);
+      setValidationErrors({}); // Clear validation errors when loading new data
       try {
         let endpoint = "";
         let payload = {};
@@ -58,28 +60,36 @@ const ProfileViewModal = ({ isOpen, onClose, userData }) => {
               const userList = data.list || [];
               if (userList.length > 0) {
                 const user = userList[0];
+                const userImage = user.u_profile_pic
+                  ? `https://lunarsenterprises.com:6031/${user.u_profile_pic}`
+                  : "/shop.png";
                 profileInfo = {
                   id: user.u_id,
                   name: user.u_name || user.name || "",
-                  image: user.u_profile_pic || user.profile_image || null,
+                  image: userImage,
                   email: user.u_email || user.email || "",
                   phone: user.u_phone || user.phone || "",
                   location: user.u_address || user.address || "",
+                  state: user.state || "",
                   role: "User",
                 };
               }
               break;
             case "deliverystaff":
               const staffList = data.list || [];
+              const staffImage = staffList[0].u_profile_pic
+                ? `https://lunarsenterprises.com:6031/${staffList[0].u_profile_pic}`
+                : "/shop.png";
               if (staffList.length > 0) {
                 const staff = staffList[0];
                 profileInfo = {
                   id: staff.u_id,
                   name: staff.name || staff.u_name || "",
-                  image: staff.profile_pic || staff.profile_image || null,
-                  email: staff.email || "",
+                  image: staffImage,
+                  email: staff.u_email || "",
                   phone: staff.phone || "",
                   location: staff.address || staff.location || "",
+                  state: staff.state || "",
                   role: "Delivery Staff",
                 };
               }
@@ -96,8 +106,11 @@ const ProfileViewModal = ({ isOpen, onClose, userData }) => {
                   name: shop.sh_name || shop.name || "",
                   image: shopImage,
                   email: shop.sh_email || shop.email || "",
-                  phone: shop.sh_phone || shop.phone || "",
+                  phone:
+                    shop.sh_primary_phone || shop.sh_phone || shop.phone || "",
                   location: shop.sh_address || shop.address || "",
+                  city: shop.sh_city || "",
+                  state: shop.sh_state || shop.state || "",
                   role: "Shop Owner",
                 };
               }
@@ -131,9 +144,20 @@ const ProfileViewModal = ({ isOpen, onClose, userData }) => {
         userData?.profile_picture ||
         null,
       email: userData?.email || userData?.u_email || userData?.sh_email || "",
-      phone: userData?.phone || userData?.u_phone || userData?.sh_phone || "",
+      phone:
+        userData?.phone ||
+        userData?.u_phone ||
+        userData?.sh_phone ||
+        userData?.sh_primary_phone ||
+        "",
       location:
-        userData?.location || userData?.u_address || userData?.sh_address || "",
+        userData?.state ||
+        userData?.u_address ||
+        userData?.sh_address ||
+        userData?.sh_city ||
+        "",
+      city: userData?.sh_city || userData?.city || "",
+      state: userData?.state || userData?.sh_state || "",
       role: getRoleDisplay(userData?.role || "user"),
     };
   };
@@ -148,6 +172,96 @@ const ProfileViewModal = ({ isOpen, onClose, userData }) => {
       shopowner: "Shop Owner",
     };
     return roleMap[role.toLowerCase()] || role;
+  };
+
+  // Validation functions
+  const validateName = (name) => {
+    if (!name || name.trim() === "") {
+      return "Name is required";
+    }
+    if (name.trim().length < 2) {
+      return "Name must be at least 2 characters long";
+    }
+    if (name.trim().length > 50) {
+      return "Name must be less than 50 characters";
+    }
+    if (!/^[a-zA-Z\s]+$/.test(name.trim())) {
+      return "Name can only contain letters and spaces";
+    }
+    return null;
+  };
+
+  const validateEmail = (email) => {
+    if (!email || email.trim() === "") {
+      return "Email is required";
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      return "Please enter a valid email address";
+    }
+    if (email.length > 100) {
+      return "Email must be less than 100 characters";
+    }
+    return null;
+  };
+
+  const validateLocation = (location) => {
+    if (!location || location.trim() === "") {
+      return "Location is required";
+    }
+    if (location.trim().length < 2) {
+      return "Location must be at least 2 characters long";
+    }
+    if (location.trim().length > 100) {
+      return "Location must be less than 100 characters";
+    }
+    return null;
+  };
+
+  const validateImage = (file) => {
+    if (!file) return null;
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+    ];
+    if (!allowedTypes.includes(file.type)) {
+      return "Please select a valid image file (JPEG, PNG, GIF, or WebP)";
+    }
+
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      return "Image file size must be less than 5MB";
+    }
+
+    return null;
+  };
+
+  const validateForm = () => {
+    const errors = {};
+
+    // Validate name
+    const nameError = validateName(profileData?.name);
+    if (nameError) errors.name = nameError;
+
+    // Validate email
+    const emailError = validateEmail(profileData?.email);
+    if (emailError) errors.email = emailError;
+
+    // Validate location
+    const locationError = validateLocation(profileData?.location);
+    if (locationError) errors.location = locationError;
+
+    // Validate image if present
+    if (profileData?.imageFile) {
+      const imageError = validateImage(profileData.imageFile);
+      if (imageError) errors.image = imageError;
+    }
+
+    return errors;
   };
 
   const getProfileImage = (data) => {
@@ -182,30 +296,172 @@ const ProfileViewModal = ({ isOpen, onClose, userData }) => {
       ...prev,
       [field]: value,
     }));
+
+    // Real-time validation
+    let error = null;
+    switch (field) {
+      case "name":
+        error = validateName(value);
+        break;
+      case "email":
+        error = validateEmail(value);
+        break;
+      case "location":
+        error = validateLocation(value);
+        break;
+    }
+
+    setValidationErrors((prev) => ({
+      ...prev,
+      [field]: error,
+    }));
   };
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setProfileData((prev) => ({
+      const imageError = validateImage(file);
+
+      if (imageError) {
+        setValidationErrors((prev) => ({
           ...prev,
-          image: e.target.result,
+          image: imageError,
         }));
-      };
-      reader.readAsDataURL(file);
+        // Don't update the image if validation fails
+        return;
+      }
+
+      // Clear image error if validation passes
+      setValidationErrors((prev) => ({
+        ...prev,
+        image: null,
+      }));
+
+      // Store the actual file object for upload
+      setProfileData((prev) => ({
+        ...prev,
+        image: URL.createObjectURL(file), // For display
+        imageFile: file, // For upload
+      }));
     }
   };
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      console.log("Saving profile data:", profileData);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const userRole = userData?.role?.toLowerCase();
+
+      validateForm();
+
+      if (userRole === "user") {
+        // User profile update
+        const formData = new FormData();
+        formData.append("u_id", profileData.id);
+        formData.append("name", profileData.name || "");
+        formData.append("email", profileData.email || "");
+        formData.append("state", profileData.state || "");
+        formData.append("address", profileData.location || "");
+        formData.append("district", "");
+        formData.append("zip_code", "");
+        formData.append("mobile", profileData.phone || "");
+        formData.append("image", "");
+
+        const response = await fetch(
+          "https://lunarsenterprises.com:6031/leeshop/user/edit/profile",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.message || "Failed to update profile");
+        }
+        console.log("User profile updated successfully:", result);
+        alert("Profile updated successfully!");
+      } else if (userRole === "shop") {
+        // Shop profile update
+        const formData = new FormData();
+        formData.append("sh_id", profileData.id);
+        formData.append("sh_name", profileData.name || "");
+        formData.append("sh_email", profileData.email || "");
+        formData.append("sh_city", profileData.city || "");
+
+        // Add other required fields with empty values
+        formData.append("sh_shop_or_service", "");
+        formData.append("sh_owner_name", "");
+        formData.append("sh_category_id", "");
+        formData.append("sh_category_name", "");
+        formData.append("sh_address", profileData.location || "");
+        formData.append("sh_state", profileData.state || "");
+        formData.append("sh_working_days", "");
+        formData.append("sh_description", "");
+        formData.append("sh_primary_phone", profileData.phone || "");
+        formData.append("sh_secondary_phone", "");
+        formData.append("sh_whatsapp_number", "");
+        formData.append("sh_product_and_service", "");
+        formData.append("sh_opening_hours", "");
+        formData.append("sh_location", "");
+        formData.append("sh_delivery_option", "");
+        formData.append("sh_service_area_coverage", "");
+        formData.append("oldimage", "");
+        formData.append("image", "");
+
+        const response = await fetch(
+          "https://lunarsenterprises.com:6031/leeshop/shop/edit/shop",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.message || "Failed to update shop profile");
+        }
+        console.log("Shop profile updated successfully:", result);
+        alert("Shop profile updated successfully!");
+      } else if (userRole === "deliverystaff") {
+        // Delivery staff profile update
+        const formData = new FormData();
+        formData.append("u_id", profileData.id);
+        formData.append("u_name", profileData.name || "");
+        formData.append("u_email", profileData.email || "");
+
+        // Add other required fields with empty values
+        formData.append("u_mobile", profileData.phone || "");
+        formData.append("u_secondary_mobile", "");
+        formData.append("u_whatsapp_contact", "");
+        formData.append("u_vehicle_type", "");
+        formData.append("u_work_type", "");
+        formData.append("profile", "");
+        formData.append("licence", "");
+
+        const response = await fetch(
+          "https://lunarsenterprises.com:6031/leeshop/deliverystaff/edit/delivery_staffs",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(
+            result.message || "Failed to update delivery staff profile"
+          );
+        }
+        console.log("Delivery staff profile updated successfully:", result);
+        alert("Delivery staff profile updated successfully!");
+      } else {
+        throw new Error("Unknown user role: " + userRole);
+      }
+
       onClose();
     } catch (error) {
       console.error("Error saving profile:", error);
+      alert("Failed to save profile. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -406,41 +662,63 @@ const ProfileViewModal = ({ isOpen, onClose, userData }) => {
                     marginBottom: "8px",
                     fontWeight: "500",
                     fontSize: "14px",
-                    color: "#059669",
+                    color: validationErrors.name ? "#DC2626" : "#059669",
                     letterSpacing: "-0.025em",
                   }}
                 >
-                  Name
+                  Name *
                 </label>
                 <input
                   type="text"
                   value={profileData?.name || ""}
                   onChange={(e) => handleInputChange("name", e.target.value)}
-                  placeholder="Alexis Sanchez"
+                  placeholder="Enter your name"
                   style={{
                     width: "100%",
                     padding: "16px 18px",
-                    border: "1px solid #D1D5DB",
+                    border: `1px solid ${
+                      validationErrors.name ? "#DC2626" : "#D1D5DB"
+                    }`,
                     borderRadius: "12px",
                     fontSize: "16px",
                     color: "#374151",
-                    backgroundColor: "#F9FAFB",
+                    backgroundColor: validationErrors.name
+                      ? "#FEF2F2"
+                      : "#F9FAFB",
                     outline: "none",
                     boxSizing: "border-box",
                     transition: "all 0.2s ease",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = "#059669";
-                    e.target.style.backgroundColor = "#FFFFFF";
-                    e.target.style.boxShadow =
-                      "0 0 0 3px rgba(5, 150, 105, 0.1)";
+                    if (!validationErrors.name) {
+                      e.target.style.borderColor = "#059669";
+                      e.target.style.backgroundColor = "#FFFFFF";
+                      e.target.style.boxShadow =
+                        "0 0 0 3px rgba(5, 150, 105, 0.1)";
+                    }
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = "#D1D5DB";
-                    e.target.style.backgroundColor = "#F9FAFB";
-                    e.target.style.boxShadow = "none";
+                    if (!validationErrors.name) {
+                      e.target.style.borderColor = "#D1D5DB";
+                      e.target.style.backgroundColor = "#F9FAFB";
+                      e.target.style.boxShadow = "none";
+                    }
                   }}
                 />
+                {validationErrors.name && (
+                  <div
+                    style={{
+                      marginTop: "6px",
+                      fontSize: "12px",
+                      color: "#DC2626",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                    }}
+                  >
+                    ⚠️ {validationErrors.name}
+                  </div>
+                )}
               </div>
 
               {/* Location Field */}
@@ -451,11 +729,11 @@ const ProfileViewModal = ({ isOpen, onClose, userData }) => {
                     marginBottom: "8px",
                     fontWeight: "500",
                     fontSize: "14px",
-                    color: "#059669",
+                    color: validationErrors.location ? "#DC2626" : "#059669",
                     letterSpacing: "-0.025em",
                   }}
                 >
-                  Location
+                  Location *
                 </label>
                 <input
                   type="text"
@@ -463,31 +741,53 @@ const ProfileViewModal = ({ isOpen, onClose, userData }) => {
                   onChange={(e) =>
                     handleInputChange("location", e.target.value)
                   }
-                  placeholder="Alexis Sanchez"
+                  placeholder="Enter your location"
                   style={{
                     width: "100%",
                     padding: "16px 18px",
-                    border: "1px solid #D1D5DB",
+                    border: `1px solid ${
+                      validationErrors.location ? "#DC2626" : "#D1D5DB"
+                    }`,
                     borderRadius: "12px",
                     fontSize: "16px",
                     color: "#374151",
-                    backgroundColor: "#F9FAFB",
+                    backgroundColor: validationErrors.location
+                      ? "#FEF2F2"
+                      : "#F9FAFB",
                     outline: "none",
                     boxSizing: "border-box",
                     transition: "all 0.2s ease",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = "#059669";
-                    e.target.style.backgroundColor = "#FFFFFF";
-                    e.target.style.boxShadow =
-                      "0 0 0 3px rgba(5, 150, 105, 0.1)";
+                    if (!validationErrors.location) {
+                      e.target.style.borderColor = "#059669";
+                      e.target.style.backgroundColor = "#FFFFFF";
+                      e.target.style.boxShadow =
+                        "0 0 0 3px rgba(5, 150, 105, 0.1)";
+                    }
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = "#D1D5DB";
-                    e.target.style.backgroundColor = "#F9FAFB";
-                    e.target.style.boxShadow = "none";
+                    if (!validationErrors.location) {
+                      e.target.style.borderColor = "#D1D5DB";
+                      e.target.style.backgroundColor = "#F9FAFB";
+                      e.target.style.boxShadow = "none";
+                    }
                   }}
                 />
+                {validationErrors.location && (
+                  <div
+                    style={{
+                      marginTop: "6px",
+                      fontSize: "12px",
+                      color: "#DC2626",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                    }}
+                  >
+                    ⚠️ {validationErrors.location}
+                  </div>
+                )}
               </div>
 
               {/* Email Address Field */}
@@ -498,63 +798,131 @@ const ProfileViewModal = ({ isOpen, onClose, userData }) => {
                     marginBottom: "8px",
                     fontWeight: "500",
                     fontSize: "14px",
-                    color: "#059669",
+                    color: validationErrors.email ? "#DC2626" : "#059669",
                     letterSpacing: "-0.025em",
                   }}
                 >
-                  Email Address
+                  Email Address *
                 </label>
                 <input
                   type="email"
                   value={profileData?.email || ""}
                   onChange={(e) => handleInputChange("email", e.target.value)}
-                  placeholder="Alexis Sanchez"
+                  placeholder="Enter your email"
                   style={{
                     width: "100%",
                     padding: "16px 18px",
-                    border: "1px solid #D1D5DB",
+                    border: `1px solid ${
+                      validationErrors.email ? "#DC2626" : "#D1D5DB"
+                    }`,
                     borderRadius: "12px",
                     fontSize: "16px",
                     color: "#374151",
-                    backgroundColor: "#F9FAFB",
+                    backgroundColor: validationErrors.email
+                      ? "#FEF2F2"
+                      : "#F9FAFB",
                     outline: "none",
                     boxSizing: "border-box",
                     transition: "all 0.2s ease",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = "#059669";
-                    e.target.style.backgroundColor = "#FFFFFF";
-                    e.target.style.boxShadow =
-                      "0 0 0 3px rgba(5, 150, 105, 0.1)";
+                    if (!validationErrors.email) {
+                      e.target.style.borderColor = "#059669";
+                      e.target.style.backgroundColor = "#FFFFFF";
+                      e.target.style.boxShadow =
+                        "0 0 0 3px rgba(5, 150, 105, 0.1)";
+                    }
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = "#D1D5DB";
-                    e.target.style.backgroundColor = "#F9FAFB";
-                    e.target.style.boxShadow = "none";
+                    if (!validationErrors.email) {
+                      e.target.style.borderColor = "#D1D5DB";
+                      e.target.style.backgroundColor = "#F9FAFB";
+                      e.target.style.boxShadow = "none";
+                    }
                   }}
                 />
+                {validationErrors.email && (
+                  <div
+                    style={{
+                      marginTop: "6px",
+                      fontSize: "12px",
+                      color: "#DC2626",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                    }}
+                  >
+                    ⚠️ {validationErrors.email}
+                  </div>
+                )}
               </div>
+
+              {/* Image Error Display */}
+              {validationErrors.image && (
+                <div
+                  style={{
+                    padding: "12px 16px",
+                    backgroundColor: "#FEF2F2",
+                    border: "1px solid #FECACA",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                    color: "#DC2626",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}
+                >
+                  ⚠️ {validationErrors.image}
+                </div>
+              )}
 
               {/* Save Button */}
               <button
                 onClick={handleSave}
-                disabled={saving}
+                disabled={
+                  saving ||
+                  Object.keys(validationErrors).some(
+                    (key) => validationErrors[key]
+                  )
+                }
                 style={{
                   width: "100%",
-                  background: saving ? "#9CA3AF" : "#059669",
+                  background:
+                    saving ||
+                    Object.keys(validationErrors).some(
+                      (key) => validationErrors[key]
+                    )
+                      ? "#9CA3AF"
+                      : "#059669",
                   color: "white",
                   border: "none",
                   padding: "16px 24px",
                   borderRadius: "12px",
                   fontSize: "16px",
                   fontWeight: "600",
-                  cursor: saving ? "not-allowed" : "pointer",
+                  cursor:
+                    saving ||
+                    Object.keys(validationErrors).some(
+                      (key) => validationErrors[key]
+                    )
+                      ? "not-allowed"
+                      : "pointer",
                   marginTop: "20px",
                   transition: "all 0.2s ease",
                   letterSpacing: "-0.025em",
+                  opacity: Object.keys(validationErrors).some(
+                    (key) => validationErrors[key]
+                  )
+                    ? 0.7
+                    : 1,
                 }}
                 onMouseEnter={(e) => {
-                  if (!saving) {
+                  if (
+                    !saving &&
+                    !Object.keys(validationErrors).some(
+                      (key) => validationErrors[key]
+                    )
+                  ) {
                     e.target.style.background = "#047857";
                     e.target.style.transform = "translateY(-1px)";
                     e.target.style.boxShadow =
@@ -562,14 +930,19 @@ const ProfileViewModal = ({ isOpen, onClose, userData }) => {
                   }
                 }}
                 onMouseLeave={(e) => {
-                  if (!saving) {
+                  if (
+                    !saving &&
+                    !Object.keys(validationErrors).some(
+                      (key) => validationErrors[key]
+                    )
+                  ) {
                     e.target.style.background = "#059669";
                     e.target.style.transform = "translateY(0)";
                     e.target.style.boxShadow = "none";
                   }
                 }}
               >
-                {saving ? "Saving..." : "Save"}
+                {saving ? "Updating..." : "Update Profile"}
               </button>
             </div>
           </div>

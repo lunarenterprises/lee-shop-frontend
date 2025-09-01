@@ -5,7 +5,6 @@ const EditShopModal = ({ isOpen, onClose, shopData, onSave }) => {
   const [activeTab, setActiveTab] = useState("basic");
   const [showAllCategories, setShowAllCategories] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
-  console.log({ shopData }, "shopdata in edit modal");
 
   // Helper function to clean and format phone numbers (for initial load and final save)
   const cleanPhoneNumber = (phone) => {

@@ -401,55 +401,83 @@ const BothRegistrationForm = () => {
         <div className="form-content2">
           <h2 className="section-title">Basic Business & Shop Location Info</h2>
           <div className="form-row">
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "5px" }}
-            >
-              <span
+            <div className="input-wrapper">
+              <div
                 style={{
-                  fontFamily: "Raleway",
-                  fontWeight: 700, // 700 = Bold
-                  fontSize: "20px",
-                  color: "#0A5C15",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "5px",
                 }}
               >
-                Service Name
-              </span>
-              <input
-                type="text"
-                name="shop_name"
-                placeholder="Enter your Shop Name."
-                value={form.shop_name}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                maxLength={100}
-                required
-              />
-              <ErrorMessage errors={errors} field="shop_name" />
+                <span
+                  style={{
+                    fontFamily: "Raleway",
+                    fontWeight: 700, // 700 = Bold
+                    fontSize: "20px",
+                    color: "#0A5C15",
+                  }}
+                >
+                  Shop Name
+                </span>
+                <input
+                  type="text"
+                  name="shop_name"
+                  placeholder="Enter your Shop Name."
+                  value={form.shop_name}
+                  onChange={handleChange}
+                  required
+                />
+                {errors.shop_name && (
+                  <div
+                    style={{
+                      color: "red",
+                      fontSize: "14px",
+                      marginTop: "4px",
+                    }}
+                  >
+                    {errors.shop_name}
+                  </div>
+                )}
+              </div>
             </div>
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "5px" }}
-            >
-              <span
+            <div className="input-wrapper">
+              <div
                 style={{
-                  fontFamily: "Raleway",
-                  fontWeight: 700,
-                  fontSize: "20px",
-                  color: "#0A5C15",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "5px",
                 }}
               >
-                Owner Name
-              </span>
-              <input
-                type="text"
-                name="owner_name"
-                placeholder="Enter Owner Name."
-                value={form.owner_name}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                maxLength={50}
-                required
-              />
-              <ErrorMessage errors={errors} field="owner_name" />
+                <span
+                  style={{
+                    fontFamily: "Raleway",
+                    fontWeight: 700,
+                    fontSize: "20px",
+                    color: "#0A5C15",
+                  }}
+                >
+                  Owner Name
+                </span>
+                <input
+                  type="text"
+                  name="owner_name"
+                  placeholder="Enter Owner Name."
+                  value={form.owner_name}
+                  onChange={handleChange}
+                  required
+                />
+                {errors.owner_name && (
+                  <div
+                    style={{
+                      color: "red",
+                      fontSize: "14px",
+                      marginTop: "4px",
+                    }}
+                  >
+                    {errors.owner_name}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           <div className="category-section">
@@ -499,65 +527,88 @@ const BothRegistrationForm = () => {
           ></textarea>
           <ErrorMessage errors={errors} field="address" />
           <div className="form-row">
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "5px",
-                marginTop: "10px",
-              }}
-            >
-              <span
+            <div className="input-wrapper">
+              <div
                 style={{
-                  fontFamily: "Raleway",
-                  fontWeight: 700,
-                  fontSize: "20px",
-                  color: "#0A5C15",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "5px",
+                  marginTop: "10px",
                 }}
               >
-                State
-              </span>
-              <input
-                type="text"
-                name="state"
-                placeholder="Enter your State your shop in."
-                value={form.state}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                maxLength={50}
-                required
-              />
-              <ErrorMessage errors={errors} field="state" />
+                <span
+                  style={{
+                    fontFamily: "Raleway",
+                    fontWeight: 700,
+                    fontSize: "20px",
+                    color: "#0A5C15",
+                  }}
+                >
+                  State
+                </span>
+                <input
+                  type="text"
+                  name="state"
+                  placeholder="Enter the State your shop is in."
+                  value={form.state}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  required
+                />
+                {errors.state && (
+                  <div
+                    style={{
+                      color: "red",
+                      fontSize: "14px",
+                      marginTop: "4px",
+                    }}
+                  >
+                    {errors.state}
+                  </div>
+                )}
+              </div>
             </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "5px",
-                marginTop: "10px",
-              }}
-            >
-              <span
+            <div className="input-wrapper">
+              <div
                 style={{
-                  fontFamily: "Raleway",
-                  fontWeight: 700,
-                  fontSize: "20px",
-                  color: "#0A5C15",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "5px",
+                  marginTop: "10px",
                 }}
               >
-                City
-              </span>
-              <input
-                type="text"
-                name="city"
-                placeholder="Enter your City."
-                value={form.city}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                maxLength={50}
-                required
-              />
-              <ErrorMessage errors={errors} field="city" />
+                <span
+                  style={{
+                    fontFamily: "Raleway",
+                    fontWeight: 700,
+                    fontSize: "20px",
+                    color: "#0A5C15",
+                  }}
+                >
+                  City
+                </span>
+
+                <input
+                  type="text"
+                  name="city"
+                  placeholder="Enter your City."
+                  value={form.city}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  required
+                />
+                {errors.city && (
+                  <div
+                    style={{
+                      color: "red",
+                      fontSize: "14px",
+                      marginTop: "4px",
+                    }}
+                  >
+                    {errors.city}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

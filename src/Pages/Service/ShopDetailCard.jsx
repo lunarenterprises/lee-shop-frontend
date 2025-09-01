@@ -1,9 +1,17 @@
 import { useState, useEffect } from "react";
 import "./ShopDetailCard.css";
 import { FaStar, FaWhatsapp } from "react-icons/fa";
-import { FiMapPin } from "react-icons/fi";
 
-const ShopDetailCard = ({ shop, shopsList = [], servicesNearby = [], userId }) => {
+const ShopDetailCard = ({
+  shop,
+  shopsList = [],
+  servicesNearby = [],
+  userId,
+  // NEW PROPS - Add these three new props
+  onSimilarShopClick,
+  onSimilarServiceClick,
+  onBackToHome,
+}) => {
   const [activeTab, setActiveTab] = useState("about");
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -25,45 +33,66 @@ const ShopDetailCard = ({ shop, shopsList = [], servicesNearby = [], userId }) =
     }
   }, [shop?.sh_id]);
 
+  
+  // NEW HANDLER - Handle similar shop clicks
+  const handleSimilarShopClick = (shopData) => {
+    if (onSimilarShopClick && shopData.id !== shop.sh_id) {
+      onSimilarShopClick(shopData.id);
+    }
+  };
+
+  // NEW HANDLER - Handle service clicks
+  const handleSimilarServiceClick = (shopData) => {
+    if (onSimilarServiceClick && shopData.id !== shop.sh_id) {
+      onSimilarServiceClick(shopData.id);
+    }
+  };
+
   // Function to fetch reviews from API
   const fetchReviews = async () => {
     if (!shop?.sh_id) return;
-    
+
     setIsLoadingReviews(true);
     try {
-      const response = await fetch('https://lunarsenterprises.com:6031/leeshop/shop/list/review', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          shop_id: shop.sh_id
-        })
-      });
+      const response = await fetch(
+        "https://lunarsenterprises.com:6031/leeshop/shop/list/review",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            shop_id: shop.sh_id,
+          }),
+        }
+      );
 
       const data = await response.json();
-      
+
       if (data.result) {
         // Transform API response to match your UI structure
-        const formattedReviews = data.list?.map(review => ({
-          id: review.r_id,
-          name: review.user_name || review.name || "Anonymous User",
-          date: review.created_at ? new Date(review.created_at).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-          }) : "Recent",
-          rating: review.r_rating,
-          text: generateHeadingFromRating(review.r_rating),
-          description: review.r_comment || review.text || ""
-        })) || [];
-        
+        const formattedReviews =
+          data.list?.map((review) => ({
+            id: review.r_id,
+            name: review.user_name || review.name || "Anonymous User",
+            date: review.created_at
+              ? new Date(review.created_at).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })
+              : "Recent",
+            rating: review.r_rating,
+            text: generateHeadingFromRating(review.r_rating),
+            description: review.r_comment || review.text || "",
+          })) || [];
+
         setReviews(formattedReviews);
       } else {
-        console.error('Failed to fetch reviews:', data.message);
+        console.error("Failed to fetch reviews:", data.message);
         setReviews([]);
       }
     } catch (error) {
-      console.error('Error fetching reviews:', error);
+      console.error("Error fetching reviews:", error);
       setReviews([]);
     } finally {
       setIsLoadingReviews(false);
@@ -77,7 +106,7 @@ const ShopDetailCard = ({ shop, shopsList = [], servicesNearby = [], userId }) =
       4: "Really good service!",
       3: "Good overall experience",
       2: "Could be better",
-      1: "Needs improvement"
+      1: "Needs improvement",
     };
     return headings[rating] || "Customer feedback";
   };
@@ -89,11 +118,11 @@ const ShopDetailCard = ({ shop, shopsList = [], servicesNearby = [], userId }) =
     }
 
     // Take first few words as heading, max 6 words
-    const words = text.trim().split(' ');
+    const words = text.trim().split(" ");
     if (words.length <= 6) {
       return text;
     }
-    return words.slice(0, 6).join(' ') + '...';
+    return words.slice(0, 6).join(" ") + "...";
   };
 
   // Handle review submission
@@ -116,21 +145,27 @@ const ShopDetailCard = ({ shop, shopsList = [], servicesNearby = [], userId }) =
     setIsSubmittingReview(true);
 
     try {
-      const dynamicHeading = generateHeadingFromText(newReview.text, newReview.rating);
-      
-      const response = await fetch('https://lunarsenterprises.com:6031/leeshop/shop/add/review', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user_id: userId,
-          shop_id: shop.sh_id,
-          comment: newReview.text,
-          heading: dynamicHeading,
-          rating: newReview.rating
-        })
-      });
+      const dynamicHeading = generateHeadingFromText(
+        newReview.text,
+        newReview.rating
+      );
+
+      const response = await fetch(
+        "https://lunarsenterprises.com:6031/leeshop/shop/add/review",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            shop_id: shop.sh_id,
+            comment: newReview.text,
+            heading: dynamicHeading,
+            rating: newReview.rating,
+          }),
+        }
+      );
 
       const data = await response.json();
 
@@ -150,18 +185,18 @@ const ShopDetailCard = ({ shop, shopsList = [], servicesNearby = [], userId }) =
 
         setReviews([newReviewData, ...reviews]);
         setNewReview({ rating: 0, text: "" });
-        
+
         // Optionally refresh reviews from server
         setTimeout(() => {
           fetchReviews();
         }, 1000);
-        
+
         alert("Review submitted successfully!");
       } else {
         alert(data.message || "Failed to submit review. Please try again.");
       }
     } catch (error) {
-      console.error('Error submitting review:', error);
+      console.error("Error submitting review:", error);
       alert("Network error. Please check your connection and try again.");
     } finally {
       setIsSubmittingReview(false);
@@ -209,31 +244,61 @@ const ShopDetailCard = ({ shop, shopsList = [], servicesNearby = [], userId }) =
   // Calculate distance
   const calculateDistance = () => "1.5 km away";
 
-  // Similar shops
-  const similarShops = Array.isArray(shopsList)
-    ? shopsList
-        .filter((item) => item.sh_id !== shop.sh_id)
-        .slice(0, 5)
-        .map((item) => ({
-          id: item.sh_id,
-          name: item.sh_name || "Sweet Treats Bakery",
-          distance: calculateDistance(),
-          rating: (item.sh_ratings || 4.5).toFixed(1),
-          reviewCount: item.sh_review_count || 120,
-          location: [
-            item.sh_location || "Panampilly Nagar",
-            item.sh_city || "Kochi",
-          ]
-            .filter(Boolean)
-            .join(", "),
-          image: item.shopimages?.[0]?.si_image
-            ? `https://lunarsenterprises.com:6031/${item.shopimages[0].si_image}`
-            : "/shop.png",
-        }))
+  // UPDATED: Separate shops and services from shopsList based on sh_shop_or_service
+  const actualShops = Array.isArray(shopsList)
+    ? shopsList.filter((item) => 
+        (item.sh_shop_or_service === "shop" || item.sh_shop_or_service === "Shop") && 
+        item.sh_id !== shop.sh_id
+      )
     : [];
 
-  // Mock services if empty
-  const services = servicesNearby.length > 0 ? servicesNearby : similarShops;
+  const actualServices = Array.isArray(shopsList)
+    ? shopsList.filter((item) => 
+        (item.sh_shop_or_service === "service" || item.sh_shop_or_service === "Service") && 
+        item.sh_id !== shop.sh_id
+      )
+    : [];
+
+  // UPDATED: Similar shops - only actual shops
+  const similarShops = actualShops
+    .slice(0, 5)
+    .map((item) => ({
+      id: item.sh_id,
+      name: item.sh_name || "Sweet Treats Bakery",
+      distance: calculateDistance(),
+      rating: (item.sh_ratings || 4.5).toFixed(1),
+      reviewCount: item.sh_review_count || 120,
+      location: [
+        item.sh_location || "Panampilly Nagar",
+        item.sh_city || "Kochi",
+      ]
+        .filter(Boolean)
+        .join(", "),
+      image: item.shopimages?.[0]?.si_image
+        ? `https://lunarsenterprises.com:6031/${item.shopimages[0].si_image}`
+        : "/shop.png",
+    }));
+
+  // UPDATED: Service shops - only actual services
+  const serviceShops = actualServices
+    .slice(0, 5)
+    .map((item) => ({
+      id: item.sh_id,
+      name: item.sh_name || "Professional Service",
+      distance: calculateDistance(),
+      rating: (item.sh_ratings || 4.5).toFixed(1),
+      reviewCount: item.sh_review_count || 100,
+      location: [
+        item.sh_location || "Multiple Areas",
+        item.sh_city || "Kochi",
+      ]
+        .filter(Boolean)
+        .join(", "),
+      image: item.shopimages?.[0]?.si_image
+        ? `https://lunarsenterprises.com:6031/${item.shopimages[0].si_image}`
+        : "/shop.png",
+      category: item.sh_category_name || "Service",
+    }));
 
   // Handle share
   const handleShare = async () => {
@@ -288,7 +353,12 @@ const ShopDetailCard = ({ shop, shopsList = [], servicesNearby = [], userId }) =
                       image: "/shop.png",
                     }))
               ).map((item, index) => (
-                <div className="sidebar-shop-card" key={item.id || index}>
+                <div
+                  className="sidebar-shop-card"
+                  key={item.id || index}
+                  onClick={() => handleSimilarShopClick(item)}
+                  style={{ cursor: "pointer" }}
+                >
                   <img
                     src={item.image || "/placeholder.svg"}
                     alt={item.name}
@@ -335,70 +405,74 @@ const ShopDetailCard = ({ shop, shopsList = [], servicesNearby = [], userId }) =
             </div>
           </div>
 
-          {/* Services Section */}
+          {/* Services Section - UPDATED to use actual services */}
           <div className="sidebar-section">
             <h3 className="sidebar-heading">Services Nearby</h3>
             <div className="sidebar-cards-list">
-              {(services.length > 0
-                ? services
+              {(serviceShops.length > 0
+                ? serviceShops
                 : Array(3)
                     .fill(null)
                     .map((_, i) => ({
-                      id: i + 10,
-                      name: "Sweet Treats Bakery",
-                      distance: "1.5 km Away",
+                      id: i,
+                      name: "Professional Service",
+                      distance: "1.25km away",
                       rating: "4.5",
-                      reviewCount: 120,
-                      location: "Panampilly Nagar, Kochi",
+                      reviewCount: 100 + i * 20,
+                      location: "Multiple Areas",
                       image: "/shop.png",
+                      category: "Service",
                     }))
-              )
-                .slice(0, 3)
-                .map((item, index) => (
-                  <div className="sidebar-shop-card" key={item.id || index}>
-                    <img
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.name}
-                      className="sidebar-shop-image"
-                    />
-                    <div className="sidebar-shop-info">
-                      <div className="distance-badge">{item.distance}</div>
-                      <h4 className="sidebar-shop-name2">{item.name}</h4>
-                      <div className="sidebar-shop-rating2">
-                        <svg
-                          width="21"
-                          height="22"
-                          viewBox="0 0 21 22"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M10.4996 15.6154L6.86831 17.8029C6.70789 17.905 6.54018 17.9488 6.36518 17.9342C6.19018 17.9196 6.03706 17.8613 5.90581 17.7592C5.77456 17.6571 5.67247 17.5296 5.59956 17.3768C5.52664 17.224 5.51206 17.0525 5.55581 16.8623L6.51831 12.7279L3.30268 9.94981C3.15685 9.81855 3.06585 9.66893 3.02968 9.50093C2.99351 9.33293 3.00431 9.16901 3.06206 9.00918C3.11981 8.84935 3.20731 8.7181 3.32456 8.61543C3.44181 8.51276 3.60222 8.44714 3.80581 8.41856L8.04956 8.04668L9.69018 4.15293C9.7631 3.97793 9.87626 3.84668 10.0297 3.75918C10.1831 3.67168 10.3397 3.62793 10.4996 3.62793C10.6594 3.62793 10.816 3.67168 10.9694 3.75918C11.1228 3.84668 11.236 3.97793 11.3089 4.15293L12.9496 8.04668L17.1933 8.41856C17.3975 8.44772 17.5579 8.51335 17.6746 8.61543C17.7912 8.71751 17.8787 8.84876 17.9371 9.00918C17.9954 9.1696 18.0065 9.33381 17.9703 9.5018C17.9341 9.66981 17.8428 9.81914 17.6964 9.94981L14.4808 12.7279L15.4433 16.8623C15.4871 17.0519 15.4725 17.2234 15.3996 17.3768C15.3266 17.5302 15.2246 17.6577 15.0933 17.7592C14.9621 17.8607 14.8089 17.919 14.6339 17.9342C14.4589 17.9493 14.2912 17.9056 14.1308 17.8029L10.4996 15.6154Z"
-                            fill="#E8C930"
-                          />
-                        </svg>
-                        <span>
-                          {item.rating} ({item.reviewCount} Reviews)
-                        </span>
-                      </div>
-                      <div className="sidebar-shop-location2">
-                        <svg
-                          width="19"
-                          height="20"
-                          viewBox="0 0 19 20"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M9.49967 9.60384C8.97477 9.60384 8.47136 9.39532 8.10019 9.02416C7.72903 8.65299 7.52051 8.14958 7.52051 7.62467C7.52051 7.09977 7.72903 6.59636 8.10019 6.22519C8.47136 5.85403 8.97477 5.64551 9.49967 5.64551C10.0246 5.64551 10.528 5.85403 10.8992 6.22519C11.2703 6.59636 11.4788 7.09977 11.4788 7.62467C11.4788 7.88458 11.4276 8.14195 11.3282 8.38207C11.2287 8.62219 11.0829 8.84037 10.8992 9.02416C10.7154 9.20794 10.4972 9.35372 10.2571 9.45319C10.0169 9.55265 9.75958 9.60384 9.49967 9.60384ZM9.49967 2.08301C8.02993 2.08301 6.62039 2.66686 5.58112 3.70612C4.54186 4.74539 3.95801 6.15493 3.95801 7.62467C3.95801 11.7809 9.49967 17.9163 9.49967 17.9163C9.49967 17.9163 15.0413 11.7809 15.0413 7.62467C15.0413 6.15493 14.4575 4.74539 13.4182 3.70612C12.379 2.66686 10.9694 2.08301 9.49967 2.08301Z"
-                            fill="#0A5C15"
-                          />
-                        </svg>
-                        <span>{item.location}</span>
-                      </div>
+              ).slice(0, 3).map((item, index) => (
+                <div
+                  className="sidebar-shop-card"
+                  key={item.id || index}
+                  onClick={() => handleSimilarServiceClick(item)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <img
+                    src={item.image || "/placeholder.svg"}
+                    alt={item.name}
+                    className="sidebar-shop-image"
+                  />
+                  <div className="sidebar-shop-info">
+                    <div className="distance-badge">{item.distance}</div>
+                    <h4 className="sidebar-shop-name2">{item.name}</h4>
+                    <div className="sidebar-shop-rating2">
+                      <svg
+                        width="21"
+                        height="22"
+                        viewBox="0 0 21 22"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M10.4996 15.6154L6.86831 17.8029C6.70789 17.905 6.54018 17.9488 6.36518 17.9342C6.19018 17.9196 6.03706 17.8613 5.90581 17.7592C5.77456 17.6571 5.67247 17.5296 5.59956 17.3768C5.52664 17.224 5.51206 17.0525 5.55581 16.8623L6.51831 12.7279L3.30268 9.94981C3.15685 9.81855 3.06585 9.66893 3.02968 9.50093C2.99351 9.33293 3.00431 9.16901 3.06206 9.00918C3.11981 8.84935 3.20731 8.7181 3.32456 8.61543C3.44181 8.51276 3.60222 8.44714 3.80581 8.41856L8.04956 8.04668L9.69018 4.15293C9.7631 3.97793 9.87626 3.84668 10.0297 3.75918C10.1831 3.67168 10.3397 3.62793 10.4996 3.62793C10.6594 3.62793 10.816 3.67168 10.9694 3.75918C11.1228 3.84668 11.236 3.97793 11.3089 4.15293L12.9496 8.04668L17.1933 8.41856C17.3975 8.44772 17.5579 8.51335 17.6746 8.61543C17.7912 8.71751 17.8787 8.84876 17.9371 9.00918C17.9954 9.1696 18.0065 9.33381 17.9703 9.5018C17.9341 9.66981 17.8428 9.81914 17.6964 9.94981L14.4808 12.7279L15.4433 16.8623C15.4871 17.0519 15.4725 17.2234 15.3996 17.3768C15.3266 17.5302 15.2246 17.6577 15.0933 17.7592C14.9621 17.8607 14.8089 17.919 14.6339 17.9342C14.4589 17.9493 14.2912 17.9056 14.1308 17.8029L10.4996 15.6154Z"
+                          fill="#E8C930"
+                        />
+                      </svg>
+                      <span>
+                        {item.rating} ({item.reviewCount} Reviews)
+                      </span>
+                    </div>
+                    <div className="sidebar-shop-location2">
+                      <svg
+                        width="19"
+                        height="20"
+                        viewBox="0 0 19 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M9.49967 9.60384C8.97477 9.60384 8.47136 9.39532 8.10019 9.02416C7.72903 8.65299 7.52051 8.14958 7.52051 7.62467C7.52051 7.09977 7.72903 6.59636 8.10019 6.22519C8.47136 5.85403 8.97477 5.64551 9.49967 5.64551C10.0246 5.64551 10.528 5.85403 10.8992 6.22519C11.2703 6.59636 11.4788 7.09977 11.4788 7.62467C11.4788 7.88458 11.4276 8.14195 11.3282 8.38207C11.2287 8.62219 11.0829 8.84037 10.8992 9.02416C10.7154 9.20794 10.4972 9.35372 10.2571 9.45319C10.0169 9.55265 9.75958 9.60384 9.49967 9.60384ZM9.49967 2.08301C8.02993 2.08301 6.62039 2.66686 5.58112 3.70612C4.54186 4.74539 3.95801 6.15493 3.95801 7.62467C3.95801 11.7809 9.49967 17.9163 9.49967 17.9163C9.49967 17.9163 15.0413 11.7809 15.0413 7.62467C15.0413 6.15493 14.4575 4.74539 13.4182 3.70612C12.379 2.66686 10.9694 2.08301 9.49967 2.08301Z"
+                          fill="#0A5C15"
+                        />
+                      </svg>
+                      <span>{item.location}</span>
                     </div>
                   </div>
-                ))}
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -722,9 +796,16 @@ const ShopDetailCard = ({ shop, shopsList = [], servicesNearby = [], userId }) =
                     >
                       {isSubmittingReview ? "Posting..." : "Post Review"}
                     </button>
-                    
+
                     {!userId && (
-                      <p className="login-notice" style={{ color: '#666', fontSize: '14px', marginTop: '10px' }}>
+                      <p
+                        className="login-notice"
+                        style={{
+                          color: "#666",
+                          fontSize: "14px",
+                          marginTop: "10px",
+                        }}
+                      >
                         Please log in to post a review
                       </p>
                     )}
@@ -754,7 +835,9 @@ const ShopDetailCard = ({ shop, shopsList = [], servicesNearby = [], userId }) =
                                     alt={review.name}
                                   />
                                 </div>
-                                <h4 className="reviewer-name2">{review.name}</h4>
+                                <h4 className="reviewer-name2">
+                                  {review.name}
+                                </h4>
                               </div>
 
                               <span className="review-date">{review.date}</span>

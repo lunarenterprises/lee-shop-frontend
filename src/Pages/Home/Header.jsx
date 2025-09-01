@@ -1,12 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  FaHeart,
-  FaUser,
-  FaBars,
-  FaTimes,
-  FaChevronDown,
-} from "react-icons/fa";
+import { FaHeart, FaUser, FaBars, FaTimes } from "react-icons/fa";
 import "./HomePage.css";
 
 import LoginModal from "./LoginModal";
@@ -204,6 +198,28 @@ const Header = ({ activeKey, onNavClick }) => {
     );
     setShowLogin(false);
   };
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("userData");
+
+    // Parse URL params
+    const searchParams = new URLSearchParams(location.search);
+    const hasCategory = searchParams.has("category");
+    const hasType = searchParams.has("type");
+
+    if (storedUser && !hasCategory && !hasType) {
+      const user = JSON.parse(storedUser);
+
+      // Redirect based on role
+      if (user.role?.toLowerCase() === "shop") {
+        navigate("/ShopProfile");
+      } else if (user.role?.toLowerCase() === "deliverystaff") {
+        navigate("/DeliveryProfile");
+      } else {
+        navigate("/UserProfile");
+      }
+    }
+  }, [navigate, location.search]);
 
   // ---------- logout handler ----------
   const handleLogout = () => {

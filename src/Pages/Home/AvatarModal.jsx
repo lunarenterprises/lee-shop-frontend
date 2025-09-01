@@ -33,7 +33,7 @@ const AvatarModal = ({
           case "deliverystaff":
             endpoint =
               "https://lunarsenterprises.com:6031/leeshop/deliverystaff/list/delivery_staffs";
-            payload = { u_id: userData.id };
+            payload = { u_id: userData.id.toString() };
             break;
           case "shop":
             endpoint =
@@ -46,7 +46,6 @@ const AvatarModal = ({
             return;
         }
 
-        // Fixed fetch call
         const response = await fetch(endpoint, {
           method: "POST",
           headers: {
@@ -56,72 +55,67 @@ const AvatarModal = ({
         });
 
         const data = await response.json();
-        console.log({data})
-        if (data.result) {
+
+        const list = data.list || [];
+
+        if (Array.isArray(list) && list.length > 0) {
           let profileInfo = {};
 
-          // Extract profile data based on role
           switch (userData.role.toLowerCase()) {
-            case "user":
-              const userList = data.list || [];
-              const userImage = userList[0].u_profile_pic
-                  ? `https://lunarsenterprises.com:6031/${userList[0].u_profile_pic}`
-                  : "/shop.png";
-              if (userList.length > 0) {
-                const user = userList[0];
-                profileInfo = {
-                  id: user.u_id,
-                  name: user.u_name || user.name || "User",
-                  image: userImage,
-                  email: user.u_email || user.email,
-                  phone: user.u_phone || user.phone,
-                  role: "User",
-                };
-              }
+            case "user": {
+              const user = list[0];
+              const userImage = user.u_profile_pic
+                ? `https://lunarsenterprises.com:6031/${user.u_profile_pic}`
+                : "/shop.png";
+              profileInfo = {
+                id: user.u_id,
+                name: user.u_name,
+                image: userImage,
+                email: user.u_email,
+                phone: user.u_phone || user.u_mobile,
+                role: "User",
+              };
               break;
-            case "deliverystaff":
-              const staffList = data.list || [];
-              if (staffList.length > 0) {
-                const staff = staffList[0];
-                profileInfo = {
-                  id: staff.u_id,
-                  name: staff.name || staff.u_name || "Delivery Staff",
-                  image: staff.profile_pic || staff.profile_image || null,
-                  email: staff.email,
-                  phone: staff.phone,
-                  role: "Delivery Staff",
-                };
-              }
+            }
+            case "deliverystaff": {
+              const staff = list[0];
+              const staffImage = staff.u_profile_pic
+                ? `https://lunarsenterprises.com:6031/${staff.u_profile_pic}`
+                : "/shop.png";
+              profileInfo = {
+                id: staff.u_id,
+                name: staff.u_name || "Delivery Staff",
+                image: staffImage,
+                email: staff.u_email || staff.email,
+                phone: staff.u_phone || staff.phone,
+                role: "Delivery Staff",
+              };
               break;
-            case "shop":
-              const shopList = data.list || [];
-
-              if (shopList.length > 0) {
-                const shop = shopList[0];
-                const shopImage = shop.shopimages?.[0]?.si_image
-                  ? `https://lunarsenterprises.com:6031/${shop.shopimages[0].si_image}`
-                  : "/shop.png";
-                profileInfo = {
-                  id: shop.sh_id,
-                  name: shop.sh_name || shop.name || "Shop",
-                  image: shopImage,
-                  email: shop.sh_email || shop.email,
-                  phone: shop.sh_phone || shop.phone,
-                  role: "Shop Owner",
-                };
-              }
+            }
+            case "shop": {
+              const shop = list[0];
+              const shopImage = shop.shopimages?.[0]?.si_image
+                ? `https://lunarsenterprises.com:6031/${shop.shopimages[0].si_image}`
+                : "/shop.png";
+              profileInfo = {
+                id: shop.sh_id,
+                name: shop.sh_name || "Shop",
+                image: shopImage,
+                email: shop.sh_email,
+                phone: shop.sh_phone,
+                role: "Shop Owner",
+              };
               break;
+            }
           }
-          console.log({ profileInfo }, "shope list");
+
           setProfileData(profileInfo);
         } else {
-          console.error("Failed to fetch profile data:", data.message);
-          // Set fallback data from userData
+          console.warn("Profile list is empty:", data);
           setProfileData(createFallbackProfile(userData));
         }
       } catch (error) {
         console.error("Error fetching profile data:", error);
-        // Set fallback data from userData on error
         setProfileData(createFallbackProfile(userData));
       } finally {
         setLoading(false);
@@ -216,7 +210,10 @@ const AvatarModal = ({
   };
 
   // Use fetched profile data or fallback to userData
-  const displayData = profileData || createFallbackProfile(userData);
+  const displayData =
+    profileData && Object.keys(profileData).length > 0
+      ? profileData
+      : createFallbackProfile(userData);
 
   return (
     <>

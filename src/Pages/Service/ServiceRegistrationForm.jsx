@@ -11,6 +11,10 @@ const ServiceRegistrationForm = () => {
   const [description, setDescription] = useState("");
   const [services, setServices] = useState([]);
   const [newService, setNewService] = useState("");
+  
+  // Add drag state for functionality
+  const [isDragActive, setIsDragActive] = useState(false);
+  const [dragCounter, setDragCounter] = useState(0);
 
   const [errors, setErrors] = useState({
     images: "",
@@ -132,6 +136,74 @@ const ServiceRegistrationForm = () => {
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
+  // Process files function - used by both drag drop and file input
+  const processFiles = (files) => {
+    clearError("images");
+
+    const totalFiles = [...imageFiles, ...files];
+    const imageErrors = validateImages(totalFiles);
+
+    if (imageErrors.length > 0) {
+      setErrors((prev) => ({ ...prev, images: imageErrors.join(". ") }));
+      return;
+    }
+
+    // Keep only image files
+    const validImages = files.filter((file) => file.type.startsWith("image/"));
+
+    if (validImages.length !== files.length) {
+      setErrors((prev) => ({
+        ...prev,
+        images: "Only image files are allowed",
+      }));
+      return;
+    }
+
+    const imageURLs = validImages.map((file) => URL.createObjectURL(file));
+
+    setImages((prev) => [...prev, ...imageURLs]);
+    setImageFiles((prev) => [...prev, ...validImages]);
+  };
+
+  // Drag and Drop handlers
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragCounter(prev => prev + 1);
+    
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      setIsDragActive(true);
+    }
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragCounter(prev => prev - 1);
+    
+    if (dragCounter === 1) {
+      setIsDragActive(false);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+    setDragCounter(0);
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const files = Array.from(e.dataTransfer.files);
+      processFiles(files);
+      e.dataTransfer.clearData();
+    }
+  };
+
   // Load service registration data from localStorage
   useEffect(() => {
     const savedServiceRegistration = localStorage.getItem(
@@ -175,36 +247,11 @@ const ServiceRegistrationForm = () => {
     }
   }, []);
 
-  // Handle image upload
+  // Handle image upload from file input
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    clearError("images");
-
-    const totalFiles = [...imageFiles, ...files];
-    const imageErrors = validateImages(totalFiles);
-
-    if (imageErrors.length > 0) {
-      setErrors((prev) => ({ ...prev, images: imageErrors.join(". ") }));
-      e.target.value = ""; // Clear input
-      return;
-    }
-
-    // Keep only image files
-    const validImages = files.filter((file) => file.type.startsWith("image/"));
-
-    if (validImages.length !== files.length) {
-      setErrors((prev) => ({
-        ...prev,
-        images: "Only image files are allowed",
-      }));
-      e.target.value = ""; // Clear input so user can reselect
-      return;
-    }
-
-    const imageURLs = validImages.map((file) => URL.createObjectURL(file));
-
-    setImages((prev) => [...prev, ...imageURLs]);
-    setImageFiles((prev) => [...prev, ...validImages]);
+    processFiles(files);
+    e.target.value = ""; // Clear input
   };
 
   const handleAddService = () => {
@@ -349,7 +396,13 @@ const ServiceRegistrationForm = () => {
                 Add Images to Attract Customers
               </p>
               <div className="image-upload-box">
-                <div className="upload-box">
+                <div 
+                  className="upload-box"
+                  onDragEnter={handleDragEnter}
+                  onDragLeave={handleDragLeave}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                >
                   <span
                     style={{
                       display: "flex",
@@ -411,7 +464,7 @@ const ServiceRegistrationForm = () => {
                     />
                   </span>
                 </div>
-                <div className="image-gallery">
+                <div className="image-gallery2">
                   {images.map((img, i) => (
                     <img
                       key={i}

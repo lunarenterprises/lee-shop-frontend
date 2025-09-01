@@ -456,7 +456,7 @@ const BrandingRegistrationForm = () => {
                     />
                   </span>
                 </div>
-                <div className="image-gallery">
+                <div className="image-gallery2">
                   {images.map((img, i) => (
                     <div
                       key={i}
