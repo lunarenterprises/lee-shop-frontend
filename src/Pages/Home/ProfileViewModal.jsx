@@ -364,7 +364,7 @@ const ProfileViewModal = ({ isOpen, onClose, userData }) => {
         formData.append("district", "");
         formData.append("zip_code", "");
         formData.append("mobile", profileData.phone || "");
-        formData.append("image", "");
+        formData.append("image", profileData?.imageFile);
 
         const response = await fetch(
           "https://lunarsenterprises.com:6031/leeshop/user/edit/profile",
@@ -388,25 +388,10 @@ const ProfileViewModal = ({ isOpen, onClose, userData }) => {
         formData.append("sh_email", profileData.email || "");
         formData.append("sh_city", profileData.city || "");
 
-        // Add other required fields with empty values
-        formData.append("sh_shop_or_service", "");
-        formData.append("sh_owner_name", "");
-        formData.append("sh_category_id", "");
-        formData.append("sh_category_name", "");
         formData.append("sh_address", profileData.location || "");
         formData.append("sh_state", profileData.state || "");
-        formData.append("sh_working_days", "");
-        formData.append("sh_description", "");
         formData.append("sh_primary_phone", profileData.phone || "");
-        formData.append("sh_secondary_phone", "");
-        formData.append("sh_whatsapp_number", "");
-        formData.append("sh_product_and_service", "");
-        formData.append("sh_opening_hours", "");
-        formData.append("sh_location", "");
-        formData.append("sh_delivery_option", "");
-        formData.append("sh_service_area_coverage", "");
-        formData.append("oldimage", "");
-        formData.append("image", "");
+        formData.append("image", profileData?.imageFile);
 
         const response = await fetch(
           "https://lunarsenterprises.com:6031/leeshop/shop/edit/shop",
@@ -426,17 +411,12 @@ const ProfileViewModal = ({ isOpen, onClose, userData }) => {
         // Delivery staff profile update
         const formData = new FormData();
         formData.append("u_id", profileData.id);
-        formData.append("u_name", profileData.name || "");
-        formData.append("u_email", profileData.email || "");
+        formData.append("u_name", profileData.name);
+        formData.append("u_email", profileData.email);
 
         // Add other required fields with empty values
-        formData.append("u_mobile", profileData.phone || "");
-        formData.append("u_secondary_mobile", "");
-        formData.append("u_whatsapp_contact", "");
-        formData.append("u_vehicle_type", "");
-        formData.append("u_work_type", "");
-        formData.append("profile", "");
-        formData.append("licence", "");
+        formData.append("u_mobile", profileData.phone);
+        formData.append("profile", profileData?.imageFile);
 
         const response = await fetch(
           "https://lunarsenterprises.com:6031/leeshop/deliverystaff/edit/delivery_staffs",

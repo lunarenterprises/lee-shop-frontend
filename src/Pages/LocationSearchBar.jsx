@@ -40,7 +40,11 @@ const LocationSearchBar = ({ onSearch, onLocationChange }) => {
   // When the user submits
   const handleSearchSubmit = (e) => {
     if (e) e.preventDefault();
-    if (onSearch) onSearch(search.trim());
+
+    // Extract the first word before the first comma
+    const city = selectedLocation.split(",")[0].trim();
+
+    if (onSearch) onSearch(search.trim(), city);
   };
 
   const handleLocationSelect = (location) => {
