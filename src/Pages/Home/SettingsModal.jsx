@@ -1,7 +1,12 @@
-import { ChevronRight, Eye, Play, X } from "lucide-react";
-import React, { useState } from "react";
+import { ChevronRight, Eye, EyeOff, Play, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
 
-const SettingsModal = ({ isOpen, onClose, userData = { id: "user123" } }) => {
+const SettingsModal = ({
+  isOpen,
+  onClose,
+  userData = { id: "user123", email: "amaldev5568@gmail.com" },
+}) => {
+  const [profileData, setProfileData] = useState(null);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [passwordData, setPasswordData] = useState({
@@ -16,13 +21,179 @@ const SettingsModal = ({ isOpen, onClose, userData = { id: "user123" } }) => {
   });
   const [loading, setLoading] = useState(false);
 
+  // All hooks first
+  useEffect(() => {
+    if (!isOpen || !userData?.id || !userData?.role) return;
+
+    const fetchProfileData = async () => {
+      setLoading(true);
+      try {
+        let endpoint = "";
+        let payload = {};
+
+        // Determine API endpoint and payload based on role
+        switch (userData.role.toLowerCase()) {
+          case "user":
+            endpoint =
+              "https://lunarsenterprises.com:6031/leeshop/user/list/user";
+            payload = { u_id: userData.id.toString() };
+            break;
+          case "deliverystaff":
+            endpoint =
+              "https://lunarsenterprises.com:6031/leeshop/deliverystaff/list/delivery_staffs";
+            payload = { u_id: userData.id };
+            break;
+          case "shop":
+            endpoint =
+              "https://lunarsenterprises.com:6031/leeshop/shop/list/shop";
+            payload = { sh_id: userData.id.toString() };
+            break;
+          default:
+            console.warn("Unknown user role:", userData.role);
+            setLoading(false);
+            return;
+        }
+
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+
+        if (data) {
+          let profileInfo = {};
+
+          // Extract profile data based on role
+          switch (userData.role.toLowerCase()) {
+            case "user":
+              const userList = data.list || [];
+              if (userList.length > 0) {
+                const user = userList[0];
+                const userImage = user.u_profile_pic
+                  ? `https://lunarsenterprises.com:6031/${user.u_profile_pic}`
+                  : "/shop.png";
+                profileInfo = {
+                  id: user.u_id,
+                  name: user.u_name || user.name || "",
+                  image: userImage,
+                  email: user.u_email || user.email || "",
+                  phone: user.u_phone || user.phone || "",
+                  location: user.u_address || user.address || "",
+                  state: user.state || "",
+                  role: "User",
+                };
+              }
+              break;
+            case "deliverystaff":
+              const staffList = data.list || [];
+              const staffImage = staffList[0].u_profile_pic
+                ? `https://lunarsenterprises.com:6031/${staffList[0].u_profile_pic}`
+                : "/shop.png";
+              if (staffList.length > 0) {
+                const staff = staffList[0];
+                profileInfo = {
+                  id: staff.u_id,
+                  name: staff.name || staff.u_name || "",
+                  image: staffImage,
+                  email: staff.u_email || "",
+                  phone: staff.phone || "",
+                  location: staff.address || staff.location || "",
+                  state: staff.state || "",
+                  role: "Delivery Staff",
+                };
+              }
+              break;
+            case "shop":
+              const shopList = data.list || [];
+              if (shopList.length > 0) {
+                const shop = shopList[0];
+                const shopImage = shop.shopimages?.[0]?.si_image
+                  ? `https://lunarsenterprises.com:6031/${shop.shopimages[0].si_image}`
+                  : "/shop.png";
+                profileInfo = {
+                  id: shop.sh_id,
+                  name: shop.sh_name || shop.name || "",
+                  image: shopImage,
+                  email: shop.sh_email || shop.email || "",
+                  phone:
+                    shop.sh_primary_phone || shop.sh_phone || shop.phone || "",
+                  location: shop.sh_address || shop.address || "",
+                  city: shop.sh_city || "",
+                  state: shop.sh_state || shop.state || "",
+                  role: "Shop Owner",
+                };
+              }
+              break;
+          }
+
+          setProfileData(profileInfo);
+        } else {
+          console.error("Failed to fetch profile data:", data.message);
+          setProfileData(createFallbackProfile(userData));
+        }
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+        setProfileData(createFallbackProfile(userData));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, [isOpen, userData?.id, userData?.role]);
+
+  const getRoleDisplay = (role) => {
+    if (!role) return "User";
+    const roleMap = {
+      user: "User",
+      deliverystaff: "Delivery Staff",
+      delivery_staff: "Delivery Staff",
+      shop: "Shop Owner",
+      shopowner: "Shop Owner",
+    };
+    return roleMap[role.toLowerCase()] || role;
+  };
+
+  // Helper functions
+  const createFallbackProfile = (userData) => {
+    return {
+      id: userData?.id || userData?.u_id || userData?.sh_id,
+      name: userData?.name || userData?.u_name || userData?.sh_name || "",
+      image:
+        userData?.image ||
+        userData?.u_profile_pic ||
+        userData?.profile_picture ||
+        null,
+      email: userData?.email || userData?.u_email || userData?.sh_email || "",
+      phone:
+        userData?.phone ||
+        userData?.u_phone ||
+        userData?.sh_phone ||
+        userData?.sh_primary_phone ||
+        "",
+      location:
+        userData?.state ||
+        userData?.u_address ||
+        userData?.sh_address ||
+        userData?.sh_city ||
+        "",
+      city: userData?.sh_city || userData?.city || "",
+      state: userData?.state || userData?.sh_state || "",
+      role: getRoleDisplay(userData?.role || "user"),
+    };
+  };
+
   const handlePasswordChange = (field, value) => {
     setPasswordData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
-
+  console.log({ userData });
   const togglePasswordVisibility = (field) => {
     setShowPasswords((prev) => ({
       ...prev,
@@ -43,15 +214,33 @@ const SettingsModal = ({ isOpen, onClose, userData = { id: "user123" } }) => {
 
     setLoading(true);
     try {
-      console.log("Changing password for user:", userData.id);
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      alert("Password changed successfully!");
-      setShowChangePassword(false);
-      setPasswordData({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
+      const response = await fetch(
+        "https://lunarsenterprises.com:6031/leeshop/user/ResetPassword",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: profileData.email,
+            password: passwordData.newPassword,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Password changed successfully!");
+        setShowChangePassword(false);
+        setPasswordData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      } else {
+        alert(data.message || "Failed to change password. Please try again.");
+      }
     } catch (error) {
       console.error("Error changing password:", error);
       alert("Failed to change password. Please try again.");
@@ -330,7 +519,7 @@ const SettingsModal = ({ isOpen, onClose, userData = { id: "user123" } }) => {
                   paddingTop: "1rem",
                   alignItems: "center",
                   textAlign: "center",
-                  display:"flex",
+                  display: "flex",
                   justifyContent: "center",
                 }}
               >

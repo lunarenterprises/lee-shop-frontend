@@ -23,7 +23,7 @@ const HomePage = () => {
   const [searching, setSearching] = useState(false);
 
   // Search handler -- passed to LocationSearchBar
-  const handleShopSearch = async (searchTerm) => {
+  const handleShopSearch = async (searchTerm, location = "Bangalore") => {
     // If blank: clear and show default sections
     if (!searchTerm || !searchTerm.trim()) {
       setSearchedShop(null);
@@ -35,7 +35,7 @@ const HomePage = () => {
       const response = await fetch(`${API_BASE_URL}/shop/list/shop`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ search: searchTerm }),
+        body: JSON.stringify({ search: searchTerm, city: location }),
       });
       const resData = await response.json();
 
@@ -154,7 +154,6 @@ const HomePage = () => {
 
   // NEW: Handle similar service click from ShopDetailCard
   const handleSimilarServiceClick = async (shopId) => {
-    console.log({ shopId }, "service");
     handleSimilarShopClick(shopId);
   };
 

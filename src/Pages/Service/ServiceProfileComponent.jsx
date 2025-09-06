@@ -9,7 +9,7 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
   const [shopInfo, setShopInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Added state for modal visibility
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const userData = JSON.parse(localStorage.getItem("userData"));
 
@@ -37,52 +37,148 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
   };
 
   // Reviews state
-  const [reviews, setReviews] = useState([
-    {
-      id: 1,
-      name: "Julia Kim",
-      date: "Jan 11",
-      rating: 5,
-      text: "Absolutely delicious and beautifully made!",
-      description:
-        "I ordered a custom chocolate truffle cake from CakeZone for my sister's birthday — it was rich, moist, perfectly decorated, and delivered on time!",
-    },
-    {
-      id: 2,
-      name: "Julia Kim",
-      date: "Jan 11",
-      rating: 5,
-      text: "Absolutely delicious and beautifully made!",
-      description:
-        "I ordered a custom chocolate truffle cake from CakeZone for my sister's birthday — it was rich, moist, perfectly decorated, and delivered on time!",
-    },
-  ]);
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [reviewsError, setReviewsError] = useState(null);
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   const [newReview, setNewReview] = useState({
     rating: 0,
     text: "",
   });
 
-  const handleSubmitReview = () => {
+  // Function to generate heading based on rating
+  const generateHeadingByRating = (rating) => {
+    const headings = {
+      5: "Excellent service!",
+      4: "Great experience!",
+      3: "Good service",
+      2: "Average experience",
+      1: "Needs improvement"
+    };
+    return headings[rating] || "Good service";
+  };
+
+  // Fetch reviews from API
+  const fetchReviews = async (shopId) => {
+    try {
+      setReviewsLoading(true);
+      setReviewsError(null);
+
+      const response = await fetch(
+        "https://lunarsenterprises.com:6031/leeshop/shop/list/review",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            shop_id: shopId,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch reviews");
+      }
+
+      const data = await response.json();
+      
+      if (data.result && data.list && Array.isArray(data.list)) {
+        // Process the reviews data
+        const processedReviews = data.list.map((review) => ({
+          id: review.r_id || review.id,
+          name: review.u_name || review.name || "Anonymous",
+          date: review.sr_created_at 
+            ? new Date(review.sr_created_at).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              })
+            : new Date().toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              }),
+          rating: review.r_rating || review.rating || 5,
+          text: review.r_heading || review.heading || generateHeadingByRating(review.r_rating),
+          description: review.r_comment || review.comment || "Great service!",
+        }));
+
+        setReviews(processedReviews);
+      } else {
+        setReviews([]);
+      }
+    } catch (err) {
+      console.error("Error fetching reviews:", err);
+      setReviewsError(err.message);
+      setReviews([]);
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
+  // Submit review to API
+  const handleSubmitReview = async () => {
     if (newReview.rating === 0 || newReview.text.trim() === "") {
       alert("Please provide a rating and write a review");
       return;
     }
 
-    const review = {
-      id: reviews.length + 1,
-      name: "You", // In real app, get from user context
-      date: new Date().toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      }),
-      rating: newReview.rating,
-      text: newReview.text,
-      description: newReview.text,
-    };
+    if (!userData?.id && !userData?.user_id) {
+      alert("Please login to submit a review");
+      return;
+    }
 
-    setReviews([review, ...reviews]);
-    setNewReview({ rating: 0, text: "" });
+    const shopId = shop?.shopId || shop?.sh_id;
+    if (!shopId) {
+      alert("Shop information not available");
+      return;
+    }
+
+    try {
+      setSubmittingReview(true);
+
+      const reviewData = {
+        user_id: userData?.id || userData?.user_id,
+        shop_id: shopId,
+        comment: newReview.text.trim(),
+        heading: generateHeadingByRating(newReview.rating),
+        rating: newReview.rating,
+      };
+
+      const response = await fetch(
+        "https://lunarsenterprises.com:6031/leeshop/shop/add/review",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(reviewData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to submit review");
+      }
+
+      const data = await response.json();
+      
+      if (data.result || data.success) {
+        // Reset form
+        setNewReview({ rating: 0, text: "" });
+        
+        // Refresh reviews list
+        await fetchReviews(shopId);
+        
+        alert("Review submitted successfully!");
+      } else {
+        throw new Error(data.message || "Failed to submit review");
+      }
+    } catch (err) {
+      console.error("Error submitting review:", err);
+      alert(err.message || "Failed to submit review. Please try again.");
+    } finally {
+      setSubmittingReview(false);
+    }
   };
 
   // Handle star rating click
@@ -156,7 +252,7 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
             shop.shopimages && shop.shopimages.length > 0
               ? shop.shopimages.map((img) => ({
                   id: img.si_id,
-                  url: `https://lunarsenterprises.com:6031${img.si_image}`, // ✅ full image URL
+                  url: `https://lunarsenterprises.com:6031${img.si_image}`,
                 }))
               : [{ id: null, url: "/api/placeholder/800/400" }];
 
@@ -164,7 +260,7 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
             shopId: shop.sh_id,
             name: shop.sh_name || "Shop Name",
             rating: shop.sh_ratings || 0,
-            reviewCount: 0, // Not provided in API
+            reviewCount: 0, // Will be updated from reviews API
             location: `${shop.sh_location || ""}, ${shop.sh_city || ""}, ${
               shop.sh_state || ""
             }`.replace(/^,\s*|,\s*$/g, ""),
@@ -172,7 +268,7 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
               ? `Open ${shop.sh_opening_hours}`
               : "Contact for hours",
             deliveryAvailable: shop.sh_delivery_option === "Available",
-            distance: "1.5 km away", // Calculate based on coordinates if needed
+            distance: "1.5 km away",
             phone: formatPhone(shop.sh_primary_phone),
             whatsapp: formatPhone(shop.sh_whatsapp_number),
             description: shop.sh_description || "Professional service provider",
@@ -190,13 +286,18 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
           };
 
           setShopInfo(processedShopData);
+          
+          // Fetch reviews for this shop
+          if (processedShopData.shopId) {
+            await fetchReviews(processedShopData.shopId);
+          }
         } else {
           throw new Error("No shop data found");
         }
       } catch (err) {
         console.error("Error fetching shop data:", err);
         setError(err.message);
-        setShopInfo(defaultShopData); // Use default data on error
+        setShopInfo(defaultShopData);
       } finally {
         setLoading(false);
       }
@@ -207,6 +308,7 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
     } else {
       setShopInfo(defaultShopData);
       setLoading(false);
+      setReviewsLoading(false);
     }
   }, [userData?.id, userData?.sh_id]);
 
@@ -225,7 +327,7 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
 
   const handleEdit = () => {
     console.log("Edit shop profile");
-    setIsEditModalOpen(true); // Open modal instead of just logging
+    setIsEditModalOpen(true);
   };
 
   // Add this function to refetch shop data
@@ -297,7 +399,7 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
           shopId: shop.sh_id,
           name: shop.sh_name || "Shop Name",
           rating: shop.sh_ratings || 0,
-          reviewCount: 0,
+          reviewCount: reviews.length || 0,
           location: `${shop.sh_location || ""}, ${shop.sh_city || ""}, ${
             shop.sh_state || ""
           }`.replace(/^,\s*|,\s*$/g, ""),
@@ -489,7 +591,7 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
                   </svg>
                   <span className="rating-text2">
                     {(shop.sh_ratings || shop.rating || 4.5).toFixed(1)} (
-                    {shop.sh_review_count || shop.reviewCount || 120} Reviews)
+                    {reviews.length || shop.reviewCount || 0} Reviews)
                   </span>
                   {/* Location - Full width */}
                   <svg
@@ -577,8 +679,6 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
                     </button>
                   )}
                   <button className="btn-whatsapp" onClick={handleEdit}>
-                    {" "}
-                    {/* Updated onClick to use handleEdit */}
                     <FaEdit size={22} />
                     <span>Edit</span>
                   </button>
@@ -641,7 +741,7 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
                 className={`tab-btn ${activeTab === "reviews" ? "active" : ""}`}
                 onClick={() => setActiveTab("reviews")}
               >
-                Reviews
+                Reviews ({reviews.length})
               </button>
             </div>
 
@@ -686,6 +786,7 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
                               star <= newReview.rating ? "active" : ""
                             }`}
                             onClick={() => handleStarClick(star)}
+                            disabled={submittingReview}
                           >
                             <svg
                               width="25"
@@ -721,13 +822,15 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
                         setNewReview({ ...newReview, text: e.target.value })
                       }
                       rows={4}
+                      disabled={submittingReview}
                     />
 
                     <button
                       className="post-review-btn"
                       onClick={handleSubmitReview}
+                      disabled={submittingReview}
                     >
-                      Post Review
+                      {submittingReview ? "Posting..." : "Post Review"}
                     </button>
                   </div>
 
@@ -735,54 +838,82 @@ const ServiceProfileComponent = ({ shopData, isOwner = true }) => {
                   <div className="customer-reviews-section">
                     <h3 className="customer-reviews-title">Customer Reviews</h3>
 
-                    <div className="reviews-grid">
-                      {reviews.map((review) => (
-                        <div key={review.id} className="review-card">
-                          <div className="review-header">
-                            <div className="reviewer-info">
-                              <div className="reviewer-avatar">
-                                <img
-                                  src="/icons-user-default.png"
-                                  alt={review.name}
-                                />
+                    {reviewsLoading ? (
+                      <div className="reviews-loading">
+                        <p>Loading reviews...</p>
+                      </div>
+                    ) : reviewsError ? (
+                      <div className="reviews-error">
+                        <p>Error loading reviews: {reviewsError}</p>
+                        <button 
+                          onClick={() => fetchReviews(shop?.shopId || shop?.sh_id)}
+                          style={{ 
+                            marginTop: "10px", 
+                            padding: "8px 16px", 
+                            backgroundColor: "#0A5C15", 
+                            color: "white", 
+                            border: "none", 
+                            borderRadius: "4px", 
+                            cursor: "pointer" 
+                          }}
+                        >
+                          Retry
+                        </button>
+                      </div>
+                    ) : reviews.length === 0 ? (
+                      <div className="no-reviews">
+                        <p>No reviews yet. Be the first to review!</p>
+                      </div>
+                    ) : (
+                      <div className="reviews-grid">
+                        {reviews.map((review) => (
+                          <div key={review.id} className="review-card">
+                            <div className="review-header">
+                              <div className="reviewer-info">
+                                <div className="reviewer-avatar">
+                                  <img
+                                    src="/icons-user-default.png"
+                                    alt={review.name}
+                                  />
+                                </div>
+                                <h4 className="reviewer-name2">{review.name}</h4>
                               </div>
-                              <h4 className="reviewer-name2">{review.name}</h4>
+
+                              <span className="review-date">{review.date}</span>
                             </div>
 
-                            <span className="review-date">{review.date}</span>
-                          </div>
+                            <div className="review-rating">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <svg
+                                  key={star}
+                                  width="25"
+                                  height="25"
+                                  viewBox="0 0 25 25"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M8.26839 7.52838L10.3472 3.39785C10.4077 3.27831 10.5007 3.17777 10.6159 3.1075C10.7311 3.03722 10.8639 3 10.9993 3C11.1347 3 11.2675 3.03722 11.3826 3.1075C11.4978 3.17777 11.5909 3.27831 11.6514 3.39785L13.7302 7.52838L18.3774 8.1947C18.5114 8.21304 18.6376 8.26819 18.7414 8.35387C18.8452 8.43954 18.9225 8.55228 18.9644 8.67922C19.0064 8.80616 19.0113 8.94218 18.9787 9.07177C18.9461 9.20135 18.8772 9.31927 18.7799 9.41207L15.4177 12.6252L16.2114 17.1647C16.313 17.7473 15.6889 18.191 15.1552 17.9163L10.9993 15.7721L6.84253 17.9163C6.30964 18.1918 5.68553 17.7473 5.78715 17.1639L6.58089 12.6244L3.21869 9.41128C3.12186 9.31842 3.05337 9.20061 3.02102 9.07126C2.98867 8.94191 2.99374 8.8062 3.03567 8.67955C3.07759 8.5529 3.15469 8.4404 3.25819 8.35483C3.36169 8.26926 3.48744 8.21405 3.62116 8.19549L8.26839 7.52838Z"
+                                    fill={
+                                      star <= review.rating
+                                        ? "#E8C930"
+                                        : "#E0E0E0"
+                                    }
+                                  />
+                                </svg>
+                              ))}
+                            </div>
 
-                          <div className="review-rating">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <svg
-                                key={star}
-                                width="25"
-                                height="25"
-                                viewBox="0 0 25 25"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M8.26839 7.52838L10.3472 3.39785C10.4077 3.27831 10.5007 3.17777 10.6159 3.1075C10.7311 3.03722 10.8639 3 10.9993 3C11.1347 3 11.2675 3.03722 11.3826 3.1075C11.4978 3.17777 11.5909 3.27831 11.6514 3.39785L13.7302 7.52838L18.3774 8.1947C18.5114 8.21304 18.6376 8.26819 18.7414 8.35387C18.8452 8.43954 18.9225 8.55228 18.9644 8.67922C19.0064 8.80616 19.0113 8.94218 18.9787 9.07177C18.9461 9.20135 18.8772 9.31927 18.7799 9.41207L15.4177 12.6252L16.2114 17.1647C16.313 17.7473 15.6889 18.191 15.1552 17.9163L10.9993 15.7721L6.84253 17.9163C6.30964 18.1918 5.68553 17.7473 5.78715 17.1639L6.58089 12.6244L3.21869 9.41128C3.12186 9.31842 3.05337 9.20061 3.02102 9.07126C2.98867 8.94191 2.99374 8.8062 3.03567 8.67955C3.07759 8.5529 3.15469 8.4404 3.25819 8.35483C3.36169 8.26926 3.48744 8.21405 3.62116 8.19549L8.26839 7.52838Z"
-                                  fill={
-                                    star <= review.rating
-                                      ? "#E8C930"
-                                      : "#000000"
-                                  } // gold if filled, gray if not
-                                />
-                              </svg>
-                            ))}
+                            <div className="review-content">
+                              <h5 className="review-title">{review.text}</h5>
+                              <p className="review-description">
+                                {review.description}
+                              </p>
+                            </div>
                           </div>
-
-                          <div className="review-content">
-                            <h5 className="review-title">{review.text}</h5>
-                            <p className="review-description">
-                              {review.description}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

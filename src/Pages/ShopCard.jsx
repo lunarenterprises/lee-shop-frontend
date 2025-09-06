@@ -48,8 +48,6 @@ const ShopCard = ({ onShopClick }) => {
     }
   }, []);
 
-  console.log({ wishlistItems });
-
   useEffect(() => {
     // Fetch shop data from the API
     const fetchShops = async () => {
@@ -58,20 +56,25 @@ const ShopCard = ({ onShopClick }) => {
       try {
         const response = await axios.post(
           `${API_BASE_URL}/shop/list/shop`,
-          {}, // Send an empty object unless the API requires filters
-          { headers: { "Content-Type": "application/json" } }
+          { city: "Bangalore" }, // ✅ send payload here
+          {
+            headers: { "Content-Type": "application/json" },
+          }
         );
+
         if (response.data.result && Array.isArray(response.data.list)) {
           setShopList(response.data.list.map(transformShop));
         } else {
           setError("No shops found!");
         }
       } catch (err) {
+        console.error("Error fetching shops:", err);
         setError("Failed to fetch shops.");
       } finally {
         setLoading(false);
       }
     };
+
     fetchShops();
   }, []);
 

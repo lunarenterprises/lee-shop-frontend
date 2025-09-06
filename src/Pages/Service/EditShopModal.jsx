@@ -155,8 +155,6 @@ const EditShopModal = ({ isOpen, onClose, shopData, onSave }) => {
   const workingDays = parseWorkingDays(shopData?.workingDays);
   const locationInfo = parseLocation(shopData?.address, shopData?.location);
 
-  console.log({ workingHours }, "working hours");
-
   const [formData, setFormData] = useState({
     shopId: shopData?.shopId,
     businessType: "Product Seller",

@@ -18,9 +18,8 @@ const Header = ({ activeKey, onNavClick }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
-  const servicesDropdownRef = useRef(null); // NEW: Added services dropdown ref
+  const servicesDropdownRef = useRef(null);
 
-  // Get URL search params to check for type parameter
   const searchParams = new URLSearchParams(location.search);
   const urlType = searchParams.get("type");
 
@@ -30,7 +29,7 @@ const Header = ({ activeKey, onNavClick }) => {
 
   // ---------- dropdown states ----------
   const [showShopDropdown, setShowShopDropdown] = useState(false);
-  const [showServicesDropdown, setShowServicesDropdown] = useState(false); // NEW: Added services dropdown state
+  const [showServicesDropdown, setShowServicesDropdown] = useState(false);
 
   useEffect(() => {
     try {
@@ -44,7 +43,7 @@ const Header = ({ activeKey, onNavClick }) => {
     }
   }, []);
 
-  // UPDATED: Close both dropdowns when clicking outside
+  // close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -60,8 +59,6 @@ const Header = ({ activeKey, onNavClick }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  console.log("Header userData:", userData);
 
   const role = (userData?.role || "guest").toLowerCase();
   const isUser = role === "user";
@@ -81,18 +78,17 @@ const Header = ({ activeKey, onNavClick }) => {
       label: "Find Your Local Shop",
       hasDropdown: true,
       dropdownType: "shop",
-    }, // UPDATED: Added dropdownType
+    },
     {
       path: "/NearbyService",
       label: "Find Nearby Services",
       hasDropdown: true,
       dropdownType: "services",
-    }, // UPDATED: Added dropdown functionality
+    },
     {
       path: "/AssignDelivery",
       label: "Assign Your Delivery Agent",
-      hasDropdown: false,
-      dropdownType: "deliveryAgent",
+      hasDropdown: false, // ✅ plain link
     },
   ];
 
@@ -127,7 +123,7 @@ const Header = ({ activeKey, onNavClick }) => {
     "Art & Craft Supplies",
   ];
 
-  // NEW: service categories (from your Figma design)
+  // service categories
   const serviceCategories = [
     "Deep Cleaning",
     "AC Installation & Repair",
@@ -199,27 +195,21 @@ const Header = ({ activeKey, onNavClick }) => {
     setShowLogin(false);
   };
 
+  // ✅ auto-redirect only on landing page
   useEffect(() => {
     const storedUser = localStorage.getItem("userData");
+    if (!storedUser) return;
+    if (location.pathname !== "/") return; // <-- Fix: don’t hijack /AssignDelivery
 
-    // Parse URL params
-    const searchParams = new URLSearchParams(location.search);
-    const hasCategory = searchParams.has("category");
-    const hasType = searchParams.has("type");
-
-    if (storedUser && !hasCategory && !hasType) {
-      const user = JSON.parse(storedUser);
-
-      // Redirect based on role
-      if (user.role?.toLowerCase() === "shop") {
-        navigate("/ShopProfile");
-      } else if (user.role?.toLowerCase() === "deliverystaff") {
-        navigate("/DeliveryProfile");
-      } else {
-        navigate("/UserProfile");
-      }
+    const user = JSON.parse(storedUser);
+    if (user.role?.toLowerCase() === "shop") {
+      navigate("/ShopProfile");
+    } else if (user.role?.toLowerCase() === "deliverystaff") {
+      navigate("/DeliveryProfile");
+    } else {
+      navigate("/UserProfile");
     }
-  }, [navigate, location.search]);
+  }, [navigate, location.pathname]);
 
   // ---------- logout handler ----------
   const handleLogout = () => {
@@ -239,22 +229,26 @@ const Header = ({ activeKey, onNavClick }) => {
     setShowSettings(true);
   };
 
-  // UPDATED: handle nav item click with dropdown logic for both shop and services
+  // ---------- nav item click ----------
   const handleNavItemClick = (item) => {
     if (item.hasDropdown) {
       if (item.dropdownType === "shop" && item.path === "/NearbyShop") {
         setShowShopDropdown(!showShopDropdown);
-        setShowServicesDropdown(false); // Close services dropdown
+        setShowServicesDropdown(false);
       } else if (
         item.dropdownType === "services" &&
         item.path === "/NearbyService"
       ) {
         setShowServicesDropdown(!showServicesDropdown);
-        setShowShopDropdown(false); // Close shop dropdown
+        setShowShopDropdown(false);
       }
     } else {
       const link = item.path || item.href;
-      onNavClick ? onNavClick(link) : navigate(link);
+
+      // ✅ always navigate (don’t let onNavClick block it)
+      navigate(link);
+      if (onNavClick) onNavClick(link);
+
       setMenuOpen(false);
       setShowShopDropdown(false);
       setShowServicesDropdown(false);
@@ -270,7 +264,7 @@ const Header = ({ activeKey, onNavClick }) => {
     setMenuOpen(false);
   };
 
-  // NEW: handle service category click
+  // handle service category click
   const handleServiceCategoryClick = (category) => {
     navigate(
       `/ServiceFinder?category=${encodeURIComponent(category)}&type=service`
@@ -291,7 +285,7 @@ const Header = ({ activeKey, onNavClick }) => {
           <img src="/logo.png" alt="Logo" style={{ height: 42 }} />
         </div>
 
-        {/* HAMBURGER (only if nav items present) */}
+        {/* HAMBURGER */}
         {navItems.length > 0 && (
           <button
             className="homepage-hamburger"
@@ -302,16 +296,15 @@ const Header = ({ activeKey, onNavClick }) => {
           </button>
         )}
 
-        {/* NAV LINKS - UPDATED to support both dropdowns */}
+        {/* NAV LINKS */}
         {navItems.length > 0 && (
           <nav className={`homepage-nav${menuOpen ? " open" : ""}`}>
             {navItems.map((item) => {
               const link = item.path || item.href;
 
-              // Enhanced active logic: check both pathname and URL type parameter
+              // active state logic
               let active = location.pathname === link || activeKey === link;
 
-              // Additional check for dropdown items based on URL type parameter
               if (item.hasDropdown && item.dropdownType) {
                 if (item.dropdownType === "shop" && urlType === "shop") {
                   active = true;
@@ -320,15 +313,10 @@ const Header = ({ activeKey, onNavClick }) => {
                   urlType === "service"
                 ) {
                   active = true;
-                } else if (
-                  item.dropdownType === "deliveryAgent" &&
-                  urlType === "deliveryAgent"
-                ) {
-                  active = true;
                 }
               }
 
-              // UPDATED: Wrap items with dropdown in a container
+              // dropdown nav items
               if (item.hasDropdown) {
                 const isShopDropdown = item.dropdownType === "shop";
                 const isServicesDropdown = item.dropdownType === "services";
@@ -360,21 +348,9 @@ const Header = ({ activeKey, onNavClick }) => {
                     >
                       {item.label}
                       <span style={{ paddingTop: "5px" }}>
-                        <svg
-                          width="14"
-                          height="15"
-                          viewBox="0 0 14 15"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M4.54446 5.16665H9.45613C9.65004 5.16636 9.84006 5.221 10.0042 5.32424C10.1683 5.42747 10.2999 5.57508 10.3836 5.74998C10.4816 5.95749 10.5194 6.18837 10.4926 6.4163C10.4658 6.64423 10.3755 6.86004 10.232 7.03915L7.77613 10.0141C7.67975 10.1253 7.5606 10.2145 7.42674 10.2757C7.29288 10.3368 7.14745 10.3684 7.0003 10.3684C6.85314 10.3684 6.70771 10.3368 6.57385 10.2757C6.43999 10.2145 6.32084 10.1253 6.22446 10.0141L3.76863 7.03915C3.62512 6.86004 3.53482 6.64423 3.508 6.4163C3.48119 6.18837 3.51894 5.95749 3.61696 5.74998C3.70069 5.57508 3.83225 5.42747 3.99639 5.32424C4.16053 5.221 4.35055 5.16636 4.54446 5.16665Z"
-                            fill={`${active ? " #0A5C15" : "white"}`}
-                          />
-                        </svg>
+                        ▼
                       </span>
                     </button>
-                    {/* UPDATED: Dropdown Menu for both shop and services */}
                     {showCurrentDropdown && (
                       <div className={dropdownClassName}>
                         <div className="dropdown-content">
@@ -397,7 +373,7 @@ const Header = ({ activeKey, onNavClick }) => {
                 );
               }
 
-              // Regular nav items (unchanged)
+              // regular nav items
               return (
                 <button
                   key={link}
@@ -409,7 +385,7 @@ const Header = ({ activeKey, onNavClick }) => {
               );
             })}
 
-            {/* Mobile icons for USER only */}
+            {/* Mobile icons */}
             {isUser && (
               <div className="mobile-user-icons">
                 <button
@@ -435,7 +411,7 @@ const Header = ({ activeKey, onNavClick }) => {
               </div>
             )}
 
-            {/* Mobile login button */}
+            {/* Mobile login */}
             {!userData && (
               <div className="mobile-auth-section">
                 <button
@@ -483,7 +459,7 @@ const Header = ({ activeKey, onNavClick }) => {
         </div>
       </header>
 
-      {/* ---------- MODALS (unchanged) ---------- */}
+      {/* ---------- MODALS ---------- */}
       {showLogin && (
         <LoginModal
           onClose={() => setShowLogin(false)}
@@ -530,10 +506,10 @@ const Header = ({ activeKey, onNavClick }) => {
       )}
       {showSuccess && <SuccessModal onClose={() => setShowSuccess(false)} />}
 
-      {/* ---------- Sign-up modal ---------- */}
+      {/* Sign-up modal */}
       {showSignUp && <SignUpModal onClose={() => setShowSignUp(false)} />}
 
-      {/* Favorites only for USER */}
+      {/* Favorites */}
       {isUser && (
         <FavoritesComponent
           isOpen={showFav}
@@ -541,7 +517,7 @@ const Header = ({ activeKey, onNavClick }) => {
         />
       )}
 
-      {/* Avatar modal always available */}
+      {/* Avatar */}
       <AvatarModal
         isOpen={showAvatar}
         onClose={() => setShowAvatar(false)}
@@ -551,14 +527,14 @@ const Header = ({ activeKey, onNavClick }) => {
         onLogout={handleLogout}
       />
 
-      {/* Profile View Modal */}
+      {/* Profile View */}
       <ProfileViewModal
         isOpen={showProfileView}
         onClose={() => setShowProfileView(false)}
         userData={userData}
       />
 
-      {/* Settings Modal */}
+      {/* Settings */}
       <SettingsModal
         isOpen={showSettings}
         onClose={() => setShowSettings(false)}

@@ -14,9 +14,10 @@ import {
 import Header from "./Header";
 import Footer from "../Footer";
 import { useNavigate } from "react-router-dom";
+import ShopDetailCard from "../Service/ShopDetailCard";
 
 // Add your API base URL here
-const API_BASE_URL = "https://lunarsenterprises.com:6031/leeshop"; // Replace with your actual API URL
+const API_BASE_URL = "https://lunarsenterprises.com:6031/leeshop";
 
 const ServiceFinder = () => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const ServiceFinder = () => {
   );
   const [searchTerm, setSearchTerm] = useState("Dry Cleaning");
   const [activeFilter, setActiveFilter] = useState("Dry Cleaning");
+  const [userData, setUserData] = useState(null);
 
   const [mapKey, setMapKey] = useState(0);
   const mapRef = useRef(null);
@@ -36,8 +38,352 @@ const ServiceFinder = () => {
   const [searchedShopList, setSearchedShopList] = useState([]);
   const [searching, setSearching] = useState(false);
 
+  // NEW: Shop detail states
+  const [selectedShop, setSelectedShop] = useState(null);
+  const [showShopDetails, setShowShopDetails] = useState(false);
+  const [loadingShopDetails, setLoadingShopDetails] = useState(false);
+
   const handleBackHome = () => {
     navigate("/");
+  };
+
+  // NEW: Handle shop card click to show details
+  const handleShopCardClick = async (provider) => {
+    setLoadingShopDetails(true);
+    setShowShopDetails(true);
+
+    try {
+      // Check if the shop is already in our current list
+      const existingShop = searchedShopList.find(
+        (shop) => shop.sh_id === provider.id
+      );
+
+      if (existingShop) {
+        // Shop is already in the list, just use it
+        setSelectedShop(existingShop);
+        setLoadingShopDetails(false);
+        return;
+      }
+
+      // If provider has shopData (from API), use it directly
+      if (provider.shopData) {
+        setSelectedShop(provider.shopData);
+        setLoadingShopDetails(false);
+        return;
+      }
+
+      // Fetch fresh data using shop/list/shop endpoint
+      const response = await fetch(`${API_BASE_URL}/shop/list/shop`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}), // Empty search to get all shops
+      });
+
+      const resData = await response.json();
+
+      if (
+        resData.result &&
+        Array.isArray(resData.list) &&
+        resData.list.length
+      ) {
+        const selectedShop = resData.list.find(
+          (shop) => shop.sh_id === provider.id
+        );
+
+        if (selectedShop) {
+          setSelectedShop(selectedShop);
+          setSearchedShopList(resData.list);
+        } else {
+          setSelectedShop({ error: "Shop details not found." });
+        }
+      } else {
+        setSelectedShop({ error: "No shop details available." });
+        setSearchedShopList([]);
+      }
+    } catch (error) {
+      console.error("Error fetching shop details:", error);
+      setSelectedShop({
+        error: "Failed to load shop details. Please try again.",
+      });
+    } finally {
+      setLoadingShopDetails(false);
+    }
+  };
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("userData");
+      if (raw && raw !== "undefined" && raw !== "null") {
+        const parsed = JSON.parse(raw);
+        if (parsed?.id) setUserData(parsed);
+      }
+    } catch {
+      localStorage.removeItem("userData");
+    }
+  }, []);
+
+  // NEW: Handle back from shop details
+  const handleBackFromShopDetails = () => {
+    setShowShopDetails(false);
+    setSelectedShop(null);
+  };
+
+  // FIXED: Handle similar shop click from ShopDetailCard
+  const handleSimilarShopClick = async (shopId) => {
+    console.log({ shopId }, "service finder");
+    setSearching(true);
+    try {
+      // Check if the shop is already in our current list
+      const existingShop = searchedShopList.find(
+        (shop) => shop.sh_id === shopId
+      );
+
+      if (existingShop) {
+        // Shop is already in the list, just switch to it
+        setSearchedShop(existingShop);
+        setSelectedShop(existingShop); // FIXED: Update selectedShop too
+        setSearching(false);
+        return;
+      }
+
+      console.log("Fetching shop data for ID:", shopId);
+
+      // Try multiple API approaches to find the shop
+      let selectedShopData = null;
+      let fullShopsList = [];
+
+      // Approach 1: Try with shop ID search
+      try {
+        const response1 = await fetch(`${API_BASE_URL}/shop/list/shop`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sh_id: shopId }),
+        });
+        const resData1 = await response1.json();
+        console.log("API Response with sh_id:", resData1);
+
+        if (
+          resData1.result &&
+          Array.isArray(resData1.list) &&
+          resData1.list.length > 0
+        ) {
+          selectedShopData = resData1.list[0];
+          fullShopsList = resData1.list;
+        }
+      } catch (e) {
+        console.log("Approach 1 failed:", e);
+      }
+
+      // Approach 2: If not found, try getting all shops
+      if (!selectedShopData) {
+        try {
+          const response2 = await fetch(`${API_BASE_URL}/shop/list/shop`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({}),
+          });
+          const resData2 = await response2.json();
+          console.log("API Response with empty body:", resData2);
+
+          if (
+            resData2.result &&
+            Array.isArray(resData2.list) &&
+            resData2.list.length > 0
+          ) {
+            selectedShopData = resData2.list.find(
+              (shop) => shop.sh_id === shopId
+            );
+            fullShopsList = resData2.list;
+            console.log(
+              "Found shop in full list:",
+              selectedShopData ? "Yes" : "No"
+            );
+          }
+        } catch (e) {
+          console.log("Approach 2 failed:", e);
+        }
+      }
+
+      // Approach 3: Try with search parameter
+      if (!selectedShopData) {
+        try {
+          const response3 = await fetch(`${API_BASE_URL}/shop/list/shop`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ search: "" }),
+          });
+          const resData3 = await response3.json();
+          console.log("API Response with search:", resData3);
+
+          if (
+            resData3.result &&
+            Array.isArray(resData3.list) &&
+            resData3.list.length > 0
+          ) {
+            selectedShopData = resData3.list.find(
+              (shop) => shop.sh_id === shopId
+            );
+            fullShopsList = resData3.list;
+          }
+        } catch (e) {
+          console.log("Approach 3 failed:", e);
+        }
+      }
+
+      if (selectedShopData) {
+        console.log("Successfully found shop:", selectedShopData.sh_name);
+        setSearchedShop(selectedShopData);
+        setSelectedShop(selectedShopData);
+        setSearchedShopList(
+          fullShopsList.length > 0 ? fullShopsList : [selectedShopData]
+        );
+      } else {
+        console.log("Shop not found with ID:", shopId);
+        const errorObj = {
+          error: `Shop not found. Please try refreshing the page.`,
+        };
+        setSearchedShop(errorObj);
+        setSelectedShop(errorObj);
+      }
+    } catch (e) {
+      console.error("Error fetching similar shop:", e);
+      const errorObj = {
+        error:
+          "Failed to fetch shop details. Please check your connection and try again.",
+      };
+      setSearchedShop(errorObj);
+      setSelectedShop(errorObj);
+    }
+    setSearching(false);
+  };
+
+  // FIXED: Handle similar service click from ShopDetailCard
+  const handleSimilarServiceClick = async (shopId) => {
+    console.log({ shopId }, "service finder - similar service");
+    setSearching(true);
+    try {
+      // Check if the shop is already in our current list
+      const existingShop = searchedShopList.find(
+        (shop) => shop.sh_id === shopId
+      );
+
+      if (existingShop) {
+        // Shop is already in the list, just switch to it
+        setSearchedShop(existingShop);
+        setSelectedShop(existingShop); // FIXED: Update selectedShop too
+        setSearching(false);
+        return;
+      }
+
+      console.log("Fetching service data for ID:", shopId);
+
+      // Try multiple API approaches to find the service
+      let selectedShopData = null;
+      let fullShopsList = [];
+
+      // Approach 1: Try with shop ID search
+      try {
+        const response1 = await fetch(`${API_BASE_URL}/shop/list/shop`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sh_id: shopId }),
+        });
+        const resData1 = await response1.json();
+        console.log("Service API Response with sh_id:", resData1);
+
+        if (
+          resData1.result &&
+          Array.isArray(resData1.list) &&
+          resData1.list.length > 0
+        ) {
+          selectedShopData = resData1.list[0];
+          fullShopsList = resData1.list;
+        }
+      } catch (e) {
+        console.log("Service Approach 1 failed:", e);
+      }
+
+      // Approach 2: If not found, try getting all services
+      if (!selectedShopData) {
+        try {
+          const response2 = await fetch(`${API_BASE_URL}/shop/list/shop`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sh_shop_or_service: "service" }),
+          });
+          const resData2 = await response2.json();
+          console.log("Service API Response with service filter:", resData2);
+
+          if (
+            resData2.result &&
+            Array.isArray(resData2.list) &&
+            resData2.list.length > 0
+          ) {
+            selectedShopData = resData2.list.find(
+              (shop) => shop.sh_id === shopId
+            );
+            fullShopsList = resData2.list;
+            console.log(
+              "Found service in service list:",
+              selectedShopData ? "Yes" : "No"
+            );
+          }
+        } catch (e) {
+          console.log("Service Approach 2 failed:", e);
+        }
+      }
+
+      // Approach 3: Try with empty search to get all
+      if (!selectedShopData) {
+        try {
+          const response3 = await fetch(`${API_BASE_URL}/shop/list/shop`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({}),
+          });
+          const resData3 = await response3.json();
+          console.log("Service API Response with empty body:", resData3);
+
+          if (
+            resData3.result &&
+            Array.isArray(resData3.list) &&
+            resData3.list.length > 0
+          ) {
+            selectedShopData = resData3.list.find(
+              (shop) => shop.sh_id === shopId
+            );
+            fullShopsList = resData3.list;
+          }
+        } catch (e) {
+          console.log("Service Approach 3 failed:", e);
+        }
+      }
+
+      if (selectedShopData) {
+        console.log("Successfully found service:", selectedShopData.sh_name);
+        setSearchedShop(selectedShopData);
+        setSelectedShop(selectedShopData);
+        setSearchedShopList(
+          fullShopsList.length > 0 ? fullShopsList : [selectedShopData]
+        );
+      } else {
+        console.log("Service not found with ID:", shopId);
+        const errorObj = {
+          error: `Service with ID ${shopId} not found. Please try refreshing the page.`,
+        };
+        setSearchedShop(errorObj);
+        setSelectedShop(errorObj);
+      }
+    } catch (e) {
+      console.error("Error fetching similar service:", e);
+      const errorObj = {
+        error:
+          "Failed to fetch service details. Please check your connection and try again.",
+      };
+      setSearchedShop(errorObj);
+      setSelectedShop(errorObj);
+    }
+    setSearching(false);
   };
 
   // Function to get URL parameters
@@ -52,6 +398,11 @@ const ServiceFinder = () => {
   // Function to update search terms from URL
   const updateFromUrl = () => {
     const currentUrlParams = getUrlParams();
+
+    // Check if URL parameters changed (new category selected from header)
+    const paramsChanged =
+      JSON.stringify(currentUrlParams) !== JSON.stringify(urlParams);
+
     setUrlParams(currentUrlParams);
 
     if (currentUrlParams.category) {
@@ -59,10 +410,23 @@ const ServiceFinder = () => {
       setSearchTerm(decodedCategory);
       setActiveFilter(decodedCategory);
     }
+
+    // ENHANCED: Always reset shop details view when URL parameters change (header navigation)
+    // This ensures we show the ServiceFinder with map when navigating via header
+    if (paramsChanged) {
+      console.log("URL parameters changed, resetting to map view");
+      setShowShopDetails(false);
+      setSelectedShop(null);
+      setLoadingShopDetails(false);
+      setSearchedShop(null); // Also reset searched shop
+
+      // Reset map to ensure fresh view
+      setMapKey((prev) => prev + 1);
+    }
   };
 
   // Shop search handler
-  const handleShopSearch = async (searchTermParam) => {
+  const handleShopSearch = async (searchTermParam, location = "Bangalore") => {
     const searchQuery = searchTermParam || searchTerm;
 
     // If blank: clear and show default sections
@@ -76,9 +440,10 @@ const ServiceFinder = () => {
     try {
       // Determine sh_shop_or_service based on URL type parameter
       const shopOrService = urlParams.type === "shop" ? "shop" : "service";
-
+      const city = location.split(",")[0].trim();
       const requestBody = {
         search: searchQuery.trim(),
+        city: city,
         sh_shop_or_service: shopOrService,
       };
 
@@ -169,7 +534,7 @@ const ServiceFinder = () => {
   useEffect(() => {
     if (urlParams.category) {
       const decodedCategory = decodeURIComponent(urlParams.category);
-      handleShopSearch(decodedCategory);
+      handleShopSearch(decodedCategory, selectedLocation);
     }
   }, [urlParams.category, urlParams.type]);
 
@@ -179,7 +544,7 @@ const ServiceFinder = () => {
 
   // Handle search button click
   const handleSearchClick = () => {
-    handleShopSearch(searchTerm);
+    handleShopSearch(searchTerm, selectedLocation);
   };
 
   // Handle filter tag click
@@ -304,6 +669,8 @@ const ServiceFinder = () => {
           phone: shop.sh_phone || "N/A",
           whatsapp: shop.sh_whatsapp || shop.sh_phone || "N/A",
           whatsappNumber: shop.sh_whatsapp || shop.sh_phone || "N/A",
+          // Pass the full shop object for the details
+          shopData: shop,
         }))
       : defaultServiceProviders;
 
@@ -458,6 +825,53 @@ const ServiceFinder = () => {
     </div>
   );
 
+  // NEW: If shop details are shown, render ShopDetailCard
+  if (showShopDetails) {
+    if (loadingShopDetails) {
+      return (
+        <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}>
+          <Header />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "70vh",
+              flexDirection: "column",
+              gap: "1rem",
+            }}
+          >
+            <Loader2
+              style={{ width: "2rem", height: "2rem", color: "#0A5C15" }}
+              className="animate-spin"
+            />
+            <p style={{ color: "#6B7280", fontSize: "16px" }}>
+              Loading shop details...
+            </p>
+          </div>
+          <Footer />
+        </div>
+      );
+    }
+
+    return (
+      <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}>
+        <Header />
+        <ShopDetailCard
+          shop={selectedShop}
+          shopsList={searchedShopList}
+          servicesNearby={[]}
+          userId={userData?.id}
+          onSimilarShopClick={handleSimilarShopClick}
+          onSimilarServiceClick={handleSimilarServiceClick}
+          onBackToHome={handleBackFromShopDetails}
+        />
+        <Footer />
+      </div>
+    );
+  }
+
+  // Original ServiceFinder UI
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}>
       <Header />
@@ -520,7 +934,7 @@ const ServiceFinder = () => {
         {/* Back to Home Button Overlay */}
         <div className="back-to-home-btn">
           <button
-            onClick={handleBackHome} // 👈 added click handler
+            onClick={handleBackHome}
             style={{
               display: "flex",
               alignItems: "center",
@@ -797,7 +1211,7 @@ const ServiceFinder = () => {
           </div>
         )}
 
-        {/* Service Provider Grid */}
+        {/* Service Provider Grid - UPDATED with click handlers */}
         {!searching && !searchedShop?.error && (
           <div
             style={{
@@ -810,6 +1224,7 @@ const ServiceFinder = () => {
               <div
                 key={provider.id}
                 className="service-card"
+                onClick={() => handleShopCardClick(provider)}
                 style={{
                   border: "1px solid #C1C1C1",
                   borderRadius: "10px",
