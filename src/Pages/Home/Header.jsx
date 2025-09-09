@@ -199,7 +199,7 @@ const Header = ({ activeKey, onNavClick }) => {
   useEffect(() => {
     const storedUser = localStorage.getItem("userData");
     if (!storedUser) return;
-    if (location.pathname !== "/") return; // <-- Fix: don’t hijack /AssignDelivery
+    if (location.pathname !== "/") return; // <-- Fix: don't hijack /AssignDelivery
 
     const user = JSON.parse(storedUser);
     if (user.role?.toLowerCase() === "shop") {
@@ -245,9 +245,17 @@ const Header = ({ activeKey, onNavClick }) => {
     } else {
       const link = item.path || item.href;
 
-      // ✅ always navigate (don’t let onNavClick block it)
-      navigate(link);
-      if (onNavClick) onNavClick(link);
+      // ✅ FIXED: Different behavior based on login status
+      const isVisitorOnLandingSection = isVisitor && onLanding && (link === "/Why" || link === "/ourGoal" || link === "/");
+      
+      if (isVisitorOnLandingSection) {
+        // For visitors on landing page sections, scroll to section
+        if (onNavClick) onNavClick(link);
+      } else {
+        // For logged-in users or other routes, navigate normally
+        navigate(link);
+        if (onNavClick) onNavClick(link);
+      }
 
       setMenuOpen(false);
       setShowShopDropdown(false);
@@ -539,6 +547,7 @@ const Header = ({ activeKey, onNavClick }) => {
         isOpen={showSettings}
         onClose={() => setShowSettings(false)}
         userData={userData}
+        onLogout={handleLogout}
       />
     </>
   );

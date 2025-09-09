@@ -4,18 +4,17 @@ import React, { useEffect, useState } from "react";
 const SettingsModal = ({
   isOpen,
   onClose,
+  onLogout, 
   userData = { id: "user123", email: "amaldev5568@gmail.com" },
 }) => {
   const [profileData, setProfileData] = useState(null);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [passwordData, setPasswordData] = useState({
-    currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
   const [showPasswords, setShowPasswords] = useState({
-    current: false,
     new: false,
     confirm: false,
   });
@@ -193,7 +192,7 @@ const SettingsModal = ({
       [field]: value,
     }));
   };
-  console.log({ userData });
+
   const togglePasswordVisibility = (field) => {
     setShowPasswords((prev) => ({
       ...prev,
@@ -231,13 +230,25 @@ const SettingsModal = ({
       const data = await response.json();
 
       if (response.ok) {
-        alert("Password changed successfully!");
+        alert("Password changed successfully! You will be logged out.");
+        
+             // Reset form
         setShowChangePassword(false);
         setPasswordData({
-          currentPassword: "",
           newPassword: "",
           confirmPassword: "",
         });
+        
+        // Close modal
+        onClose();
+        
+        // Logout user
+        if (onLogout) {
+          onLogout();
+        } else {
+          // Fallback: redirect to login page or reload
+          window.location.href = '/'; // Adjust path as needed
+        }
       } else {
         alert(data.message || "Failed to change password. Please try again.");
       }
@@ -269,12 +280,10 @@ const SettingsModal = ({
     setShowChangePassword(false);
     setShowDeleteConfirm(false);
     setPasswordData({
-      currentPassword: "",
       newPassword: "",
       confirmPassword: "",
     });
     setShowPasswords({
-      current: false,
       new: false,
       confirm: false,
     });
@@ -595,77 +604,6 @@ const SettingsModal = ({
             >
               <div>
                 <label
-                  htmlFor="current-password"
-                  style={{
-                    display: "block",
-                    fontSize: "0.875rem",
-                    fontWeight: "500",
-                    color: "#374151",
-                    marginBottom: "0.5rem",
-                  }}
-                >
-                  Current Password
-                </label>
-                <div style={{ position: "relative" }}>
-                  <input
-                    id="current-password"
-                    type={showPasswords.current ? "text" : "password"}
-                    value={passwordData.currentPassword}
-                    onChange={(e) =>
-                      handlePasswordChange("currentPassword", e.target.value)
-                    }
-                    placeholder="Enter current password"
-                    style={inputStyle}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = "#10b981";
-                      e.target.style.boxShadow =
-                        "0 0 0 3px rgba(16, 185, 129, 0.1)";
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = "#e5e5e5";
-                      e.target.style.boxShadow = "none";
-                    }}
-                  />
-                  <button
-                    type="button"
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      right: 0,
-                      bottom: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      paddingRight: "1rem",
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      outline: "none",
-                    }}
-                    onClick={() => togglePasswordVisibility("current")}
-                  >
-                    {showPasswords.current ? (
-                      <EyeOff
-                        style={{
-                          width: "1.25rem",
-                          height: "1.25rem",
-                          color: "#9ca3af",
-                        }}
-                      />
-                    ) : (
-                      <Eye
-                        style={{
-                          width: "1.25rem",
-                          height: "1.25rem",
-                          color: "#9ca3af",
-                        }}
-                      />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label
                   htmlFor="new-password"
                   style={{
                     display: "block",
@@ -811,14 +749,12 @@ const SettingsModal = ({
                   ...primaryButtonStyle,
                   backgroundColor:
                     loading ||
-                    !passwordData.currentPassword ||
                     !passwordData.newPassword ||
                     !passwordData.confirmPassword
                       ? "#d1d5db"
                       : "#10b981",
                   cursor:
                     loading ||
-                    !passwordData.currentPassword ||
                     !passwordData.newPassword ||
                     !passwordData.confirmPassword
                       ? "not-allowed"
@@ -827,7 +763,6 @@ const SettingsModal = ({
                 onClick={handleChangePassword}
                 disabled={
                   loading ||
-                  !passwordData.currentPassword ||
                   !passwordData.newPassword ||
                   !passwordData.confirmPassword
                 }
