@@ -1,10 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./EditShopModal.css";
+
+// Utility: fetch image URL -> File object
+async function urlToFile(url, filename) {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  return new File([blob], filename, { type: blob.type });
+}
 
 const EditShopModal = ({ isOpen, onClose, shopData, onSave }) => {
   const [activeTab, setActiveTab] = useState("basic");
   const [showAllCategories, setShowAllCategories] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
+
+  console.log({ shopData }, "shopdata");
 
   // Helper function to clean and format phone numbers (for initial load and final save)
   const cleanPhoneNumber = (phone) => {
@@ -140,15 +149,24 @@ const EditShopModal = ({ isOpen, onClose, shopData, onSave }) => {
   };
 
   // Helper function to initialize gallery images
-  const initializeGalleryImages = (previousImages) => {
+  const initializeGalleryImages = async (previousImages) => {
     if (!previousImages || !Array.isArray(previousImages)) return [];
 
-    return previousImages.map((img, index) => ({
-      id: img.id || index,
-      url: img.url || img.image || img, // Handle different object structures
-      isNew: false,
-      file: null,
-    }));
+    const previews = await Promise.all(
+      previousImages.map(async (img, index) => {
+        const url = img.url;
+        const file = await urlToFile(url, `image_${img.id}_${index}.jpg`);
+
+        return {
+          id: img.id, // or img.id depending on your API
+          url: url,
+          file,
+          isNew: false,
+        };
+      })
+    );
+
+    return previews;
   };
 
   const workingHours = parseWorkingHours(shopData?.openingHours);
@@ -182,10 +200,27 @@ const EditShopModal = ({ isOpen, onClose, shopData, onSave }) => {
     email: shopData?.email,
   });
 
-  // Separate state for gallery images to track new vs existing
-  const [imagePreviews, setImagePreviews] = useState(() =>
-    initializeGalleryImages(shopData?.previousImages)
-  );
+  // Separate state for gallery images to track new vs existing - initialize with empty array
+  const [imagePreviews, setImagePreviews] = useState([]);
+
+  // Use useEffect to load initial images asynchronously
+  useEffect(() => {
+    const loadInitialImages = async () => {
+      if (shopData?.previousImages) {
+        try {
+          const initialImages = await initializeGalleryImages(shopData.previousImages);
+          setImagePreviews(initialImages);
+        } catch (error) {
+          console.error("Error loading initial images:", error);
+          setImagePreviews([]);
+        }
+      }
+    };
+
+    loadInitialImages();
+  }, [shopData?.previousImages]);
+
+  console.log({ imagePreviews }, "image previews");
 
   const businessCategories = [
     "Grocery",
@@ -407,7 +442,6 @@ const EditShopModal = ({ isOpen, onClose, shopData, onSave }) => {
 
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
-    console.log("Uploading images:", files);
 
     const newImages = files.map((file, index) => ({
       id: `new_${Date.now()}_${index}`,
@@ -1097,59 +1131,60 @@ const EditShopModal = ({ isOpen, onClose, shopData, onSave }) => {
                   {/* Existing Images */}
                   <div className="existing-images">
                     <div className="images-grid">
-                      {imagePreviews.map((image, index) => (
-                        <div
-                          key={index}
-                          className="image-item"
-                          style={{ position: "relative" }}
-                        >
-                          <img
-                            src={image.url || "/placeholder.svg"}
-                            alt={`Gallery item ${index + 1}`}
-                            style={{
-                              width: "100%",
-                              height: "150px",
-                              objectFit: "cover",
-                              borderRadius: "8px",
-                            }}
-                          />
-                          <button
-                            className="remove-image-btn"
-                            onClick={() => removeImage(index)}
-                            style={{
-                              position: "absolute",
-                              top: "5px",
-                              right: "5px",
-                              background: "rgba(255, 0, 0, 0.7)",
-                              color: "white",
-                              border: "none",
-                              borderRadius: "50%",
-                              width: "20px",
-                              height: "20px",
-                              cursor: "pointer",
-                              fontSize: "12px",
-                            }}
+                      {imagePreviews.length > 0 &&
+                        imagePreviews?.map((image, index) => (
+                          <div
+                            key={index}
+                            className="image-item"
+                            style={{ position: "relative" }}
                           >
-                            ×
-                          </button>
-                          {image.isNew && (
-                            <div
+                            <img
+                              src={image.url || "/placeholder.svg"}
+                              alt={`Gallery item ${index + 1}`}
+                              style={{
+                                width: "100%",
+                                height: "150px",
+                                objectFit: "cover",
+                                borderRadius: "8px",
+                              }}
+                            />
+                            <button
+                              className="remove-image-btn"
+                              onClick={() => removeImage(index)}
                               style={{
                                 position: "absolute",
-                                bottom: "5px",
-                                left: "5px",
-                                background: "rgba(0, 128, 0, 0.8)",
+                                top: "5px",
+                                right: "5px",
+                                background: "rgba(255, 0, 0, 0.7)",
                                 color: "white",
-                                padding: "2px 6px",
-                                borderRadius: "4px",
-                                fontSize: "10px",
+                                border: "none",
+                                borderRadius: "50%",
+                                width: "20px",
+                                height: "20px",
+                                cursor: "pointer",
+                                fontSize: "12px",
                               }}
                             >
-                              New
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                              ×
+                            </button>
+                            {image.isNew && (
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  bottom: "5px",
+                                  left: "5px",
+                                  background: "rgba(0, 128, 0, 0.8)",
+                                  color: "white",
+                                  padding: "2px 6px",
+                                  borderRadius: "4px",
+                                  fontSize: "10px",
+                                }}
+                              >
+                                New
+                              </div>
+                            )}
+                          </div>
+                        ))}
                     </div>
                   </div>
                 </div>
