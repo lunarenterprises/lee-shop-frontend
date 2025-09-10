@@ -263,10 +263,56 @@ const SettingsModal = ({
   const handleDeleteAccount = async () => {
     setLoading(true);
     try {
-      console.log("Deleting account for user:", userData.id);
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      alert("Account deleted successfully!");
-      onClose();
+      let endpoint = "";
+      let payload = {};
+
+      // Determine API endpoint and payload based on role
+      switch (userData.role.toLowerCase()) {
+        case "user":
+          endpoint = "https://lunarsenterprises.com:6031/leeshop/user/delete/user";
+          payload = { u_id: userData.id.toString() };
+          break;
+        case "deliverystaff":
+          endpoint = "https://lunarsenterprises.com:6031/leeshop/deliverystaff/delete/delivery_staffs";
+          payload = { u_id: userData.id };
+          break;
+        case "shop":
+          endpoint = "https://lunarsenterprises.com:6031/leeshop/shop/delete/shop";
+          payload = { sh_id: userData.id };
+          break;
+        default:
+          console.warn("Unknown user role:", userData.role);
+          alert("Unable to delete account: Unknown user role");
+          setLoading(false);
+          setShowDeleteConfirm(false);
+          return;
+      }
+
+      console.log("Deleting account for user:", userData.id, "Role:", userData.role);
+      
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Account deleted successfully!");
+        onClose();
+        // Logout user after successful deletion
+        if (onLogout) {
+          onLogout();
+        } else {
+          // Fallback: redirect to login page or reload
+          window.location.href = '/'; // Adjust path as needed
+        }
+      } else {
+        alert(data.message || "Failed to delete account. Please try again.");
+      }
     } catch (error) {
       console.error("Error deleting account:", error);
       alert("Failed to delete account. Please try again.");

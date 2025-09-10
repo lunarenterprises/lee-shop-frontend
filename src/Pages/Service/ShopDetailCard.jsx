@@ -110,21 +110,7 @@ const ShopDetailCard = ({
     return headings[rating] || "Customer feedback";
   };
 
-  // Generate dynamic heading from review text
-  const generateHeadingFromText = (text, rating) => {
-    if (!text || text.trim().length === 0) {
-      return generateHeadingFromRating(rating);
-    }
-
-    // Take first few words as heading, max 6 words
-    const words = text.trim().split(" ");
-    if (words.length <= 6) {
-      return text;
-    }
-    return words.slice(0, 6).join(" ") + "...";
-  };
-
-  // Handle review submission
+  // Handle review submission - FIXED VERSION
   const handleSubmitReview = async () => {
     if (newReview.rating === 0 || newReview.text.trim() === "") {
       alert("Please provide a rating and write a review");
@@ -144,10 +130,15 @@ const ShopDetailCard = ({
     setIsSubmittingReview(true);
 
     try {
-      const dynamicHeading = generateHeadingFromText(
-        newReview.text,
-        newReview.rating
-      );
+      const dynamicHeading = generateHeadingFromRating(newReview.rating);
+
+      console.log("Submitting review:", {
+        user_id: userId,
+        shop_id: shop.sh_id,
+        comment: newReview.text,
+        heading: dynamicHeading,
+        rating: newReview.rating,
+      });
 
       const response = await fetch(
         "https://lunarsenterprises.com:6031/leeshop/shop/add/review",
@@ -167,10 +158,12 @@ const ShopDetailCard = ({
       );
 
       const data = await response.json();
+      console.log("Server response:", data);
 
-      if (response.ok && data.success) {
+      // Check for successful response more carefully
+      if (response.ok && (data.success === true || data.result === true)) {
         const newReviewData = {
-          id: Date.now(),
+          id: `temp_${Date.now()}`, // Temporary ID with prefix
           name: "You",
           date: new Date().toLocaleDateString("en-US", {
             month: "short",
@@ -181,16 +174,25 @@ const ShopDetailCard = ({
           description: newReview.text,
         };
 
-        setReviews([newReviewData, ...reviews]);
+        console.log("Adding new review to state:", newReviewData);
+        console.log("Current reviews count:", reviews.length);
+
+        // Use functional state update and log the result
+        setReviews((prevReviews) => {
+          const updatedReviews = [newReviewData, ...prevReviews];
+          console.log("Updated reviews count:", updatedReviews.length);
+          return updatedReviews;
+        });
+
+        // Clear the form
         setNewReview({ rating: 0, text: "" });
 
-        // Optionally refresh reviews from server
-        setTimeout(() => {
-          fetchReviews();
-        }, 1000);
-
         alert("Review submitted successfully!");
+
+        // REMOVED: setTimeout fetchReviews to avoid conflicts
+        // The local state update should be sufficient
       } else {
+        console.error("Review submission failed:", data);
         alert(data.message || "Failed to submit review. Please try again.");
       }
     } catch (error) {
@@ -819,9 +821,19 @@ const ShopDetailCard = ({
                                   <path
                                     d="M8.26839 7.52838L10.3472 3.39785C10.4077 3.27831 10.5007 3.17777 10.6159 3.1075C10.7311 3.03722 10.8639 3 10.9993 3C11.1347 3 11.2675 3.03722 11.3826 3.1075C11.4978 3.17777 11.5909 3.27831 11.6514 3.39785L13.7302 7.52838L18.3774 8.1947C18.5114 8.21304 18.6376 8.26819 18.7414 8.35387C18.8452 8.43954 18.9225 8.55228 18.9644 8.67922C19.0064 8.80616 19.0113 8.94218 18.9787 9.07177C18.9461 9.20135 18.8772 9.31927 18.7799 9.41207L15.4177 12.6252L16.2114 17.1647C16.313 17.7473 15.6889 18.191 15.1552 17.9163L10.9993 15.7721L6.84253 17.9163C6.30964 18.1918 5.68553 17.7473 5.78715 17.1639L6.58089 12.6244L3.21869 9.41128C3.12186 9.31842 3.05337 9.20061 3.02102 9.07126C2.98867 8.94191 2.99374 8.8062 3.03567 8.67955C3.07759 8.5529 3.15469 8.4404 3.25819 8.35483C3.36169 8.26926 3.48744 8.21405 3.62116 8.19549L8.26839 7.52838Z"
                                     fill={
-                                      star <= review.rating
+                                      star <= (review?.rating || 0)
                                         ? "#E8C930"
-                                        : "#000000"
+                                        : "none"
+                                    }
+                                    stroke={
+                                      star <= (review?.rating || 0)
+                                        ? "none"
+                                        : "#E8C930"
+                                    }
+                                    strokeWidth={
+                                      star <= (review?.rating || 0)
+                                        ? "0"
+                                        : "1.5"
                                     }
                                   />
                                 </svg>

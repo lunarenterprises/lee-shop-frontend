@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { FaArrowLeft, FaCamera } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const ProfileViewModal = ({ isOpen, onClose, userData }) => {
+  const navigate = useNavigate();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -439,6 +441,7 @@ const ProfileViewModal = ({ isOpen, onClose, userData }) => {
       }
 
       onClose();
+      navigate("/");
     } catch (error) {
       console.error("Error saving profile:", error);
       alert("Failed to save profile. Please try again.");

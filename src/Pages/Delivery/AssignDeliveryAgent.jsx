@@ -59,7 +59,7 @@ const transformAgent = (agent, idx) => {
     mobile: agent.u_mobile,
     whatsapp: agent.u_whatsapp_contact,
     status,
-    location: "Edapally, Kochi", // replace with real if available
+    location: agent.u_location || "Edapally, Kochi", // use API location if available
     deliveryStatus: status,
   };
 };
@@ -112,49 +112,101 @@ function AssignDeliveryAgent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState(TABS[0].key);
+  const [searchParams, setSearchParams] = useState({
+    searchTerm: "",
+    location: "Bangalore, Karnataka, India",
+  });
 
-  useEffect(() => {
-    const fetchAgents = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await axios.post(
-          `${API_BASE_URL}/deliverystaff/list/delivery_staffs`,
-          {},
-          { headers: { "Content-Type": "application/json" } }
-        );
-        if (
-          response.data.result &&
-          Array.isArray(response.data.list) &&
-          response.data.list.length
-        ) {
-          setAgents(response.data.list.map(transformAgent));
-        } else {
-          setAgents(RAW_AGENTS); // fallback
-        }
-      } catch {
-        setAgents(RAW_AGENTS); // fallback
-        setError("Displaying sample data. Failed to fetch agents.");
-      } finally {
-        setLoading(false);
+  const fetchAgents = async (searchTerm = "", location = "Bangalore") => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Prepare request body with search parameters
+      const requestBody = {};
+
+      if (searchTerm.trim()) {
+        requestBody.search = searchTerm.trim();
       }
-    };
-    fetchAgents();
+
+      if (location.trim()) {
+        // Extract city name from full location string
+        const city = location.split(",")[0].trim();
+        requestBody.location = city;
+      }
+
+      console.log("API Request Body:", requestBody);
+
+      const response = await axios.post(
+        `${API_BASE_URL}/deliverystaff/list/delivery_staffs`,
+        requestBody,
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      console.log("API Response:", response.data);
+
+      if (
+        response.data.result &&
+        Array.isArray(response.data.list) &&
+        response.data.list.length
+      ) {
+        setAgents(response.data.list.map(transformAgent));
+      } else {
+        setAgents(RAW_AGENTS); // fallback
+        setError(
+          "No delivery agents found for the selected criteria. Showing sample data."
+        );
+      }
+    } catch (err) {
+      console.error("API Error:", err);
+      setAgents(RAW_AGENTS); // fallback
+      setError("Failed to fetch delivery agents. Showing sample data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initial load
+  useEffect(() => {
+    fetchAgents(searchParams.searchTerm, searchParams.location);
   }, []);
+
+  // Handle search from LocationSearchBar
+  const handleSearch = (searchTerm, location) => {
+    console.log("Search triggered:", { searchTerm, location });
+    const newSearchParams = {
+      searchTerm: searchTerm || "",
+      location: location || searchParams.location,
+    };
+    setSearchParams(newSearchParams);
+    fetchAgents(newSearchParams.searchTerm, newSearchParams.location);
+  };
+
+  // Handle location change from LocationSearchBar
+  const handleLocationChange = (location) => {
+    console.log("Location changed:", location);
+    const newSearchParams = {
+      ...searchParams,
+      location,
+    };
+    setSearchParams(newSearchParams);
+    fetchAgents(newSearchParams.searchTerm, location);
+  };
 
   // Filter agents according to tab
   const filteredAgents = agents.filter(
     (agent) => agent.deliveryStatus === activeTab
   );
 
-  console.log({ agents });
-  console.log({ activeTab });
+  console.log({ agents, activeTab, searchParams });
 
   return (
     <div className="homepage-container">
       <Header />
       <div className="homepage-hero">
-        <LocationSearchBar />
+        <LocationSearchBar
+          onSearch={handleSearch}
+          onLocationChange={handleLocationChange}
+        />
       </div>
       <div className="shop-list-section">
         <div className="delivery-container">
@@ -199,7 +251,16 @@ function AssignDeliveryAgent() {
             {loading ? (
               <div className="delivery-loading">Loading...</div>
             ) : filteredAgents.length === 0 ? (
-              <div className="delivery-nodata">No agents in this status.</div>
+              <div className="delivery-nodata">
+                No agents found for{" "}
+                {TABS.find((t) => t.key === activeTab)?.label.toLowerCase()}{" "}
+                status
+                {searchParams.searchTerm &&
+                  ` matching "${searchParams.searchTerm}"`}
+                {searchParams.location &&
+                  ` in ${searchParams.location.split(",")[0]}`}
+                .
+              </div>
             ) : (
               filteredAgents.map((agent, idx) => (
                 <div className="delivery-card" key={agent.id + idx}>
@@ -316,7 +377,7 @@ function AssignDeliveryAgent() {
                         className="whatsapp-btn2"
                         onClick={() =>
                           window.open(
-                            `https://wa.me/${agent.whatsapp.replace(
+                            `https://wa.me/${String(agent.whatsapp).replace(
                               /\D/g,
                               ""
                             )}`,

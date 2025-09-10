@@ -143,7 +143,8 @@ const RegistrationJoin = () => {
     navigate(pathMap[selectedValue]);
   };
 
-  const handleBack = () => navigate(-1);
+  // Changed to navigate to home page instead of going back in history
+  const handleBack = () => navigate("/");
   const handleSkip = () => navigate("/");
 
   return (
