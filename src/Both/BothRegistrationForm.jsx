@@ -315,6 +315,7 @@ const BothRegistrationForm = () => {
     };
 
     localStorage.setItem("bothInfo", JSON.stringify(trimmedForm));
+    localStorage.setItem("businessInfo", JSON.stringify(trimmedForm));
     console.log("Storing bothInfo:", trimmedForm);
     navigate("/BothBusinessOperatingDetails");
   };
