@@ -437,7 +437,7 @@ const ContactInfoForm = () => {
         localStorage.removeItem("businessInfo");
         localStorage.removeItem("operatingDetails");
         localStorage.removeItem("brandingDetails");
-
+        localStorage.removeItem("bothInfo");
         // Or alternatively, clear all localStorage (your current approach)
         // localStorage.clear();
 

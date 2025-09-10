@@ -148,12 +148,21 @@ const BothBusinessOperatingDetails = () => {
     }
   };
 
+  const allFilled =
+    selectedDays.length > 0 &&
+    openingHour &&
+    openingMeridian &&
+    closingHour &&
+    closingMeridian &&
+    selectedDelivery &&
+    Object.keys(errors).length === 0;
+
   const handleNext = () => {
     if (!validateForm()) {
       return;
     }
 
-    // Format and persist current step data
+    // Format and persist current step data, but DO NOT overwrite previous step's data
     const formattedOpening = `${openingHour} ${openingMeridian}`;
     const formattedClosing = `${closingHour} ${closingMeridian}`;
 
@@ -171,6 +180,7 @@ const BothBusinessOperatingDetails = () => {
 
     localStorage.setItem("operatingDetails", JSON.stringify(opDetails));
     console.log("Storing operatingDetails:", opDetails);
+    // Next: BrandingRegistrationform always reads previous data from localStorage!
 
     navigate("/BrandingRegistrationform");
   };
@@ -179,6 +189,8 @@ const BothBusinessOperatingDetails = () => {
   const handleSkip = () => {
     navigate("/BrandingRegistrationform");
   };
+
+  console.log({ deliveryOptions });
 
   return (
     <div className="registration-container">
