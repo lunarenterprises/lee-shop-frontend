@@ -11,7 +11,7 @@ const ServiceRegistrationForm = () => {
   const [description, setDescription] = useState("");
   const [services, setServices] = useState([]);
   const [newService, setNewService] = useState("");
-  
+
   // Add drag state for functionality
   const [isDragActive, setIsDragActive] = useState(false);
   const [dragCounter, setDragCounter] = useState(0);
@@ -169,8 +169,8 @@ const ServiceRegistrationForm = () => {
   const handleDragEnter = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setDragCounter(prev => prev + 1);
-    
+    setDragCounter((prev) => prev + 1);
+
     if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
       setIsDragActive(true);
     }
@@ -179,8 +179,8 @@ const ServiceRegistrationForm = () => {
   const handleDragLeave = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setDragCounter(prev => prev - 1);
-    
+    setDragCounter((prev) => prev - 1);
+
     if (dragCounter === 1) {
       setIsDragActive(false);
     }
@@ -345,10 +345,6 @@ const ServiceRegistrationForm = () => {
     return !imageErrors.length && !descErrors.length && !serviceErrors.length;
   };
 
-  // Are all fields filled and valid?
-  const allFilled = description && services.length > 0 && imageFiles.length > 0;
-  const hasErrors = Object.values(errors).some((error) => error !== "");
-
   const handleNext = () => {
     if (!validateForm()) {
       return;
@@ -361,10 +357,7 @@ const ServiceRegistrationForm = () => {
       "serviceRegistration",
       JSON.stringify({ description, services })
     );
-    console.log(
-      "Storing serviceRegistration:",
-      JSON.stringify({ description, services })
-    );
+
     navigate("/ServiceContactPage");
   };
 
@@ -396,7 +389,7 @@ const ServiceRegistrationForm = () => {
                 Add Images to Attract Customers
               </p>
               <div className="image-upload-box">
-                <div 
+                <div
                   className="upload-box"
                   onDragEnter={handleDragEnter}
                   onDragLeave={handleDragLeave}
