@@ -14,6 +14,29 @@ const DeliveryAgentForm = () => {
     location: "",
   });
 
+  // Location options for delivery agents
+  const locationOptions = [
+    "Bangalore, Karnataka, India",
+    "Mumbai, Maharashtra, India",
+    "Delhi, India",
+    "Chennai, Tamil Nadu, India",
+    "Kolkata, West Bengal, India",
+    "Hyderabad, Telangana, India",
+    "Pune, Maharashtra, India",
+    "Ahmedabad, Gujarat, India",
+    "Jaipur, Rajasthan, India",
+    "Kochi, Kerala, India",
+    "Thiruvananthapuram, Kerala, India",
+    "Kozhikode, Kerala, India",
+    "Thrissur, Kerala, India",
+    "Alappuzha, Kerala, India",
+    "Palakkad, Kerala, India",
+    "Kannur, Kerala, India",
+    "Kottayam, Kerala, India",
+    "Malappuram, Kerala, India",
+    "Kollam, Kerala, India",
+  ];
+
   // State for validation errors
   const [errors, setErrors] = useState({
     name: "",
@@ -383,11 +406,11 @@ const DeliveryAgentForm = () => {
                 required
               >
                 <option value="">Select your Location</option>
-                <option value="Autraval">Autraval</option>
-                <option value="Chennai">Chennai</option>
-                <option value="Bangalore">Bangalore</option>
-                <option value="Mumbai">Mumbai</option>
-                <option value="Delhi">Delhi</option>
+                {locationOptions.map((location, index) => (
+                  <option key={index} value={location}>
+                    {location}
+                  </option>
+                ))}
               </select>
             </div>
               {isSubmitted && errors.location && (

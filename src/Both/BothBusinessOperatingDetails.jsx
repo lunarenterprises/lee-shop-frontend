@@ -174,7 +174,7 @@ const BothBusinessOperatingDetails = () => {
 
     const opDetails = {
       working_days: selectedDays,
-      opening_hours: `${formattedOpening} - ${formattedClosing}`,
+      opening_hours: `Open Daily: ${formattedOpening} to ${formattedClosing}`,
       delivery_option: deliveryMapping[selectedDelivery],
     };
 

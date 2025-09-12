@@ -165,7 +165,6 @@ const DeliveryContactInformation = () => {
     const phones = [
       formData.primary_phone,
       formData.secondary_phone,
-      formData.whatsapp_contact,
     ].filter((phone) => phone && phone.trim());
     const uniquePhones = [...new Set(phones)];
     return phones.length !== uniquePhones.length;
@@ -257,7 +256,7 @@ const DeliveryContactInformation = () => {
         localStorage.removeItem("deliveryAgentData");
         window.deliveryAgentProfileFile = null;
         window.deliveryAgentLicenceFile = null;
-        navigate("/ShopProfileLayout");
+        navigate("/");
       } else {
         alert(res.data?.message || "Registration failed.");
       }

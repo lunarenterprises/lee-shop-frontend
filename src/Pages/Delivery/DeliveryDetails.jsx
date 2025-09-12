@@ -675,7 +675,7 @@ const DeliveryDetails = () => {
                       color: "#858585",
                     }}
                   >
-                    JPEG, PNG, PDF & formats, upto 50 MB
+                    JPEG, PNG formats, upto 50 MB
                   </p>
                   <span
                     className="upload-btn"
