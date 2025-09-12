@@ -600,13 +600,16 @@ const ShopDetailCard = ({
                       className="btn-whatsapp"
                       onClick={() =>
                         window.open(
-                          `https://wa.me/${whatsapp.replace(/[^0-9]/g, "")}`,
+                          `https://wa.me/${String(whatsapp).replace(
+                            /[^0-9]/g,
+                            ""
+                          )}`,
                           "_blank"
                         )
                       }
                     >
-                      <FaWhatsapp size={"24"} />
-                      <span>What's app</span>
+                      <FaWhatsapp size={24} />
+                      <span>WhatsApp</span>
                     </button>
                   )}
                 </div>

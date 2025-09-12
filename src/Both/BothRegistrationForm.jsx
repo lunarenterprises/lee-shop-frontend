@@ -39,22 +39,22 @@ const BothRegistrationForm = () => {
     const errors = [];
 
     if (!shopName.trim()) {
-      errors.push("Service name is required");
+      errors.push("Shop name is required");
       return errors;
     }
 
     if (shopName.trim().length < 2) {
-      errors.push("Service name must be at least 2 characters long");
+      errors.push("Shop name must be at least 2 characters long");
     }
 
     if (shopName.trim().length > 100) {
-      errors.push("Service name must not exceed 100 characters");
+      errors.push("Shop name must not exceed 100 characters");
     }
 
     // Check for valid characters (allow letters, numbers, spaces, and common business punctuation)
     const validNameRegex = /^[a-zA-Z0-9\s\-&,.()'"]+$/;
     if (!validNameRegex.test(shopName.trim())) {
-      errors.push("Service name contains invalid characters");
+      errors.push("Shop name contains invalid characters");
     }
 
     // Check for inappropriate content
@@ -62,7 +62,7 @@ const BothRegistrationForm = () => {
     if (
       inappropriateWords.some((word) => shopName.toLowerCase().includes(word))
     ) {
-      errors.push("Please enter a valid service name");
+      errors.push("Please enter a valid shop name");
     }
 
     return errors;

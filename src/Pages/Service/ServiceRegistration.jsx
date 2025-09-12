@@ -51,13 +51,13 @@ const ServiceRegistration = () => {
     switch (name) {
       case "shopName":
         if (!value.trim()) {
-          newErrors.shopName = "Service name is required"
+          newErrors.shopName = "Shop name is required"
         } else if (value.trim().length < 2) {
-          newErrors.shopName = "Service name must be at least 2 characters"
+          newErrors.shopName = "Shop name must be at least 2 characters"
         } else if (value.trim().length > 100) {
-          newErrors.shopName = "Service name must be less than 100 characters"
+          newErrors.shopName = "Shop name must be less than 100 characters"
         } else if (!/^[a-zA-Z0-9\s&.-]+$/.test(value.trim())) {
-          newErrors.shopName = "Service name contains invalid characters"
+          newErrors.shopName = "Shop name contains invalid characters"
         } else {
           delete newErrors.shopName
         }
@@ -140,11 +140,11 @@ const ServiceRegistration = () => {
 
     // Required field validations
     if (!formData.shopName.trim()) {
-      newErrors.shopName = "Service name is required"
+      newErrors.shopName = "Shop name is required"
     } else if (formData.shopName.trim().length < 2) {
-      newErrors.shopName = "Service name must be at least 2 characters"
+      newErrors.shopName = "Shop name must be at least 2 characters"
     } else if (!/^[a-zA-Z0-9\s&.-]+$/.test(formData.shopName.trim())) {
-      newErrors.shopName = "Service name contains invalid characters"
+      newErrors.shopName = "Shop name contains invalid characters"
     }
 
     if (!formData.ownerName.trim()) {

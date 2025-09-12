@@ -229,7 +229,7 @@ const SettingsModal = ({
 
       const data = await response.json();
 
-      if (response.ok) {
+      if (response.result) {
         alert("Password changed successfully! You will be logged out.");
         
              // Reset form
